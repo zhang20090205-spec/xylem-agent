@@ -93,36 +93,36 @@ export const saucerswapRouterSwapParameters = (context: Context = {}) => {
       SAUCERSWAP_ROUTER_SWAP_OPERATIONS.SWAP_HBAR_FOR_EXACT_TOKENS,
       SAUCERSWAP_ROUTER_SWAP_OPERATIONS.SWAP_TOKENS_FOR_EXACT_HBAR,
       SAUCERSWAP_ROUTER_SWAP_OPERATIONS.SWAP_TOKENS_FOR_EXACT_TOKENS,
-    ]).describe('要执行的 swap operation'),
+    ]).describe('The swap operation to perform'),
     
     amountIn: z.string().optional().describe(
-      '精确输入数量，使用最小单位（exact input swap 必需）。HBAR 使用 8 decimals（例如 "100000000" = 1 HBAR）'
+      'Exact input amount in smallest unit (required for exact input swaps). For HBAR: use 8 decimals (e.g., "100000000" = 1 HBAR)'
     ),
     
     amountOut: z.string().optional().describe(
-      '精确输出数量，使用最小单位（exact output swap 必需）。其他 token 请检查 decimals'
+      'Exact output amount in smallest unit (required for exact output swaps). For tokens: check token decimals'
     ),
     
     tokenPath: z.array(z.string()).min(2).describe(
-      '表示 swap path 的 token ID 数组。原生 HBAR 使用 "HBAR"。示例：["HBAR", "0.0.731861"] 表示 HBAR 到 SAUCE'
+      'Array of token IDs representing swap path. Use "HBAR" for native HBAR. Example: ["HBAR", "0.0.731861"] for HBAR to SAUCE'
     ),
     
     slippagePercent: z.number().min(0.01).max(50).default(2.0).describe(
-      '最大可接受滑点百分比（2.0 = 2.0%）。用于计算最小输出或最大输入'
+      'Maximum acceptable slippage as percentage (2.0 = 2.0%). Used to calculate minimum output or maximum input'
     ),
     
     deadline: z.number().optional().describe(
-      'swap 的 Unix timestamp deadline。未提供时默认当前时间 + 10 分钟'
+      'Unix timestamp deadline for the swap. If not provided, defaults to current time + 10 minutes'
     ),
     
     network: z.enum(['mainnet', 'testnet']).default(
       (process.env.HEDERA_NETWORK as 'mainnet' | 'testnet') || 'mainnet'
     ).describe(
-      '执行 swap 的网络（默认使用 .env 中的 HEDERA_NETWORK）'
+      'Network to execute swap on (defaults to HEDERA_NETWORK from .env)'
     ),
 
     recipientAccountId: z.string().optional().describe(
-      '接收 swap 后 token 的账户 ID。未提供时使用交易签名账户'
+      'Account ID to receive the swapped tokens. If not provided, uses the transaction signer account'
     ),
   });
 };
@@ -305,13 +305,13 @@ export async function getSaucerswapRouterSwap(
         operation: params.operation,
         timestamp: new Date().toISOString(),
         troubleshooting: {
-          issue: '参数无效',
-          possible_causes: ['缺少必需参数', 'token 格式无效', '数量无效'],
+          issue: 'Invalid parameters',
+          possible_causes: ['Missing required parameters', 'Invalid token format', 'Invalid amounts'],
           next_steps: [
-            '确认 exact input swap 已提供 amountIn',
-            '确认 exact output swap 已提供 amountOut',
-            '确认 token ID 格式正确（0.0.xxxxx 或 HBAR）',
-            '确认数量使用最小单位（HBAR 为 8 decimals）'
+            'Check that amountIn is provided for exact input swaps',
+            'Check that amountOut is provided for exact output swaps', 
+            'Verify token IDs are in correct format (0.0.xxxxx or HBAR)',
+            'Ensure amounts are in smallest unit (8 decimals for HBAR)'
           ]
         },
         contractInfo: {
@@ -327,7 +327,7 @@ export async function getSaucerswapRouterSwap(
     const userAccountId = params.recipientAccountId || context.accountId;
     
     if (!userAccountId) {
-      throw new Error('必须在参数或上下文中提供用户账户 ID');
+      throw new Error('User account ID is required either in params or context');
     }
 
     console.log(`📍 Swap path: ${params.tokenPath.join(' → ')}`);
@@ -358,24 +358,24 @@ export async function getSaucerswapRouterSwap(
     
     return {
       success: false,
-      error: `准备 SaucerSwap Router swap 时出错：${error.message}`,
+      error: `Error preparing SaucerSwap Router swap: ${error.message}`,
       operation: params.operation,
       timestamp: new Date().toISOString(),
       troubleshooting: {
-        issue: '合约交互失败',
+        issue: 'Contract interaction failed',
         possible_causes: [
-          '网络连接异常',
-          'path 中 token 地址无效',
-          '池子流动性不足',
-          'Router 合约不可用',
-          '账户配置不完整'
+          'Network connectivity issues',
+          'Invalid token addresses in path',
+          'Insufficient liquidity in pools',
+          'Router contract not available',
+          'Account not properly configured'
         ],
         next_steps: [
-          '检查互联网连接',
-          '确认 token ID 存在于该网络',
-          '尝试不同滑点容忍度',
-          '在 SaucerSwap 界面检查池子可用性',
-          '确认账户余额充足'
+          'Check internet connection',
+          'Verify token IDs exist on the network',
+          'Try with different slippage tolerance',
+          'Check SaucerSwap interface for pool availability',
+          'Ensure account has sufficient balance'
         ]
       },
       contractInfo: {
@@ -403,16 +403,16 @@ function validateSwapParameters(params: any): { valid: boolean; error?: string }
   ];
 
   if (exactInputOps.includes(params.operation) && !params.amountIn) {
-    return { valid: false, error: 'exact input swap operation 需要 amountIn' };
+    return { valid: false, error: 'amountIn is required for exact input swap operations' };
   }
   
   if (exactOutputOps.includes(params.operation) && !params.amountOut) {
-    return { valid: false, error: 'exact output swap operation 需要 amountOut' };
+    return { valid: false, error: 'amountOut is required for exact output swap operations' };
   }
 
   // Validate token path
   if (!params.tokenPath || params.tokenPath.length < 2) {
-    return { valid: false, error: 'tokenPath 至少需要包含 2 个 token' };
+    return { valid: false, error: 'tokenPath must contain at least 2 tokens' };
   }
 
   return { valid: true };
@@ -499,7 +499,7 @@ async function createSwapTransaction(
         break;
 
       default:
-        throw new Error(`不支持的 swap operation：${params.operation}`);
+        throw new Error(`Unsupported swap operation: ${params.operation}`);
     }
 
     // Create the contract execute transaction
@@ -572,15 +572,15 @@ async function createSwapTransaction(
         bytes: result.bytes, // Put bytes at top level for WebSocket agent
         result,
         message: context.mode === 'returnBytes' 
-          ? `SaucerSwap swap 交易已准备好，请签名（${params.tokenPath.join(' → ')}）`
-          : `SaucerSwap swap 已成功执行：${params.tokenPath.join(' → ')}`,
+          ? `SaucerSwap swap transaction ready for signature (${params.tokenPath.join(' → ')})`
+          : `Successfully executed SaucerSwap swap: ${params.tokenPath.join(' → ')}`,
       };
     }
 
     return {
       ...swapResult,
       result,
-      message: `SaucerSwap swap 已准备好：${params.tokenPath.join(' → ')}`,
+      message: `Successfully prepared SaucerSwap swap: ${params.tokenPath.join(' → ')}`,
     };
 
   } catch (error: any) {
@@ -593,7 +593,7 @@ async function createSwapTransaction(
 export default function saucerswapRouterSwapTool(client: Client, context: Context = {}) {
   return {
     name: SAUCERSWAP_ROUTER_SWAP_TOOL,
-    description: '使用 UniswapV2Router02 合约在 SaucerSwap 上执行 token swap',
+    description: 'Execute token swaps on SaucerSwap using UniswapV2Router02 contract',
     parameters: saucerswapRouterSwapParameters(context),
     func: async (params: z.infer<ReturnType<typeof saucerswapRouterSwapParameters>>) => {
       const result = await getSaucerswapRouterSwap(client, context, params);

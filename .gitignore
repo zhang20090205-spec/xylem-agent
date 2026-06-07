@@ -33,6 +33,9 @@ omx/
 
 # Editor and OS files
 .cursor/
+!Hedron/.cursor/
+!Hedron/.cursor/rules/
+!Hedron/.cursor/rules/**
 .vscode/
 .idea/
 .DS_Store

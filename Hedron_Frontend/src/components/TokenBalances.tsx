@@ -1,5 +1,5 @@
 import React from 'react'
-import { Loader2, RefreshCw, AlertCircle, TrendingUp } from 'lucide-react'
+import { Loader2, RefreshCw, AlertCircle, TrendingUp, TrendingDown } from 'lucide-react'
 import { useTokenBalances, type TokenBalance } from '../hooks/useTokenBalances'
 
 interface TokenBalancesProps {
@@ -54,7 +54,7 @@ const TokenItem: React.FC<TokenItemProps> = ({ balance, variant }) => {
 
   if (variant === 'compact') {
     return (
-      <div className="flex min-w-[140px] items-center gap-2.5 border border-white/12 bg-white/6 px-3 py-2 backdrop-blur-sm">
+      <div className="flex items-center gap-2.5 px-3 py-2 bg-theme-bg-tertiary/50 dark:bg-gray-700/50 rounded-lg border border-theme-border-primary/10 min-w-[140px]">
         <img 
           src={getTokenIcon(balance.symbol, balance.icon)} 
           alt={balance.symbol}
@@ -72,15 +72,15 @@ const TokenItem: React.FC<TokenItemProps> = ({ balance, variant }) => {
         />
         <div className="flex flex-col min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <div className="text-sm font-semibold text-white/88">
+            <div className="text-sm font-semibold text-theme-text-primary">
               {formatBalance(balance.formattedBalance)}
             </div>
-            <div className="ether-micro ether-faint">
+            <div className="text-xs font-medium text-theme-text-secondary uppercase">
               {balance.symbol}
             </div>
           </div>
           {balance.usdValue && (
-            <div className="mt-0.5 text-xs font-medium text-emerald-100/78">
+            <div className="text-xs font-medium text-green-600 dark:text-green-400 mt-0.5">
               {formatUsdValue(balance.usdValue)}
             </div>
           )}
@@ -90,7 +90,7 @@ const TokenItem: React.FC<TokenItemProps> = ({ balance, variant }) => {
   }
 
   return (
-    <div className="flex items-center gap-3 border border-white/12 bg-white/6 p-3">
+    <div className="flex items-center gap-3 p-3 bg-theme-bg-tertiary dark:bg-gray-700/50 rounded-lg">
       <div className="relative">
         <img 
           src={getTokenIcon(balance.symbol, balance.icon)} 
@@ -109,19 +109,19 @@ const TokenItem: React.FC<TokenItemProps> = ({ balance, variant }) => {
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <div className="truncate text-sm font-semibold text-white/88">
+          <div className="text-sm font-semibold text-theme-text-primary truncate">
             {balance.name}
           </div>
-          <div className="font-mono text-sm text-white/88">
+          <div className="text-sm font-mono text-theme-text-primary">
             {formatBalance(balance.formattedBalance)}
           </div>
         </div>
         <div className="flex items-center justify-between mt-1">
-          <div className="ether-micro ether-faint">
+          <div className="text-xs text-theme-text-secondary uppercase font-medium">
             {balance.symbol}
           </div>
           {balance.usdValue && (
-            <div className="text-xs text-white/56">
+            <div className="text-xs text-theme-text-secondary">
               {formatUsdValue(balance.usdValue)}
             </div>
           )}
@@ -141,13 +141,13 @@ export default function TokenBalances({ accountId, variant = 'full', className =
   if (error) {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
-        <AlertCircle size={16} className="text-red-200" />
-        <span className="ether-micro text-red-100/82">加载余额失败</span>
+        <AlertCircle size={16} className="text-red-500" />
+        <span className="text-xs text-red-500">Failed to load balances</span>
         <button
           onClick={refetch}
-          className="ether-micro text-red-100/82 underline hover:text-white"
+          className="text-xs text-red-500 hover:text-red-400 underline"
         >
-          重试
+          Retry
         </button>
       </div>
     )
@@ -156,8 +156,8 @@ export default function TokenBalances({ accountId, variant = 'full', className =
   if (isLoading) {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
-        <Loader2 size={16} className="animate-spin text-white/56" />
-        <span className="ether-micro ether-faint">正在加载余额...</span>
+        <Loader2 size={16} className="animate-spin text-theme-text-secondary" />
+        <span className="text-xs text-theme-text-secondary">Loading balances...</span>
       </div>
     )
   }
@@ -165,7 +165,7 @@ export default function TokenBalances({ accountId, variant = 'full', className =
   if (balances.length === 0) {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
-        <span className="ether-micro ether-faint">暂无 token 余额</span>
+        <span className="text-xs text-theme-text-secondary">No token balances</span>
       </div>
     )
   }
@@ -180,25 +180,25 @@ export default function TokenBalances({ accountId, variant = 'full', className =
             <TokenItem key={balance.tokenId} balance={balance} variant="compact" />
           ))}
           {balances.length > 4 && (
-            <div className="flex min-w-[60px] items-center border border-white/12 bg-white/6 px-2.5 py-2">
-              <span className="text-sm font-medium text-white/58">+{balances.length - 4}</span>
+            <div className="flex items-center px-2.5 py-2 bg-theme-bg-tertiary dark:bg-gray-700/50 rounded-lg border border-theme-border-primary/10 min-w-[60px]">
+              <span className="text-sm font-medium text-theme-text-secondary">+{balances.length - 4}</span>
             </div>
           )}
         </div>
         {totalUsdValue > 0 && (
-          <div className="flex items-center gap-1.5 border border-emerald-100/18 bg-emerald-300/10 px-2.5 py-1.5">
-            <TrendingUp size={14} className="text-emerald-100/82" />
-            <span className="text-sm font-semibold text-emerald-50/88">
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-green-100 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800/50">
+            <TrendingUp size={14} className="text-green-600 dark:text-green-400" />
+            <span className="text-sm font-semibold text-green-700 dark:text-green-300">
               ${totalUsdValue < 1000 ? totalUsdValue.toFixed(2) : `${(totalUsdValue / 1000).toFixed(1)}k`}
             </span>
           </div>
         )}
         <button
           onClick={refetch}
-          className="p-1.5 text-white/54 transition-colors hover:bg-white/8 hover:text-white"
-          title="刷新余额"
+          className="p-1.5 hover:bg-theme-bg-tertiary dark:hover:bg-gray-700/50 rounded-lg transition-colors"
+          title="Refresh balances"
         >
-          <RefreshCw size={14} />
+          <RefreshCw size={14} className="text-theme-text-secondary hover:text-theme-text-primary" />
         </button>
       </div>
     )
@@ -207,22 +207,22 @@ export default function TokenBalances({ accountId, variant = 'full', className =
   return (
     <div className={`space-y-3 ${className}`}>
       <div className="flex items-center justify-between">
-        <h3 className="ether-micro text-white/82">TOKEN BALANCES / Token 余额</h3>
+        <h3 className="text-lg font-semibold text-theme-text-primary">Token Balances</h3>
         <div className="flex items-center gap-2">
           {totalUsdValue > 0 && (
-            <div className="flex items-center gap-1 border border-emerald-100/18 bg-emerald-300/10 px-2 py-1">
-              <TrendingUp size={14} className="text-emerald-100/82" />
-              <span className="text-sm font-medium text-emerald-50/88">
-                总计：${totalUsdValue.toFixed(2)}
+            <div className="flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/20 rounded-md">
+              <TrendingUp size={14} className="text-green-600 dark:text-green-400" />
+              <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                Total: ${totalUsdValue.toFixed(2)}
               </span>
             </div>
           )}
           <button
             onClick={refetch}
-            className="p-1.5 text-white/54 transition-colors hover:bg-white/8 hover:text-white"
-            title="刷新余额"
+            className="p-1.5 hover:bg-theme-bg-tertiary dark:hover:bg-gray-700/50 rounded-md transition-colors"
+            title="Refresh balances"
           >
-            <RefreshCw size={14} />
+            <RefreshCw size={14} className="text-theme-text-secondary hover:text-theme-text-primary" />
           </button>
         </div>
       </div>

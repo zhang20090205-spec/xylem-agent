@@ -22,7 +22,7 @@ export const BONZO_API_CONFIG = {
   ENDPOINTS: {
     ACCOUNT_DASHBOARD: '/dashboard',
     MARKET_INFO: '/market',
-    POOL_STATS: '/stats',
+    POOL_STATS: '/stats', 
     PROTOCOL_INFO: '/info',
     BONZO_TOKEN: '/bonzo',
     BONZO_CIRCULATION: '/bonzo/circulation',
@@ -69,13 +69,13 @@ const fetchWithRetry = async (url: string, maxRetries = BONZO_API_CONFIG.RATE_LI
   const now = Date.now();
   const timeSinceLastRequest = now - lastRequestTime;
   const minDelay = BONZO_API_CONFIG.RATE_LIMIT.DELAY_MS;
-
+  
   if (timeSinceLastRequest < minDelay) {
     const sleepTime = minDelay - timeSinceLastRequest;
     console.log(`⏱️ Rate limiting: waiting ${sleepTime}ms before request`);
     await sleep(sleepTime);
   }
-
+  
   lastRequestTime = Date.now();
 
   // Enhanced headers to appear more legitimate
@@ -192,10 +192,10 @@ export const bonzoApiQueryParameters = (context: Context = {}) => {
       BONZO_API_OPERATIONS.BONZO_TOKEN,
       BONZO_API_OPERATIONS.BONZO_CIRCULATION,
     ]).describe(
-      '要执行的 Bonzo API operation：account_dashboard、market_info、pool_stats、protocol_info、bonzo_token 或 bonzo_circulation'
+      'The Bonzo API operation to perform: account_dashboard, market_info, pool_stats, protocol_info, bonzo_token, or bonzo_circulation'
     ),
     accountId: z.string().optional().describe(
-      'Hedera 账户 ID，格式为 shard.realm.num（仅 account_dashboard operation 需要）'
+      'Hedera account ID in format shard.realm.num (required only for account_dashboard operation)'
     ),
   }) as any;
 };
@@ -207,51 +207,51 @@ const getBonzoApiQueryPrompt = (context: Context = {}) => {
   return `
 ${contextSnippet}
 
-该工具通过 Bonzo Finance 官方 REST API 查询实时借贷池数据、账户信息和协议统计。
+This tool allows you to query Bonzo Finance DeFi protocol using their official REST API to get real-time lending pool data, account information, and protocol statistics.
 
-重要提示：Bonzo API 仅提供 MAINNET 数据。即使使用 testnet 账户，API 也会返回 mainnet 市场信息和合约地址。
+⚠️ IMPORTANT: The Bonzo API only provides MAINNET data. Even when using testnet accounts, the API will return mainnet market information and contract addresses.
 
-可用 operation:
+Available operations:
 
 1. **Account Dashboard** (account_dashboard):
-   - 查询账户借贷仓位详情
-   - 需要 accountId 参数
-   - 返回 supply/borrow 余额、APY、抵押品信息
+   - Get detailed account lending/borrowing positions
+   - Requires accountId parameter
+   - Returns supply/borrow balances, APY rates, collateral info
 
 2. **Market Information** (market_info):
-   - 查询所有支持 token 的当前市场数据
-   - 返回 supply/borrow APY、利用率、可用流动性
-   - 不需要额外参数
+   - Get current market data for all supported tokens
+   - Returns supply/borrow APY, utilization rates, available liquidity
+   - No additional parameters needed
 
 3. **Pool Statistics** (pool_stats):
-   - 查询 24 小时协议统计
-   - 返回交易数量、费用、清算数据
-   - 不需要额外参数
+   - Get 24-hour protocol statistics
+   - Returns transaction counts, fees, liquidations
+   - No additional parameters needed
 
 4. **Protocol Information** (protocol_info):
-   - 查询协议配置和合约地址
-   - 返回 lending pool、oracle 和 configurator 地址
-   - 不需要额外参数
+   - Get protocol configuration and contract addresses
+   - Returns lending pool, oracle, and configurator addresses
+   - No additional parameters needed
 
 5. **BONZO Token Information** (bonzo_token):
-   - 查询 BONZO token 详情和 treasury 信息
-   - 返回总供应量、流通量、treasury 余额
-   - 不需要额外参数
+   - Get BONZO token details and treasury information
+   - Returns total/circulating supply, treasury balances
+   - No additional parameters needed
 
 6. **BONZO Circulation Supply** (bonzo_circulation):
-   - 查询当前流通供应量，返回纯数字
-   - 不需要额外参数
+   - Get current circulating supply as plain number
+   - No additional parameters needed
 
-参数:
-- operation (required): 要执行的 API operation
-- accountId (optional): 仅 account_dashboard operation 需要
+Parameters:
+- operation (required): The API operation to perform
+- accountId (optional): Required only for account_dashboard operation
 
 ${usageInstructions}
 
-示例:
-- 查询市场数据: operation="market_info"
-- 查询账户信息: operation="account_dashboard", accountId="0.0.123456"
-- 查询协议信息: operation="protocol_info"
+Examples:
+- Get market data: operation="market_info"
+- Get account info: operation="account_dashboard", accountId="0.0.123456"
+- Get protocol info: operation="protocol_info"
 `;
 };
 
@@ -266,7 +266,7 @@ export const getBonzoApiQuery = async (
     // Log warning about mainnet-only API
     const network = process.env.HEDERA_NETWORK || 'mainnet';
     if (network === 'testnet') {
-      console.warn('提示：Bonzo API 仅提供 MAINNET 数据。当前为 testnet 查询，但会收到 mainnet 市场信息。');
+      console.warn('⚠️  WARNING: Bonzo API only serves MAINNET data. You are querying testnet but will receive mainnet market info.');
     }
 
     // Clean expired cache entries
@@ -275,7 +275,7 @@ export const getBonzoApiQuery = async (
     // Check cache first
     const cacheKey = getCacheKey(params.operation, params.accountId);
     const cached = apiCache.get(cacheKey);
-
+    
     if (cached) {
       console.log('💾 Returning cached result for:', cacheKey);
       return {
@@ -288,14 +288,14 @@ export const getBonzoApiQuery = async (
     // Validate account ID for dashboard operation
     if (params.operation === BONZO_API_OPERATIONS.ACCOUNT_DASHBOARD && !params.accountId) {
       return {
-        error: 'account_dashboard operation 需要 accountId',
-        suggestion: '请提供格式为 shard.realm.num 的 Hedera 账户 ID（例如 "0.0.123456"）'
+        error: 'accountId is required for account_dashboard operation',
+        suggestion: 'Provide a Hedera account ID in format shard.realm.num (e.g., "0.0.123456")'
       };
     }
 
     // Build API URL
     let apiUrl = BONZO_API_CONFIG.BASE_URL;
-
+    
     switch (params.operation) {
       case BONZO_API_OPERATIONS.ACCOUNT_DASHBOARD:
         apiUrl += `${BONZO_API_CONFIG.ENDPOINTS.ACCOUNT_DASHBOARD}/${params.accountId}`;
@@ -316,7 +316,7 @@ export const getBonzoApiQuery = async (
         apiUrl += BONZO_API_CONFIG.ENDPOINTS.BONZO_CIRCULATION;
         break;
       default:
-        throw new Error(`不支持的 operation：${params.operation}`);
+        throw new Error(`Unsupported operation: ${params.operation}`);
     }
 
     // Make API request with retry logic
@@ -325,7 +325,7 @@ export const getBonzoApiQuery = async (
     // Handle different response types
     let data;
     const contentType = response.headers.get('content-type');
-
+    
     if (params.operation === BONZO_API_OPERATIONS.BONZO_CIRCULATION) {
       // This endpoint returns plain text
       data = await response.text();
@@ -354,26 +354,26 @@ export const getBonzoApiQuery = async (
 
   } catch (error) {
     console.error('❌ Bonzo API query failed:', error);
-
-    const errorMessage = error instanceof Error ? error.message : '未知错误';
-
+    
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
     return {
-      error: `查询 Bonzo Finance API 时出错：${errorMessage}`,
+      error: `Error querying Bonzo Finance API: ${errorMessage}`,
       operation: params.operation,
       timestamp: new Date().toISOString(),
-      suggestion: 'API 可能正在限流。请等待几秒后再请求。',
+      suggestion: 'The API may be rate limiting requests. Try waiting a few seconds between requests.',
       troubleshooting: {
         common_causes: [
-          '触发频率限制（初次请求后出现 403 Forbidden）',
-          '短时间请求过多',
-          '网络连接异常',
-          'API 暂时不可用'
+          'Rate limiting (403 Forbidden after initial requests)',
+          'Too many requests in short time period', 
+          'Network connectivity issues',
+          'API temporarily unavailable'
         ],
         solutions: [
-          '等待 30-60 秒后再请求',
-          '通过缓存结果减少请求次数',
-          '检查账户 ID 格式是否正确',
-          '确认互联网连接正常'
+          'Wait 30-60 seconds before making another request',
+          'Use fewer requests by caching results',
+          'Check if account ID format is correct',
+          'Verify internet connection'
         ]
       },
       api_documentation: 'https://docs.bonzo.finance/hub/developer/bonzo-v1-data-api'
@@ -391,4 +391,4 @@ const bonzoApiQueryTool = (context: Context): Tool => ({
   execute: getBonzoApiQuery,
 });
 
-export default bonzoApiQueryTool;
+export default bonzoApiQueryTool; 

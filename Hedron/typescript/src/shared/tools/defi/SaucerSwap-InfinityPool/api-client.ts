@@ -121,22 +121,22 @@ export const infinityPoolStakeParameters = (context: Context = {}) => {
       INFINITY_POOL_OPERATIONS.UNSTAKE_XSAUCE,
       INFINITY_POOL_OPERATIONS.FULL_STAKE_FLOW,
       INFINITY_POOL_OPERATIONS.FULL_UNSTAKE_FLOW,
-    ]).describe('要执行的 SaucerSwap Infinity Pool operation'),
+    ]).describe('The SaucerSwap Infinity Pool operation to perform'),
     
     userAccountId: z.string().optional().describe(
       PromptGenerator.getAccountParameterDescription('userAccountId', context)
     ),
     
     sauceAmount: z.number().optional().describe(
-      '要质押的 SAUCE token 数量（例如 100.5 表示 100.5 SAUCE）。stake operation 必需。'
+      'Amount of SAUCE tokens to stake (e.g., 100.5 for 100.5 SAUCE). Required for stake operations.'
     ),
     
     xSauceAmount: z.number().optional().describe(
-      '要解除质押的 xSAUCE token 数量（例如 50.25 表示 50.25 xSAUCE）。unstake operation 必需。'
+      'Amount of xSAUCE tokens to unstake (e.g., 50.25 for 50.25 xSAUCE). Required for unstake operations.'
     ),
     
     approveAmount: z.number().optional().describe(
-      '授权给 MotherShip 合约的 SAUCE 数量。未指定时使用质押数量。'
+      'Amount of SAUCE to approve for the MotherShip contract. If not specified, will approve the staking amount.'
     ),
     
     associateTokens: z.boolean().optional().default(true).describe(
@@ -144,7 +144,7 @@ export const infinityPoolStakeParameters = (context: Context = {}) => {
     ),
     
     transactionMemo: z.string().optional().describe(
-      '交易可选 memo'
+      'Optional memo for the transactions'
     ),
     
     originalParams: z.any().optional().describe(
@@ -235,7 +235,7 @@ const createEthereumTransaction = async (
     // Get private key from environment
     const privateKey = process.env.ECDSA_PRIVATE_KEY;
     if (!privateKey) {
-      throw new Error('direct execution mode 需要 ECDSA_PRIVATE_KEY 环境变量');
+      throw new Error('ECDSA_PRIVATE_KEY environment variable is required for direct execution mode');
     }
     
     // Create ethers wallet
@@ -354,7 +354,7 @@ const normalizeInfinityPoolParams = (
 ) => {
   const userAccountId = params.userAccountId || context.accountId;
   if (!userAccountId) {
-    throw new Error('必须在参数或上下文中提供用户账户 ID');
+    throw new Error('User account ID is required either in params or context');
   }
 
   // Convert amounts to smallest units (SAUCE/xSAUCE use 6 decimals)
@@ -398,37 +398,37 @@ const infinityPoolPrompt = (context: Context = {}) => {
   return `
 ${contextSnippet}
 
-该工具支持在 ${networkDisplayName} 上将 SAUCE token 质押到 SaucerSwap Infinity Pool，以赚取 xSAUCE。
+This tool enables staking SAUCE tokens in SaucerSwap's Infinity Pool on ${networkDisplayName} to earn xSAUCE.
 
- **重要安全提示:**
- - 该工具运行在 ${networkDisplayName.toUpperCase()}，${currentNetwork === 'mainnet' ? '涉及真实资金' : '用于测试'}
- - 交易一旦确认不可逆
- - 确认交易前请仔细核对金额
- - 仅对你控制的钱包账户使用
+ **IMPORTANT SECURITY NOTES:**
+ - This tool operates on ${networkDisplayName.toUpperCase()} ${currentNetwork === 'mainnet' ? 'with REAL FUNDS' : 'for TESTING'}
+ - All transactions are irreversible once confirmed
+ - Double-check amounts before confirming transactions
+ - Only use with accounts you control
 
- **GAS 优化与 HTS 兼容:**
- - 使用带 maxGasAllowanceHbar 的 EthereumTransaction 处理 HTS system contracts
- - 所有 operation 自动估算 gas，并增加 30% buffer
- - 覆盖 HTS transferToken 成本（最多 ${INFINITY_POOL_CONFIG.MAX_GAS_ALLOWANCE_HBAR} HBAR allowance）
- - 最大 gas limit 保护（${INFINITY_POOL_CONFIG.MAX_GAS_LIMIT} gas 上限）
- - 通过智能 fallback 提高系统合约成本下的交易成功率
+ **GAS OPTIMIZATION & HTS COMPATIBILITY:**
+ - Uses EthereumTransaction with maxGasAllowanceHbar for HTS system contracts
+ - Automatic gas estimation with 30% buffer for all operations
+ - Handles HTS transferToken costs (up to ${INFINITY_POOL_CONFIG.MAX_GAS_ALLOWANCE_HBAR} HBAR allowance)
+ - Maximum gas limit protection (${INFINITY_POOL_CONFIG.MAX_GAS_LIMIT} gas cap)
+ - Smart fallback to ensure transactions succeed despite system contract costs
 
-**Staking 流程 (SAUCE → xSAUCE):**
-1. Token Association - 将 SAUCE 和 xSAUCE token 关联到你的账户
-2. Token Approval - 授权 MotherShip 合约使用你的 SAUCE token
-3. Stake Operation - 调用 MotherShip.enter() 将 SAUCE 转换为 xSAUCE
+**Staking Process (SAUCE → xSAUCE):**
+1. Token Association - Associates your account with SAUCE and xSAUCE tokens
+2. Token Approval - Approves MotherShip contract to spend your SAUCE tokens
+3. Stake Operation - Calls MotherShip.enter() to convert SAUCE to xSAUCE
 
-**Unstaking 流程 (xSAUCE → SAUCE):**
-1. Unstake Operation - 调用 MotherShip.leave() 将 xSAUCE 转回 SAUCE
+**Unstaking Process (xSAUCE → SAUCE):**
+1. Unstake Operation - Calls MotherShip.leave() to convert xSAUCE back to SAUCE
 
-**参数:**
-- operation (required): 要执行的 operation
+**Parameters:**
+- operation (required): The operation to perform
 - ${userAccountDesc}
-- sauceAmount (number, optional): 要质押的 SAUCE 数量（例如 100.5）
-- xSauceAmount (number, optional): 要解除质押的 xSAUCE 数量（例如 50.25）
-- approveAmount (number, optional): 要授权的 SAUCE 数量（默认使用质押数量）
-- associateTokens (boolean, optional): 是否执行 token association（默认 true）
-- transactionMemo (string, optional): 交易可选 memo
+- sauceAmount (number, optional): Amount of SAUCE to stake (e.g., 100.5)
+- xSauceAmount (number, optional): Amount of xSAUCE to unstake (e.g., 50.25)
+- approveAmount (number, optional): Amount of SAUCE to approve (defaults to staking amount)
+- associateTokens (boolean, optional): Whether to associate tokens (default: true)
+- transactionMemo (string, optional): Optional memo for transactions
 
 **Contract Addresses (${networkDisplayName}):**
 - MotherShip Contract: ${networkConfig.MOTHERSHIP_CONTRACT_ID} (${networkConfig.MOTHERSHIP_EVM_ADDRESS})
@@ -495,8 +495,8 @@ export const associateInfinityPoolTokens = async (
         success: true,
         tokenIds: params.tokenIds,
         message: context.mode === 'returnBytes' 
-          ? 'SAUCE 和 xSAUCE token association 交易已准备好，请签名'
-          : 'SAUCE 和 xSAUCE token association 已成功完成',
+          ? 'SAUCE and xSAUCE token association transaction ready for signature'
+          : 'SAUCE and xSAUCE tokens association completed successfully',
         bytes: result.bytes, // Put bytes at top level
         result,
         // Add identification fields for detection
@@ -510,7 +510,7 @@ export const associateInfinityPoolTokens = async (
       operation: INFINITY_POOL_OPERATIONS.ASSOCIATE_TOKENS,
       success: true,
       tokenIds: params.tokenIds,
-      message: 'SAUCE 和 xSAUCE token association 已成功完成',
+      message: 'SAUCE and xSAUCE tokens association completed successfully',
       result,
       // Add identification fields for detection
       toolType: 'infinity_pool',
@@ -522,8 +522,8 @@ export const associateInfinityPoolTokens = async (
       step: INFINITY_POOL_CONFIG.STEP_TYPES.TOKEN_ASSOCIATION,
       operation: INFINITY_POOL_OPERATIONS.ASSOCIATE_TOKENS,
       success: false,
-      error: error instanceof Error ? error.message : 'token association 过程中发生未知错误',
-      suggestion: '请确认账户有足够 HBAR 支付交易手续费，并且账户 key 有效',
+      error: error instanceof Error ? error.message : 'Unknown error during token association',
+      suggestion: 'Ensure the account has sufficient HBAR for transaction fees and the account key is valid',
     };
   }
 };
@@ -581,8 +581,8 @@ export const approveSauceForMotherShip = async (
          success: true,
          approvedAmount: params.amount,
          message: context.mode === 'returnBytes' 
-            ? 'SAUCE approval 交易已准备好，请签名'
-            : 'MotherShip 合约的 SAUCE approval 已成功完成',
+           ? 'SAUCE approval transaction ready for signature'
+           : 'SAUCE approval for MotherShip contract completed successfully',
          bytes: result.bytes, // Put bytes at top level
          result,
          // Add identification fields for detection
@@ -594,7 +594,7 @@ export const approveSauceForMotherShip = async (
        if (params.originalParams && context.mode === 'returnBytes') {
          response.nextStep = 'stake';
          response.originalParams = params.originalParams;
-          response.instructions = '请签名该 approval 交易，之后 staking 会自动继续';
+         response.instructions = 'Sign this approval transaction, then staking will proceed automatically';
        }
        
        return response;
@@ -605,7 +605,7 @@ export const approveSauceForMotherShip = async (
        operation: INFINITY_POOL_OPERATIONS.APPROVE_SAUCE,
        success: true,
        approvedAmount: params.amount,
-        message: 'MotherShip 合约的 SAUCE approval 已成功完成',
+       message: 'SAUCE approval for MotherShip contract completed successfully',
        result,
        // Add identification fields for detection
        toolType: 'infinity_pool',
@@ -625,8 +625,8 @@ export const approveSauceForMotherShip = async (
       step: INFINITY_POOL_CONFIG.STEP_TYPES.TOKEN_APPROVAL,
       operation: INFINITY_POOL_OPERATIONS.APPROVE_SAUCE,
       success: false,
-      error: error instanceof Error ? error.message : 'SAUCE approval 过程中发生未知错误',
-      suggestion: '请确认账户有足够 HBAR 支付交易手续费，并且持有 SAUCE token',
+      error: error instanceof Error ? error.message : 'Unknown error during SAUCE approval',
+      suggestion: 'Ensure the account has sufficient HBAR for transaction fees and owns SAUCE tokens',
     };
   }
 };
@@ -705,7 +705,7 @@ export const stakeSauceTokens = async (
     const normalizedParams = normalizeInfinityPoolParams(params, context);
     
     if (!normalizedParams.sauceAmountInSmallestUnits) {
-      throw new Error('staking operation 需要 SAUCE 数量');
+      throw new Error('SAUCE amount is required for staking operation');
     }
 
     // Check allowance first unless explicitly skipped
@@ -741,7 +741,7 @@ export const stakeSauceTokens = async (
 
         // Direct mode - throw error
         throw new Error(
-          `SAUCE allowance 不足。当前：${allowanceCheck.currentAllowance}，需要：${normalizedParams.sauceAmountInSmallestUnits}。请先授权 SAUCE token。`,
+          `Insufficient SAUCE allowance. Current: ${allowanceCheck.currentAllowance}, Required: ${normalizedParams.sauceAmountInSmallestUnits}. Please approve SAUCE tokens first.`,
         );
       }
       
@@ -780,8 +780,8 @@ export const stakeSauceTokens = async (
         userAccount: normalizedParams.userAccountId,
         mothershipContract: networkConfig.MOTHERSHIP_CONTRACT_ID,
         message: context.mode === 'returnBytes' 
-          ? `SAUCE staking 交易已准备好，请签名（${params.sauceAmount} SAUCE）`
-          : `已成功将 ${params.sauceAmount} SAUCE token 质押到 Infinity Pool`,
+          ? `SAUCE staking transaction ready for signature (${params.sauceAmount} SAUCE)`
+          : `Successfully staked ${params.sauceAmount} SAUCE tokens in Infinity Pool`,
         bytes: result.bytes, // Put bytes at top level
         result,
       };
@@ -795,12 +795,12 @@ export const stakeSauceTokens = async (
       stakeAmountSmallestUnits: normalizedParams.sauceAmountInSmallestUnits,
       userAccount: normalizedParams.userAccountId,
       mothershipContract: networkConfig.MOTHERSHIP_CONTRACT_ID,
-      message: `已成功将 ${params.sauceAmount} SAUCE token 质押到 Infinity Pool`,
+      message: `Successfully staked ${params.sauceAmount} SAUCE tokens in Infinity Pool`,
       nextSteps: [
-        '你的 SAUCE token 已质押到 Infinity Pool',
-        '你会收到代表质押份额和奖励的 xSAUCE token',
-        '检查账户余额，确认 xSAUCE token 已到账',
-        '使用 SaucerSwap 界面跟踪质押仓位',
+        'Your SAUCE tokens have been staked in the Infinity Pool',
+        'You will receive xSAUCE tokens representing your stake + rewards',
+        'Check your account balance to see the xSAUCE tokens',
+        'Use SaucerSwap interface to track your staking position',
       ],
       result,
     };
@@ -810,20 +810,20 @@ export const stakeSauceTokens = async (
       step: INFINITY_POOL_CONFIG.STEP_TYPES.STAKE,
       operation: INFINITY_POOL_OPERATIONS.STAKE_SAUCE,
       success: false,
-      error: error instanceof Error ? error.message : 'staking 过程中发生未知错误',
-      suggestion: '请确认 SAUCE 余额充足，并且 token 已关联且已授权',
+      error: error instanceof Error ? error.message : 'Unknown error during staking',
+      suggestion: 'Ensure sufficient SAUCE balance and that tokens are associated and approved',
       troubleshooting: {
         commonIssues: [
-          'SAUCE 余额不足，无法质押',
-          'SAUCE 或 xSAUCE token 尚未关联到账户',
-          'SAUCE 尚未授权给 MotherShip 合约',
-          'gas limit 太低，无法执行合约',
+          'Insufficient SAUCE balance for staking',
+          'SAUCE or xSAUCE tokens not associated to account',
+          'SAUCE not approved for MotherShip contract',
+          'Gas limit too low for contract execution',
         ],
         solutions: [
-          '检查 SAUCE 余额，确认有可质押 token',
-          '请先执行 token association',
-          '请为 MotherShip 合约执行 SAUCE approval',
-          '使用默认 gas limit 重试',
+          'Check SAUCE balance and ensure you have tokens to stake',
+          'Run token association first',
+          'Run SAUCE approval for MotherShip contract',
+          'Try again with default gas limit',
         ],
       },
     };
@@ -844,7 +844,7 @@ export const unstakeXSauceTokens = async (
     const normalizedParams = normalizeInfinityPoolParams(params, context);
     
     if (!normalizedParams.xSauceAmountInSmallestUnits) {
-      throw new Error('unstaking operation 需要 xSAUCE 数量');
+      throw new Error('xSAUCE amount is required for unstaking operation');
     }
 
          console.log(`🔄 Unstaking ${params.xSauceAmount} xSAUCE tokens...`);
@@ -879,8 +879,8 @@ export const unstakeXSauceTokens = async (
         userAccount: normalizedParams.userAccountId,
         mothershipContract: networkConfig.MOTHERSHIP_CONTRACT_ID,
         message: context.mode === 'returnBytes' 
-          ? `xSAUCE unstaking 交易已准备好，请签名（${params.xSauceAmount} xSAUCE）`
-          : `已成功从 Infinity Pool 解除质押 ${params.xSauceAmount} xSAUCE token`,
+          ? `xSAUCE unstaking transaction ready for signature (${params.xSauceAmount} xSAUCE)`
+          : `Successfully unstaked ${params.xSauceAmount} xSAUCE tokens from Infinity Pool`,
         bytes: result.bytes, // Put bytes at top level
         result,
       };
@@ -894,11 +894,11 @@ export const unstakeXSauceTokens = async (
       unstakeAmountSmallestUnits: normalizedParams.xSauceAmountInSmallestUnits,
       userAccount: normalizedParams.userAccountId,
       mothershipContract: networkConfig.MOTHERSHIP_CONTRACT_ID,
-      message: `已成功从 Infinity Pool 解除质押 ${params.xSauceAmount} xSAUCE token`,
+      message: `Successfully unstaked ${params.xSauceAmount} xSAUCE tokens from Infinity Pool`,
       nextSteps: [
-        '你的 xSAUCE token 已解除质押',
-        '你会收到 SAUCE token（原始质押 + 奖励）',
-        '检查账户余额，确认 SAUCE token 已返回',
+        'Your xSAUCE tokens have been unstaked',
+        'You will receive SAUCE tokens (original stake + rewards)',
+        'Check your account balance to see the returned SAUCE tokens',
       ],
       result,
     };
@@ -908,18 +908,18 @@ export const unstakeXSauceTokens = async (
       step: INFINITY_POOL_CONFIG.STEP_TYPES.UNSTAKE,
       operation: INFINITY_POOL_OPERATIONS.UNSTAKE_XSAUCE,
       success: false,
-      error: error instanceof Error ? error.message : 'unstaking 过程中发生未知错误',
-      suggestion: '请确认 xSAUCE 余额充足，并且 token 已关联',
+      error: error instanceof Error ? error.message : 'Unknown error during unstaking',
+      suggestion: 'Ensure sufficient xSAUCE balance and that tokens are associated',
       troubleshooting: {
         commonIssues: [
-          'xSAUCE 余额不足，无法解除质押',
-          'xSAUCE token 尚未关联到账户',
-          'gas limit 太低，无法执行合约',
+          'Insufficient xSAUCE balance for unstaking',
+          'xSAUCE tokens not associated to account',
+          'Gas limit too low for contract execution',
         ],
         solutions: [
-          '检查 xSAUCE 余额，确认有可解除质押 token',
-          '请先执行 token association',
-          '使用默认 gas limit 重试',
+          'Check xSAUCE balance and ensure you have tokens to unstake',
+          'Run token association first',
+          'Try again with default gas limit',
         ],
       },
     };
@@ -949,7 +949,7 @@ export const infinityPoolStakeFlow = async (
              case INFINITY_POOL_OPERATIONS.APPROVE_SAUCE:
          const normalizedParams = normalizeInfinityPoolParams(params, context);
          if (!normalizedParams.approveAmountInSmallestUnits) {
-           throw new Error('SAUCE approval operation 需要 approve amount');
+           throw new Error('Approve amount is required for SAUCE approval operation');
          }
          return await approveSauceForMotherShip(client, context, {
            userAccountId: normalizedParams.userAccountId,
@@ -970,14 +970,14 @@ export const infinityPoolStakeFlow = async (
         return await executeFullUnstakeFlow(client, context, params);
 
       default:
-        throw new Error(`未知 operation：${params.operation}`);
+        throw new Error(`Unknown operation: ${params.operation}`);
     }
   } catch (error) {
     console.error('❌ Infinity Pool operation failed:', error);
     return {
       operation: params.operation,
       success: false,
-      error: error instanceof Error ? error.message : 'Infinity Pool operation 中发生未知错误',
+      error: error instanceof Error ? error.message : 'Unknown error in Infinity Pool operation',
       timestamp: new Date().toISOString(),
     };
   }
@@ -1014,13 +1014,13 @@ const executeFullStakeFlow = async (
           ...associationResult,
           nextStep: 'approval',
           originalParams: params,
-          message: '第 1/3 步：Token association 交易已准备好，请签名',
-          instructions: '请签名该交易以关联 SAUCE 和 xSAUCE token。确认后，approval 步骤会自动执行。',
+          message: '🔗 Step 1/3: Token association transaction ready for signature',
+          instructions: 'Sign this transaction to associate SAUCE and xSAUCE tokens. After confirmation, approval step will execute automatically.',
         };
       } 
       
       // This should NEVER be reached in normal full_stake_flow
-      throw new Error('状态无效：full_stake_flow 应始终从 token association 开始');
+      throw new Error('❌ Invalid state: full_stake_flow should always start with token association');
     }
     
     // Legacy mode: Execute all transactions sequentially (for direct execution)
@@ -1042,7 +1042,7 @@ const executeFullStakeFlow = async (
         return {
           operation: INFINITY_POOL_OPERATIONS.FULL_STAKE_FLOW,
           success: false,
-          error: 'Token association 失败',
+          error: 'Token association failed',
           steps: results,
         };
       }
@@ -1053,7 +1053,7 @@ const executeFullStakeFlow = async (
     // Step 2: Approve SAUCE
     const normalizedParams = normalizeInfinityPoolParams(params, context);
     if (!normalizedParams.approveAmountInSmallestUnits) {
-      throw new Error('approval 需要 SAUCE 数量');
+      throw new Error('SAUCE amount is required for approval');
     }
     
     console.log('Step 2: SAUCE Approval');
@@ -1068,7 +1068,7 @@ const executeFullStakeFlow = async (
       return {
         operation: INFINITY_POOL_OPERATIONS.FULL_STAKE_FLOW,
         success: false,
-        error: 'SAUCE approval 失败',
+        error: 'SAUCE approval failed',
         steps: results,
       };
     }
@@ -1084,7 +1084,7 @@ const executeFullStakeFlow = async (
       return {
         operation: INFINITY_POOL_OPERATIONS.FULL_STAKE_FLOW,
         success: false,
-        error: 'Staking 失败',
+        error: 'Staking failed',
         steps: results,
       };
     }
@@ -1102,14 +1102,14 @@ const executeFullStakeFlow = async (
         userAccount: params.userAccountId || context.accountId,
         timestamp: new Date().toISOString(),
       },
-      message: `已成功完成 SaucerSwap Infinity Pool 质押：${params.sauceAmount} SAUCE`,
+      message: `Successfully completed SaucerSwap Infinity Pool staking of ${params.sauceAmount} SAUCE`,
     };
   } catch (error) {
     console.error('❌ Infinity Pool staking flow failed:', error);
     return {
       operation: INFINITY_POOL_OPERATIONS.FULL_STAKE_FLOW,
       success: false,
-      error: error instanceof Error ? error.message : 'staking flow 中发生未知错误',
+      error: error instanceof Error ? error.message : 'Unknown error in staking flow',
       timestamp: new Date().toISOString(),
     };
   }
@@ -1133,8 +1133,8 @@ const executeFullUnstakeFlow = async (
       success: unstakeResult.success,
       result: unstakeResult,
       message: unstakeResult.success 
-        ? `已成功从 Infinity Pool 解除质押 ${params.xSauceAmount} xSAUCE`
-        : 'Unstaking 失败',
+        ? `Successfully unstaked ${params.xSauceAmount} xSAUCE from Infinity Pool`
+        : 'Unstaking failed',
       timestamp: new Date().toISOString(),
     };
   } catch (error) {
@@ -1142,7 +1142,7 @@ const executeFullUnstakeFlow = async (
     return {
       operation: INFINITY_POOL_OPERATIONS.FULL_UNSTAKE_FLOW,
       success: false,
-      error: error instanceof Error ? error.message : 'unstaking flow 中发生未知错误',
+      error: error instanceof Error ? error.message : 'Unknown error in unstaking flow',
       timestamp: new Date().toISOString(),
     };
   }
@@ -1176,7 +1176,7 @@ export const executeInfinityPoolStepOnly = async (
     // In step mode, we typically want to do approval followed by staking
     // For simplicity, let's execute the approval step
     if (!normalizedParams.approveAmountInSmallestUnits) {
-      throw new Error('step operation 需要数量');
+      throw new Error('Amount is required for step operation');
     }
     
     const approvalResult = await approveSauceForMotherShip(client, context, {
@@ -1188,8 +1188,8 @@ export const executeInfinityPoolStepOnly = async (
       ...approvalResult,
       nextStep: 'stake',
       originalParams: params,
-      message: 'SAUCE approval 交易已准备好，请签名',
-      instructions: '请签名该交易以授权 SAUCE 支出，然后继续 staking',
+      message: 'SAUCE approval transaction ready for signature',
+      instructions: 'Sign this transaction to approve SAUCE spending, then proceed with staking',
     };
   } catch (error: any) {
     console.error('❌ Infinity Pool step operation failed:', error);

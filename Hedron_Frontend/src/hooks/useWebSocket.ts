@@ -18,21 +18,13 @@ function getWebSocketUrl(): string {
   // - 'development' when running npm run dev
   // - 'production' when running npm run build
   const isProduction = import.meta.env.PROD; // boolean: true in production
-
-  const sameOriginUrl =
-    typeof window !== 'undefined'
-      ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`
-      : 'ws://localhost:8080';
-  const isLocalBrowserHost =
-    typeof window !== 'undefined' &&
-    ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
-  const configuredLocalUrl = import.meta.env.VITE_WEBSOCKET_URL_LOCAL || 'ws://localhost:8080';
-  const localUrl = isLocalBrowserHost ? configuredLocalUrl : sameOriginUrl;
-  const productionUrl = import.meta.env.VITE_WEBSOCKET_URL_PRODUCTION || sameOriginUrl;
-
+  
+  const localUrl = import.meta.env.VITE_WEBSOCKET_URL_LOCAL || 'ws://localhost:8080';
+  const productionUrl = import.meta.env.VITE_WEBSOCKET_URL_PRODUCTION || 'wss://hedron-production.up.railway.app';
+  
   const selectedUrl = isProduction ? productionUrl : localUrl;
   console.log(`🌍 Environment: ${import.meta.env.MODE}, WebSocket URL: ${selectedUrl}`);
-
+  
   return selectedUrl;
 }
 
@@ -42,7 +34,7 @@ export function useWebSocket(url?: string): UseWebSocketReturn {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastMessage, setLastMessage] = useState<WSIncomingMessage | null>(null);
-
+  
   const ws = useRef<WebSocket | null>(null);
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -53,7 +45,7 @@ export function useWebSocket(url?: string): UseWebSocketReturn {
 
     setIsConnecting(true);
     setError(null);
-
+    
     const wsUrl = url || getWebSocketUrl();
     console.log(`🔗 Connecting to WebSocket: ${wsUrl}`);
 
@@ -74,16 +66,13 @@ export function useWebSocket(url?: string): UseWebSocketReturn {
           setLastMessage(message);
 
           // Check for authentication success
-          if (
-            message.type === 'SYSTEM_MESSAGE' &&
-            (message.message.includes('Authenticated successfully') || message.message.includes('认证成功'))
-          ) {
+          if (message.type === 'SYSTEM_MESSAGE' && message.message.includes('Authenticated successfully')) {
             setIsAuthenticated(true);
             console.log('✅ Authentication completed!');
           }
         } catch (err) {
           console.error('❌ Failed to parse WebSocket message:', err);
-          setError('无法解析服务器消息');
+          setError('Failed to parse message from server');
         }
       };
 
@@ -95,7 +84,7 @@ export function useWebSocket(url?: string): UseWebSocketReturn {
 
         // Auto-reconnect after 3 seconds unless it was a clean close
         if (event.code !== 1000) {
-          setError('连接已中断，正在尝试重新连接...');
+          setError('Connection lost. Attempting to reconnect...');
           reconnectTimeout.current = setTimeout(() => {
             connect();
           }, 3000);
@@ -104,13 +93,13 @@ export function useWebSocket(url?: string): UseWebSocketReturn {
 
       ws.current.onerror = (event) => {
         console.error('❌ WebSocket error:', event);
-        setError('连接错误，请确认后端已在 8080 端口运行。');
+        setError('Connection error. Check if the backend is running on port 8080.');
         setIsConnecting(false);
       };
 
     } catch (err) {
       console.error('❌ Failed to create WebSocket connection:', err);
-      setError('无法连接后端');
+      setError('Failed to connect to backend');
       setIsConnecting(false);
     }
   }, [url]);
@@ -122,7 +111,7 @@ export function useWebSocket(url?: string): UseWebSocketReturn {
     }
 
     if (ws.current) {
-      ws.current.close(1000, '客户端主动断开');
+      ws.current.close(1000, 'Client disconnect');
       ws.current = null;
     }
 
@@ -133,12 +122,12 @@ export function useWebSocket(url?: string): UseWebSocketReturn {
 
   const authenticate = useCallback((userAccountId: string) => {
     if (!ws.current || ws.current.readyState !== WebSocket.OPEN) {
-      setError('尚未连接后端');
+      setError('Not connected to backend');
       return;
     }
 
     console.log(`🔐 Authenticating with account: ${userAccountId}`);
-
+    
     const authMessage: WSConnectionAuth = {
       type: 'CONNECTION_AUTH',
       userAccountId,
@@ -150,18 +139,18 @@ export function useWebSocket(url?: string): UseWebSocketReturn {
       console.log('📤 Sent authentication:', authMessage);
     } catch (err) {
       console.error('❌ Failed to send authentication:', err);
-      setError('认证失败');
+      setError('Failed to authenticate');
     }
   }, []);
 
   const sendMessage = useCallback((message: string, userAccountId: string) => {
     if (!ws.current || ws.current.readyState !== WebSocket.OPEN) {
-      setError('尚未连接后端');
+      setError('Not connected to backend');
       return;
     }
 
     if (!isAuthenticated) {
-      setError('尚未认证，请先完成认证。');
+      setError('Not authenticated. Please authenticate first.');
       return;
     }
 
@@ -177,13 +166,13 @@ export function useWebSocket(url?: string): UseWebSocketReturn {
       console.log('📤 Sent message:', userMessage);
     } catch (err) {
       console.error('❌ Failed to send message:', err);
-      setError('发送消息失败');
+      setError('Failed to send message');
     }
   }, [isAuthenticated]);
 
   const sendTransactionResult = useCallback((result: Omit<WSTransactionResult, 'type'>) => {
     if (!ws.current || ws.current.readyState !== WebSocket.OPEN) {
-      setError('尚未连接后端');
+      setError('Not connected to backend');
       return;
     }
 
@@ -197,7 +186,7 @@ export function useWebSocket(url?: string): UseWebSocketReturn {
       console.log('📤 Sent transaction result:', transactionResult);
     } catch (err) {
       console.error('❌ Failed to send transaction result:', err);
-      setError('发送交易结果失败');
+      setError('Failed to send transaction result');
     }
   }, []);
 
@@ -217,4 +206,4 @@ export function useWebSocket(url?: string): UseWebSocketReturn {
     authenticate,
     lastMessage
   };
-}
+} 

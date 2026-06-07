@@ -155,7 +155,7 @@ export class HbarYieldOptimizationWorkflow {
       
     } catch (error) {
       console.error('❌ Error in yield optimization workflow:', error);
-      throw new Error(`生成收益优化策略失败：${error instanceof Error ? error.message : '未知错误'}`);
+      throw new Error(`Failed to generate yield optimization strategy: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -268,8 +268,8 @@ export class HbarYieldOptimizationWorkflow {
     // Conservative strategy for new users or high liquidity needs
     if (riskTolerance === 'conservative' || experienceLevel === 'novice' || liquidityPreference === 'high') {
       return {
-        name: '稳健借贷优先',
-        description: '优先选择流动性较高、收益更稳定的借贷策略',
+        name: 'Conservative Lending Focus',
+        description: 'Prioritize stable lending yields with high liquidity',
         primaryPlatforms: ['bonzo'],
         riskLevel: 'low' as const,
         expectedApy: yields.bonzo.hbarSupplyApy,
@@ -280,8 +280,8 @@ export class HbarYieldOptimizationWorkflow {
     // Moderate strategy for balanced approach
     if (riskTolerance === 'moderate' || timelineMonths >= 6) {
       return {
-        name: '均衡多平台配置',
-        description: '在借贷和 staking 之间分散配置，保持中等风险',
+        name: 'Balanced Multi-Platform',
+        description: 'Diversify across lending and staking with moderate risk',
         primaryPlatforms: ['bonzo', 'saucerswap_infinity'],
         riskLevel: 'medium' as const,
         expectedApy: (yields.bonzo.hbarSupplyApy + yields.saucerswapInfinityPool.xSauceApy) / 2,
@@ -291,8 +291,8 @@ export class HbarYieldOptimizationWorkflow {
 
     // Aggressive strategy for experienced users with longer timelines
     return {
-      name: '进取收益最大化',
-      description: '通过更高级策略提高收益，同时承担更高风险',
+      name: 'Aggressive Yield Maximization',
+      description: 'Maximize yields through advanced strategies and higher risk',
       primaryPlatforms: ['bonzo', 'saucerswap_infinity', 'saucerswap_lp', 'autoswap_limit'],
       riskLevel: 'high' as const,
       expectedApy: Math.max(yields.bonzo.hbarSupplyApy, yields.saucerswapInfinityPool.xSauceApy),
@@ -312,25 +312,25 @@ export class HbarYieldOptimizationWorkflow {
     const allocation: any = {};
 
     switch (strategy.name) {
-      case '稳健借贷优先':
+      case 'Conservative Lending Focus':
         // 80% Bonzo HBAR lending, 20% liquid HBAR
         allocation.bonzoFinance = {
           platform: 'bonzo',
           token: 'HBAR',
           amount: totalHbar * 0.8,
           expectedApy: yields.bonzo.hbarSupplyApy,
-          reason: '借贷收益较稳定，流动性较高，整体风险较低'
+          reason: 'Stable lending yield with high liquidity and low risk'
         };
         break;
 
-      case '均衡多平台配置':
+      case 'Balanced Multi-Platform':
         // 50% Bonzo, 30% Infinity Pool, 20% liquid
         allocation.bonzoFinance = {
           platform: 'bonzo',
           token: 'HBAR',
           amount: totalHbar * 0.5,
           expectedApy: yields.bonzo.hbarSupplyApy,
-          reason: '通过成熟借贷协议获得较稳定的基础收益'
+          reason: 'Stable base yield from established lending protocol'
         };
         
         // Convert some HBAR to SAUCE for Infinity Pool staking
@@ -339,34 +339,34 @@ export class HbarYieldOptimizationWorkflow {
           platform: 'saucerswap_infinity',
           amount: sauceAmount,
           expectedApy: yields.saucerswapInfinityPool.xSauceApy,
-          reason: '通过 SAUCE staking 获取更高收益，并保持中等风险'
+          reason: 'Higher yields from SAUCE staking with moderate risk'
         };
         break;
 
-      case '进取收益最大化':
+      case 'Aggressive Yield Maximization':
         // 40% Bonzo, 30% Infinity Pool, 20% LP, 10% AutoSwap
         allocation.bonzoFinance = {
           platform: 'bonzo',
           token: 'HBAR',
           amount: totalHbar * 0.4,
           expectedApy: yields.bonzo.hbarSupplyApy,
-          reason: '为进取策略保留稳定的收益基础'
+          reason: 'Stable foundation for aggressive strategy'
         };
         
         allocation.infinityPool = {
           platform: 'saucerswap_infinity',
           amount: this.estimateSauceFromHbar(totalHbar * 0.3),
           expectedApy: yields.saucerswapInfinityPool.xSauceApy,
-          reason: '通过 governance token staking 获取更高收益'
+          reason: 'High yields from governance token staking'
         };
 
         allocation.autoswapOrders = [{
           platform: 'autoswap_limit',
-          orderType: '定投式分批建仓',
+          orderType: 'Dollar Cost Averaging',
           amount: totalHbar * 0.1,
-          targetPrice: '按市场优化',
+          targetPrice: 'market-optimized',
           expirationHours: 168, // 1 week
-          reason: '通过自动化交易争取额外收益机会'
+          reason: 'Automated trading for additional yield opportunities'
         }];
         break;
     }
@@ -461,7 +461,7 @@ export class HbarYieldOptimizationWorkflow {
 
   private estimateExecutionTime(allocation: any): string {
     const steps = Object.keys(allocation).length;
-    return `${steps * 2}-${steps * 5} 分钟`; // Estimate based on transaction complexity
+    return `${steps * 2}-${steps * 5} minutes`; // Estimate based on transaction complexity
   }
 
   private estimateSauceFromHbar(hbarAmount: number): number {
@@ -472,57 +472,41 @@ export class HbarYieldOptimizationWorkflow {
 
   private generateConsiderations(profile: YieldOptimizationProfile, yields: PlatformYields, strategy: any): string[] {
     const considerations = [
-      `策略侧重${this.formatRiskLevel(strategy.riskLevel)}风险投资，并与你的${this.formatRiskTolerance(profile.riskTolerance)}风险偏好匹配`,
-      `${profile.timelineMonths} 个月的周期适合选择${this.formatLiquidityLevel(strategy.liquidity)}流动性的投资`,
+      `Strategy focuses on ${strategy.riskLevel} risk investments aligned with your ${profile.riskTolerance} risk tolerance`,
+      `Timeline of ${profile.timelineMonths} months allows for ${strategy.liquidity} liquidity investments`,
     ];
 
     if (yields.bonzo.utilization > 0.8) {
-      considerations.push('Bonzo 利用率较高可能影响流动性，规划仓位时需要考虑这一点');
+      considerations.push('High utilization in Bonzo may affect liquidity - consider this for planning');
     }
 
     if (profile.experienceLevel === 'novice') {
-      considerations.push('作为新用户，建议先用较小金额熟悉各个平台');
+      considerations.push('As a new user, start with smaller amounts to familiarize yourself with each platform');
     }
 
     return considerations;
   }
 
   private generateNextSteps(allocation: any, profile: YieldOptimizationProfile): string[] {
-    const steps = ['查看推荐配置，并根据自己的舒适度调整仓位'];
+    const steps = ['Review the recommended allocation and adjust based on your comfort level'];
 
     if (allocation.bonzoFinance) {
-      steps.push(`向 Bonzo Finance 存入 ${allocation.bonzoFinance.amount} HBAR，目标 APY 为 ${allocation.bonzoFinance.expectedApy.toFixed(2)}%`);
+      steps.push(`Deposit ${allocation.bonzoFinance.amount} HBAR into Bonzo Finance for ${allocation.bonzoFinance.expectedApy.toFixed(2)}% APY`);
     }
 
     if (allocation.infinityPool) {
-      steps.push('使用 SaucerSwap DEX 将 HBAR 兑换为 SAUCE');
-      steps.push(`在 Infinity Pool 中 stake SAUCE，目标 APY 为 ${allocation.infinityPool.expectedApy.toFixed(2)}%`);
+      steps.push('Convert HBAR to SAUCE using SaucerSwap DEX');
+      steps.push(`Stake SAUCE in Infinity Pool for ${allocation.infinityPool.expectedApy.toFixed(2)}% APY`);
     }
 
     if (allocation.autoswapOrders) {
-      steps.push('设置自动化限价单，用于定投式分批建仓');
+      steps.push('Set up automated limit orders for dollar-cost averaging');
     }
 
-    steps.push('持续监控持仓，并根据市场情况按季度再平衡');
-    steps.push('可以在 1-2 周内分批执行，以降低择时风险');
+    steps.push('Monitor your positions and rebalance quarterly based on market conditions');
+    steps.push('Consider gradual implementation over 1-2 weeks to minimize timing risk');
 
     return steps;
-  }
-
-  private formatRiskLevel(riskLevel: string): string {
-    return ({ low: '低', medium: '中等', high: '高' } as Record<string, string>)[riskLevel] || riskLevel;
-  }
-
-  private formatRiskTolerance(riskTolerance: string): string {
-    return ({
-      conservative: '保守',
-      moderate: '中等',
-      aggressive: '进取',
-    } as Record<string, string>)[riskTolerance] || riskTolerance;
-  }
-
-  private formatLiquidityLevel(liquidity: string): string {
-    return ({ high: '高', medium: '中等', low: '较低' } as Record<string, string>)[liquidity] || liquidity;
   }
 }
 

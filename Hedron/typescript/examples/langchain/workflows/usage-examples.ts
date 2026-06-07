@@ -14,10 +14,6 @@ import {
   createHbarYieldOptimizationWorkflow
 } from './hbar-yield-optimization-workflow';
 
-function formatRiskLevel(riskLevel: string): string {
-  return ({ low: '低', medium: '中等', high: '高' } as Record<string, string>)[riskLevel] || riskLevel;
-}
-
 /**
  * Example 1: New User Scenario
  * User prompt: "I am a new user to the Hedera network, and I have a lot of hbar that I plan on keeping for 6-9 months. I want to find a way to optimize my returns."
@@ -51,7 +47,7 @@ export async function handleNewUserYieldOptimization(
     
   } catch (error) {
     console.error('❌ Error generating recommendations:', error);
-    return `抱歉，分析收益机会时遇到错误。请确认 Hedera 账户有效后重试。错误：${error instanceof Error ? error.message : '未知错误'}`;
+    return `I apologize, but I encountered an error while analyzing yield opportunities. Please ensure you have a valid Hedera account and try again. Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
   }
 }
 
@@ -87,7 +83,7 @@ export async function handleExperiencedUserOptimization(
     
   } catch (error) {
     console.error('❌ Error generating recommendations:', error);
-    return `分析市场时遇到问题。请稍后重试，或联系支持人员。错误：${error instanceof Error ? error.message : '未知错误'}`;
+    return `I encountered an issue while analyzing the market. Please try again or contact support. Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
   }
 }
 
@@ -131,7 +127,7 @@ export async function handlePortfolioRebalancing(
     
   } catch (error) {
     console.error('❌ Error analyzing portfolio:', error);
-    return `未能完成投资组合分析。请确认账户信息后重试。错误：${error instanceof Error ? error.message : '未知错误'}`;
+    return `I couldn't complete the portfolio analysis. Please verify your account details and try again. Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
   }
 }
 
@@ -139,16 +135,16 @@ export async function handlePortfolioRebalancing(
  * Format basic recommendation response for new users
  */
 function formatRecommendationResponse(recommendation: any, profile: YieldOptimizationProfile): string {
-  let response = `🎯 **HBAR 收益优化建议**\n\n`;
+  let response = `🎯 **HBAR Yield Optimization Recommendation**\n\n`;
   
-  response += `基于你的 ${profile.totalHbar} HBAR 和 ${profile.timelineMonths} 个月周期，分析如下：\n\n`;
+  response += `Based on your ${profile.totalHbar} HBAR and ${profile.timelineMonths}-month timeline, here's my analysis:\n\n`;
   
-  response += `**🏆 推荐策略：${recommendation.strategy}**\n`;
-  response += `预期总 APY：${recommendation.totalExpectedApy.toFixed(2)}%\n`;
-  response += `风险等级：${formatRiskLevel(recommendation.riskLevel)}\n`;
-  response += `预计配置时间：${recommendation.timeToExecute}\n\n`;
+  response += `**🏆 Recommended Strategy: ${recommendation.strategy}**\n`;
+  response += `Expected Total APY: ${recommendation.totalExpectedApy.toFixed(2)}%\n`;
+  response += `Risk Level: ${recommendation.riskLevel}\n`;
+  response += `Estimated Setup Time: ${recommendation.timeToExecute}\n\n`;
   
-  response += `**💰 配置明细：**\n`;
+  response += `**💰 Allocation Breakdown:**\n`;
   
   if (recommendation.allocation.bonzoFinance) {
     const bonzo = recommendation.allocation.bonzoFinance;
@@ -158,21 +154,21 @@ function formatRecommendationResponse(recommendation: any, profile: YieldOptimiz
   
   if (recommendation.allocation.infinityPool) {
     const infinity = recommendation.allocation.infinityPool;
-    response += `• **SaucerSwap Infinity Pool**：将约 ${(infinity.amount / 100).toFixed(0)} HBAR 兑换为 SAUCE（${infinity.expectedApy.toFixed(2)}% APY）\n`;
+    response += `• **SaucerSwap Infinity Pool**: Convert ~${(infinity.amount / 100).toFixed(0)} HBAR to SAUCE (${infinity.expectedApy.toFixed(2)}% APY)\n`;
     response += `  └─ ${infinity.reason}\n\n`;
   }
   
-  response += `**📋 下一步：**\n`;
+  response += `**📋 Next Steps:**\n`;
   recommendation.nextSteps.forEach((step: string, index: number) => {
     response += `${index + 1}. ${step}\n`;
   });
   
-  response += `\n**⚠️ 重要提示：**\n`;
+  response += `\n**⚠️ Important Considerations:**\n`;
   recommendation.considerations.forEach((consideration: string) => {
     response += `• ${consideration}\n`;
   });
   
-  response += `\n*本建议基于当前市场情况和你的风险画像生成。投资前请务必自行研究。*`;
+  response += `\n*This recommendation is based on current market conditions and your risk profile. Always do your own research before investing.*`;
   
   return response;
 }
@@ -183,29 +179,29 @@ function formatRecommendationResponse(recommendation: any, profile: YieldOptimiz
 function formatDetailedRecommendationResponse(recommendation: any, profile: YieldOptimizationProfile): string {
   let response = formatRecommendationResponse(recommendation, profile);
   
-  response += `\n\n**🔧 技术执行步骤：**\n`;
+  response += `\n\n**🔧 Technical Implementation:**\n`;
   
   if (recommendation.allocation.bonzoFinance) {
-    response += `\n**Bonzo Finance 配置：**\n`;
-    response += `1. 访问 Bonzo Finance dApp 或使用 agent tools\n`;
-    response += `2. 连接钱包并存入 ${recommendation.allocation.bonzoFinance.amount} HBAR\n`;
-    response += `3. 获得会累积利息的 aWHBAR token\n`;
-    response += `4. 监控收益，并在需要时提取\n`;
+    response += `\n**Bonzo Finance Setup:**\n`;
+    response += `1. Visit Bonzo Finance dApp or use agent tools\n`;
+    response += `2. Connect wallet and deposit ${recommendation.allocation.bonzoFinance.amount} HBAR\n`;
+    response += `3. Receive aWHBAR tokens that accrue interest\n`;
+    response += `4. Monitor yields and withdraw when needed\n`;
   }
   
   if (recommendation.allocation.infinityPool) {
-    response += `\n**Infinity Pool 配置：**\n`;
-    response += `1. 在 SaucerSwap DEX 将 HBAR swap 为 SAUCE\n`;
-    response += `2. 在 Infinity Pool 中 stake SAUCE token\n`;
-    response += `3. 获得代表 staking 仓位的 xSAUCE\n`;
-    response += `4. 从交易费用和协议激励中获取奖励\n`;
+    response += `\n**Infinity Pool Setup:**\n`;
+    response += `1. Swap HBAR to SAUCE on SaucerSwap DEX\n`;
+    response += `2. Stake SAUCE tokens in Infinity Pool\n`;
+    response += `3. Receive xSAUCE representing your staked position\n`;
+    response += `4. Earn rewards from trading fees and protocol emissions\n`;
   }
   
   if (recommendation.allocation.autoswapOrders) {
-    response += `\n**AutoSwap Limit Orders：**\n`;
-    response += `1. 设置自动化限价单，用于策略化入场\n`;
-    response += `2. 在波动市场中使用定投式分批建仓\n`;
-    response += `3. 监控订单执行并调整参数\n`;
+    response += `\n**AutoSwap Limit Orders:**\n`;
+    response += `1. Set up automated limit orders for strategic entries\n`;
+    response += `2. Use dollar-cost averaging for volatile markets\n`;
+    response += `3. Monitor order execution and adjust parameters\n`;
   }
   
   return response;
@@ -240,10 +236,10 @@ function analyzeRebalancingNeeds(currentHoldings: any, recommendation: any): any
     if (Math.abs(currentBonzoPercent - recBonzoPercent) > 10) {
       if (currentBonzoPercent > recBonzoPercent) {
         analysis.overAllocated.push('Bonzo Finance');
-        analysis.rebalanceActions.push(`考虑从 Bonzo 撤出 ${(currentBonzoPercent - recBonzoPercent).toFixed(1)}% 仓位`);
+        analysis.rebalanceActions.push(`Consider withdrawing ${(currentBonzoPercent - recBonzoPercent).toFixed(1)}% from Bonzo`);
       } else {
         analysis.underAllocated.push('Bonzo Finance');
-        analysis.rebalanceActions.push(`考虑将 Bonzo 配置提高 ${(recBonzoPercent - currentBonzoPercent).toFixed(1)}%`);
+        analysis.rebalanceActions.push(`Consider increasing Bonzo allocation by ${(recBonzoPercent - currentBonzoPercent).toFixed(1)}%`);
       }
     }
   }
@@ -255,28 +251,28 @@ function analyzeRebalancingNeeds(currentHoldings: any, recommendation: any): any
  * Format rebalancing-specific response
  */
 function formatRebalancingResponse(recommendation: any, profile: YieldOptimizationProfile, rebalanceAnalysis: any): string {
-  let response = `🔄 **投资组合再平衡分析**\n\n`;
+  let response = `🔄 **Portfolio Rebalancing Analysis**\n\n`;
   
-  response += `当前投资组合价值：约 ${profile.totalHbar} HBAR\n\n`;
+  response += `Current Portfolio Value: ${profile.totalHbar} HBAR equivalent\n\n`;
   
   response += formatRecommendationResponse(recommendation, profile);
   
   if (rebalanceAnalysis.rebalanceActions.length > 0) {
-    response += `\n\n**🎯 再平衡操作：**\n`;
+    response += `\n\n**🎯 Rebalancing Actions:**\n`;
     rebalanceAnalysis.rebalanceActions.forEach((action: string, index: number) => {
       response += `${index + 1}. ${action}\n`;
     });
   }
   
   if (rebalanceAnalysis.overAllocated.length > 0) {
-    response += `\n**📈 超配仓位：**\n`;
+    response += `\n**📈 Over-allocated positions:**\n`;
     rebalanceAnalysis.overAllocated.forEach((position: string) => {
       response += `• ${position}\n`;
     });
   }
   
   if (rebalanceAnalysis.underAllocated.length > 0) {
-    response += `\n**📉 低配仓位：**\n`;
+    response += `\n**📉 Under-allocated positions:**\n`;
     rebalanceAnalysis.underAllocated.forEach((position: string) => {
       response += `• ${position}\n`;
     });
@@ -289,10 +285,10 @@ function formatRebalancingResponse(recommendation: any, profile: YieldOptimizati
  * Quick helper to demonstrate all example scenarios
  */
 export async function demonstrateAllScenarios(client: Client, context: Context) {
-  console.log('🚀 演示 HBAR 收益优化场景\n');
+  console.log('🚀 Demonstrating HBAR Yield Optimization Scenarios\n');
   
   // Example 1: Conservative new user
-  console.log('📊 场景 1：保守型新用户');
+  console.log('📊 Scenario 1: New Conservative User');
   try {
     const result1 = await handleNewUserYieldOptimization(
       client, 
@@ -302,11 +298,11 @@ export async function demonstrateAllScenarios(client: Client, context: Context) 
     );
     console.log(result1.substring(0, 200) + '...\n');
   } catch (error) {
-    console.log(`场景 1 错误：${error}\n`);
+    console.log(`Error in scenario 1: ${error}\n`);
   }
   
   // Example 2: Balanced experienced user
-  console.log('📊 场景 2：均衡型有经验用户');
+  console.log('📊 Scenario 2: Balanced Experienced User');
   try {
     const result2 = await handleExperiencedUserOptimization(
       client,
@@ -321,11 +317,11 @@ export async function demonstrateAllScenarios(client: Client, context: Context) 
     );
     console.log(result2.substring(0, 200) + '...\n');
   } catch (error) {
-    console.log(`场景 2 错误：${error}\n`);
+    console.log(`Error in scenario 2: ${error}\n`);
   }
   
   // Example 3: Portfolio rebalancing
-  console.log('📊 场景 3：投资组合再平衡');
+  console.log('📊 Scenario 3: Portfolio Rebalancing');
   try {
     const result3 = await handlePortfolioRebalancing(
       client,
@@ -340,7 +336,7 @@ export async function demonstrateAllScenarios(client: Client, context: Context) 
     );
     console.log(result3.substring(0, 200) + '...\n');
   } catch (error) {
-    console.log(`场景 3 错误：${error}\n`);
+    console.log(`Error in scenario 3: ${error}\n`);
   }
 }
 
@@ -364,10 +360,7 @@ export class YieldOptimizationIntegration {
     const yieldKeywords = [
       'optimize returns', 'maximize yield', 'best apy', 'investment strategy',
       'where to stake', 'defi opportunities', 'earn interest', 'passive income',
-      'bonzo or saucerswap', 'infinity pool', 'lending vs staking',
-      '优化收益', '最大化收益', '最高 apy', '最佳 apy', '投资策略',
-      '在哪里 stake', 'defi 机会', '赚利息', '被动收入',
-      'bonzo 还是 saucerswap', '借贷还是 staking', '收益机会'
+      'bonzo or saucerswap', 'infinity pool', 'lending vs staking'
     ];
     
     const hasYieldKeywords = yieldKeywords.some(keyword => lowerMessage.includes(keyword));
@@ -381,24 +374,24 @@ export class YieldOptimizationIntegration {
     const hbarAmount = hbarMatch ? parseInt(hbarMatch[1].replace(/,/g, '')) : 1000; // Default to 1000
     
     // Extract timeline if mentioned
-    const timelineMatch = message.match(/(\d+)[-\s]*(\d+)?\s*(months?|个月|月)/i);
+    const timelineMatch = message.match(/(\d+)[-\s]*(\d+)?\s*months?/i);
     const timelineMonths = timelineMatch ? parseInt(timelineMatch[1]) : 6; // Default to 6 months
     
     // Determine risk tolerance from message context
     let riskTolerance: 'conservative' | 'moderate' | 'aggressive' = 'conservative';
-    if (lowerMessage.includes('aggressive') || lowerMessage.includes('high risk') || lowerMessage.includes('maximum') || message.includes('进取') || message.includes('高风险') || message.includes('最大化')) {
+    if (lowerMessage.includes('aggressive') || lowerMessage.includes('high risk') || lowerMessage.includes('maximum')) {
       riskTolerance = 'aggressive';
-    } else if (lowerMessage.includes('moderate') || lowerMessage.includes('balanced') || message.includes('中等') || message.includes('均衡')) {
+    } else if (lowerMessage.includes('moderate') || lowerMessage.includes('balanced')) {
       riskTolerance = 'moderate';
     }
     
     // Determine experience level
     let experienceLevel: 'novice' | 'intermediate' | 'advanced' = 'novice';
-    if (lowerMessage.includes('new user') || lowerMessage.includes('beginner') || message.includes('新手') || message.includes('新用户')) {
+    if (lowerMessage.includes('new user') || lowerMessage.includes('beginner')) {
       experienceLevel = 'novice';
-    } else if (lowerMessage.includes('experienced') || lowerMessage.includes('familiar') || message.includes('有经验') || message.includes('熟悉')) {
+    } else if (lowerMessage.includes('experienced') || lowerMessage.includes('familiar')) {
       experienceLevel = 'intermediate';
-    } else if (lowerMessage.includes('expert') || lowerMessage.includes('advanced') || message.includes('专家') || message.includes('高级')) {
+    } else if (lowerMessage.includes('expert') || lowerMessage.includes('advanced')) {
       experienceLevel = 'advanced';
     }
     

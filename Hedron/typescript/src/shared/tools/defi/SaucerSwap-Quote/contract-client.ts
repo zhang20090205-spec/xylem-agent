@@ -80,29 +80,29 @@ export const saucerswapRouterSwapQuoteParameters = {
   operation: {
     type: 'string',
     enum: Object.values(SAUCERSWAP_ROUTER_OPERATIONS),
-    description: '报价 operation：get_amounts_out 表示由输入计算输出，get_amounts_in 表示由输出计算输入'
+    description: 'Quote operation: get_amounts_out for output from input, get_amounts_in for input from output'
   },
   amount: {
     type: 'string',
-    description: 'Token 数量，使用最小单位（例如 8 decimals 的 1 HBAR 为 "100000000"）'
+    description: 'Token amount in smallest unit (e.g., "1000000" for 1 HBAR with 8 decimals)'
   },
   tokenPath: {
     type: 'array',
     items: { type: 'string' },
     minItems: 2,
-    description: '表示 swap path 的 token ID 数组。原生 HBAR 使用 "HBAR"。'
+    description: 'Array of token IDs representing swap path. Use "HBAR" for native HBAR.'
   },
   fees: {
     type: 'array',
     items: { type: 'number' },
-    description: 'pool fee 数组，单位为 hundredths of a bip（例如 [3000] 表示 0.30%）。长度必须为 tokenPath.length - 1',
+    description: 'Array of pool fees in hundredths of a bip (e.g., [3000] for 0.30%). Length must be tokenPath.length - 1',
     optional: true
   },
   network: {
     type: 'string',
     enum: ['mainnet', 'testnet'],
     default: (process.env.HEDERA_NETWORK as 'mainnet' | 'testnet') || 'mainnet',
-    description: '要查询的网络（默认使用 .env 中的 HEDERA_NETWORK）'
+    description: 'Network to query (defaults to HEDERA_NETWORK from .env)'
   }
 } as const;
 
@@ -228,7 +228,7 @@ export async function getSaucerswapRouterSwapQuote(
       ]);
       functionName = 'quoteExactOutput';
     } else {
-      throw new Error(`不支持的 operation：${params.operation}`);
+      throw new Error(`Unsupported operation: ${params.operation}`);
     }
 
     console.log(`🔍 Calling ${functionName} with path: ${encodedPath}, amount: ${params.amount}`);
@@ -285,26 +285,26 @@ export async function getSaucerswapRouterSwapQuote(
     console.error('❌ SaucerSwap Router quote error:', error);
     
     return {
-      error: `SaucerSwap Router 报价失败：${error.message}`,
+      error: `SaucerSwap Router quote failed: ${error.message}`,
       operation: params.operation,
       timestamp: timestamp,
       troubleshooting: {
-        issue: '报价请求失败',
+        issue: 'Quote request failed',
         possibleCauses: [
-          'token path 无效，相关 token 在 SaucerSwap V2 上可能没有交易对',
-          '交易对 fee tier 不正确（使用 100、500、3000 或 10000）',
-          'Hashio RPC 网络连接异常',
-          'QuoterV2 合约调用失败或返回空数据',
-          '所选网络未找到 token ID',
-          '包含 fee 的 path 编码异常'
+          'Invalid token path - tokens may not have trading pairs on SaucerSwap V2',
+          'Incorrect fee tiers for the token pair (use 100, 500, 3000, or 10000)',
+          'Network connectivity issues with Hashio RPC',
+          'QuoterV2 contract call failed or returned empty data',
+          'Token IDs not found on selected network',
+          'Path encoding issue with embedded fees'
         ],
         nextSteps: [
-          '确认 token ID 在所选网络有效',
-          '确认相关 token 在 SaucerSwap V2 上存在交易对',
-          '尝试标准 fee：[3000] 表示 0.30%',
-          '确认 path 长度与 fees 数组精确匹配',
-          '先用更简单的 2-token path 测试',
-          '检查到 Hashio RPC endpoint 的网络连接'
+          'Verify token IDs are valid on the selected network',
+          'Check that trading pairs exist for the tokens on SaucerSwap V2',
+          'Try with standard fees: [3000] for 0.30%',
+          'Ensure path length and fees array match exactly',
+          'Test with a simpler 2-token path first',
+          'Check network connectivity to Hashio RPC endpoints'
         ],
         pathEncoding: {
           providedPath: params.tokenPath,

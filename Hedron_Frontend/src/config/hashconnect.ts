@@ -33,7 +33,7 @@ const networkName = networkConfig.charAt(0).toUpperCase() + networkConfig.slice(
 // App metadata for HashConnect
 export const appMetadata = {
   name: 'Xylem agent',
-  description: '集成 Hedera 钱包的 Xylem agent',
+  description: 'Xylem agent with direct Hedera wallet integration',
   url: typeof window !== 'undefined' ? window.location.origin : '',
   icons: ['https://avatars.githubusercontent.com/u/37784886']
 }
@@ -43,7 +43,7 @@ export const createHashConnect = () => {
   console.log(`🚀 Creating HashConnect instance for Hedera ${networkName}`)
   console.log('📋 Project ID:', projectId.slice(0, 8) + '...')
   console.log('🌐 Network:', networkConfig.toUpperCase())
-
+  
   return new HashConnect(
     ledgerId,  // Dynamic network based on environment variable
     projectId,
@@ -56,4 +56,4 @@ export const createHashConnect = () => {
 export { projectId, networkConfig, networkName, ledgerId }
 
 // Export types for use in components
-export type { HashConnectConnectionState, SessionData }
+export type { HashConnectConnectionState, SessionData } 

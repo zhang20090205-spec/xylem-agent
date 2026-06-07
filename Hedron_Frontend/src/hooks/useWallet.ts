@@ -2,34 +2,17 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { HashConnect, HashConnectConnectionState, SessionData } from 'hashconnect'
 import { createHashConnect } from '../config/hashconnect'
 
-const DEMO_WALLET_ENABLED = import.meta.env.VITE_DEMO_WALLET_ENABLED !== 'false'
-const DEMO_ACCOUNT_ID = import.meta.env.VITE_DEMO_ACCOUNT_ID || '0.0.5864846'
-const DEMO_WALLET_BALANCE_HBAR = Number(import.meta.env.VITE_DEMO_WALLET_BALANCE_HBAR || '2500')
-const DEMO_SESSION_DATA = { accountIds: [DEMO_ACCOUNT_ID] } as unknown as SessionData
-const createDemoBalance = () => ({
-  value: BigInt(Math.round(DEMO_WALLET_BALANCE_HBAR * 100000000)),
-  symbol: 'HBAR'
-})
-
 // Global singleton to prevent multiple HashConnect instances across hot reloads
 let globalHashConnectInstance: HashConnect | null = null
 let globalInitPromise: Promise<HashConnect> | null = null
 
 export function useWallet() {
   const [hashconnect, setHashconnect] = useState<HashConnect | null>(null)
-  const [connectionState, setConnectionState] = useState<HashConnectConnectionState>(
-    DEMO_WALLET_ENABLED ? HashConnectConnectionState.Paired : HashConnectConnectionState.Disconnected
-  )
-  const [sessionData, setSessionData] = useState<SessionData | null>(
-    DEMO_WALLET_ENABLED ? DEMO_SESSION_DATA : null
-  )
+  const [connectionState, setConnectionState] = useState<HashConnectConnectionState>(HashConnectConnectionState.Disconnected)
+  const [sessionData, setSessionData] = useState<SessionData | null>(null)
   const [isConnecting, setIsConnecting] = useState(false)
-  const [address, setAddress] = useState<string | null>(
-    DEMO_WALLET_ENABLED ? DEMO_ACCOUNT_ID : null
-  )
-  const [balance, setBalance] = useState<any>(
-    DEMO_WALLET_ENABLED ? createDemoBalance() : null
-  )
+  const [address, setAddress] = useState<string | null>(null)
+  const [balance, setBalance] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
   
   // Stable refs that persist across re-renders
@@ -100,18 +83,6 @@ export function useWallet() {
 
   // Initialize HashConnect only once per component instance
   useEffect(() => {
-    if (DEMO_WALLET_ENABLED) {
-      setHashconnect(null)
-      setConnectionState(HashConnectConnectionState.Paired)
-      setSessionData(DEMO_SESSION_DATA)
-      setAddress(DEMO_ACCOUNT_ID)
-      setBalance(createDemoBalance())
-      setIsConnecting(false)
-      setError(null)
-      console.log('Demo wallet connected:', DEMO_ACCOUNT_ID)
-      return
-    }
-
     let isMounted = true
 
     const initializeHashConnect = async () => {
@@ -187,7 +158,7 @@ export function useWallet() {
       } catch (error) {
         if (!isMounted) return
         console.error('❌ Failed to initialize HashConnect:', error)
-        setError(error instanceof Error ? error.message : '初始化钱包连接失败')
+        setError(error instanceof Error ? error.message : 'Failed to initialize wallet connection')
       }
     }
 
@@ -227,11 +198,6 @@ export function useWallet() {
 
   // Get balance when address changes
   useEffect(() => {
-    if (DEMO_WALLET_ENABLED && address) {
-      setBalance(createDemoBalance())
-      return
-    }
-
     if (address && connectionState === HashConnectConnectionState.Paired) {
       // For now, we'll show a mock balance
       // In a real implementation, you would query the Hedera mirror node
@@ -246,17 +212,8 @@ export function useWallet() {
 
   // Connect function with improved error handling
   const connect = useCallback(async () => {
-    if (DEMO_WALLET_ENABLED) {
-      setConnectionState(HashConnectConnectionState.Paired)
-      setSessionData(DEMO_SESSION_DATA)
-      setAddress(DEMO_ACCOUNT_ID)
-      setBalance(createDemoBalance())
-      setError(null)
-      return
-    }
-
     if (!hashconnect) {
-      setError('钱包尚未初始化')
+      setError('Wallet not initialized')
       return
     }
 
@@ -289,22 +246,13 @@ export function useWallet() {
       
     } catch (error) {
       console.error('❌ Failed to open pairing modal:', error)
-      setError(error instanceof Error ? error.message : '连接钱包失败')
+      setError(error instanceof Error ? error.message : 'Failed to connect to wallet')
       modalOpenedRef.current = false // Reset flag only on error
     }
   }, [hashconnect, connectionState, sessionData])
 
   // Disconnect function with proper cleanup
   const disconnect = useCallback(async () => {
-    if (DEMO_WALLET_ENABLED) {
-      setConnectionState(HashConnectConnectionState.Paired)
-      setSessionData(DEMO_SESSION_DATA)
-      setAddress(DEMO_ACCOUNT_ID)
-      setBalance(createDemoBalance())
-      setError(null)
-      return
-    }
-
     if (!hashconnect) return
     
     try {
@@ -324,21 +272,12 @@ export function useWallet() {
       
     } catch (error) {
       console.error('❌ Failed to disconnect:', error)
-      setError(error instanceof Error ? error.message : '断开钱包失败')
+      setError(error instanceof Error ? error.message : 'Failed to disconnect wallet')
     }
   }, [hashconnect])
 
   // Force reset function for emergency cases
   const forceReset = useCallback(() => {
-    if (DEMO_WALLET_ENABLED) {
-      setConnectionState(HashConnectConnectionState.Paired)
-      setSessionData(DEMO_SESSION_DATA)
-      setAddress(DEMO_ACCOUNT_ID)
-      setBalance(createDemoBalance())
-      setError(null)
-      return
-    }
-
     console.log('🚨 Force resetting HashConnect...')
     
     // Clear all storage
@@ -388,12 +327,12 @@ export function useWallet() {
 
   // Computed values
   const isConnected = useMemo(() => 
-    DEMO_WALLET_ENABLED || (connectionState === HashConnectConnectionState.Paired && !!sessionData), 
+    connectionState === HashConnectConnectionState.Paired && !!sessionData, 
     [connectionState, sessionData]
   )
   
   const isDisconnected = useMemo(() => 
-    !DEMO_WALLET_ENABLED && connectionState === HashConnectConnectionState.Disconnected, 
+    connectionState === HashConnectConnectionState.Disconnected, 
     [connectionState]
   )
 
@@ -423,7 +362,6 @@ export function useWallet() {
     sessionData,
     hashconnect,
     error,
-    isDemoWallet: DEMO_WALLET_ENABLED,
     forceReset, // Emergency reset function
     // Additional methods for compatibility
     openModal: connect,

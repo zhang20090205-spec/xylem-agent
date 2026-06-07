@@ -1,55 +1,80 @@
-# Railway 部署
+# 🚀 Hedera WebSocket Agent - Railway Deployment
 
-本文说明如何把 Hedron WebSocket Agent 部署到 Railway。
+This repository contains a Hedera WebSocket agent that can be easily deployed on Railway.
 
-## 准备
-- Railway 账号
-- GitHub 仓库
-- `OPENAI_API_KEY`
-- 需要的 Hedera 与 SaucerSwap 环境变量
+## 📋 Prerequisites
 
-## 环境变量
-```env
-OPENAI_API_KEY=your-openai-key
-HEDERA_NETWORK=mainnet
-LLM_MODEL=gpt-5-mini
-LLM_MAX_TOKENS=12000
-MEMORY_MAX_TOKEN_LIMIT=8000
-SAUCERSWAP_MAINNET_API_KEY=your-key
-SAUCERSWAP_TESTNET_API_KEY=your-key
-```
+- Railway account at [Railway](https://railway.app)
+- OpenAI API Key
+- (Optional) Hedera Testnet account
 
-## 启动命令
-在 Railway 中将服务根目录指向 `typescript`，启动命令可使用：
+## 🚂 Railway Deployment
 
-```bash
-npm run start:prod
-```
+### Option 1: Deploy Button (Easiest)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template)
 
-或直接：
+### Option 2: From GitHub
+1. Go to [Railway](https://railway.app)
+2. Create new project → **Deploy from GitHub repo**
+3. Select this repository
+4. **DO NOT** specify Root Directory (leave it empty)
 
-```bash
-cd examples/langchain && npx ts-node websocket-agent.ts
-```
+## ⚙️ Required Environment Variables
 
-## 健康检查
-部署后访问：
-
-```text
-https://your-service.up.railway.app/health
-```
-
-返回 `status: healthy` 表示服务可用。
-
-## 前端连接
-在前端生产环境配置：
+In Railway Dashboard → Variables, add:
 
 ```env
-VITE_WEBSOCKET_URL_PRODUCTION=wss://your-service.up.railway.app
+OPENAI_API_KEY=your_openai_key_here
+PORT=8080
+NODE_ENV=production
 ```
 
-## 排障
-- 构建失败：确认 `typescript/package.json` 依赖已安装
-- WebSocket 无法连接：确认 Railway 暴露了正确端口，并使用 `wss://`
-- Agent 无响应：确认 `OPENAI_API_KEY` 有效
-- API 数据为空：确认 SaucerSwap API key 和 `HEDERA_NETWORK`
+### Optional Variables:
+```env
+HEDERA_NETWORK=testnet
+HEDERA_ACCOUNT_ID=0.0.12345
+HEDERA_PRIVATE_KEY=your_private_key
+```
+
+## 🔧 Automatic Configuration
+
+Railway automatically detects:
+- **Build Command**: `npm run build`
+- **Start Command**: `npm start`
+- **Port**: `8080`
+
+## 🌐 Endpoints
+
+Once deployed:
+- **Health Check**: `https://tu-app.railway.app/health`
+- **WebSocket**: `wss://tu-app.railway.app`
+
+## 🐛 Debugging
+
+To view logs:
+```bash
+railway logs
+```
+
+For local development:
+```bash
+npm run dev
+```
+
+## 📁 Project Structure
+
+```
+/
+├── package.json (main configuration)
+├── railway.json (Railway configuration)
+├── typescript/
+│   ├── src/shared/ (shared code)
+│   └── examples/langchain/
+│       └── websocket-agent.ts (main agent)
+```
+
+## 🔗 Useful URLs
+
+- [Railway Docs](https://docs.railway.app)
+- [Hedera Docs](https://docs.hedera.com)
+- [WebSocket API Documentation](./typescript/examples/langchain/README-WEBSOCKET.md)

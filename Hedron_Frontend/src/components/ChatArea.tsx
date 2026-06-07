@@ -20,139 +20,149 @@ export default function ChatArea({ messages, isLoading, onExecuteSwap, onSendMes
     scrollToBottom();
   }, [messages]);
 
+  // Example prompts organized by category
   const promptCategories = [
     {
-      code: '01',
-      title: 'MARKET DATA',
-      label: '分析与市场数据',
+      emoji: "📈",
+      title: "Analytics & Market Data",
       prompts: [
-        '帮我查看 Bonzo Finance 的借贷利率和市场统计',
-        '当前 SaucerSwap 有哪些 farming 机会？',
-      ],
+        "Show me Bonzo Finance lending rates and market statistics",
+        "What are the current SaucerSwap farming opportunities?"
+      ]
     },
     {
-      code: '02',
-      title: 'DEFI OPS',
-      label: 'DeFi 操作',
+      emoji: "💰",
+      title: "DeFi Operations",
       prompts: [
-        '将 25 SAUCE 存入 Bonzo Finance 赚取收益',
-        '当 SAUCE 价格跌到 0.0045 USDC 时，用 10 HBAR 创建限价单',
-      ],
+        "Deposit 25 SAUCE into Bonzo Finance to earn interest",
+                  "Create a limit order with 10 HBAR when SAUCE token price drops to 0.0045 USDC"
+      ]
     },
     {
-      code: '03',
-      title: 'ACCOUNT QUERY',
-      label: '账户与网络查询',
+      emoji: "🔍",
+      title: "Account & Network Queries",
       prompts: [
-        '根据我的情况，为我的 HBAR 制定收益策略',
-        '查看我的 Infinity Pool 质押奖励和 xSAUCE 余额',
-      ],
-    },
+        "Create a yield strategy for my HBAR based on my profile",
+        "Check my Infinity Pool staking rewards and xSAUCE balance"
+      ]
+    }
   ];
 
-  const promptList = promptCategories.flatMap((category) =>
-    category.prompts.map((prompt, promptIndex) => ({
-      ...category,
-      prompt,
-      itemCode: `${category.code}.${promptIndex + 1}`,
-    })),
-  );
-
   const handlePromptClick = (prompt: string) => {
-    onSendMessage?.(prompt);
+    if (onSendMessage) {
+      onSendMessage(prompt);
+    }
   };
 
   if (messages.length === 0) {
     return (
-      <div className="ether-scroll min-h-0 flex-1 overflow-y-auto">
-        <div className="relative mx-auto flex min-h-full max-w-7xl flex-col px-5 py-6 lg:px-8 lg:py-8">
-          <section className="flex min-h-[340px] flex-1 flex-col items-center justify-center pb-10 pt-12 text-center md:min-h-[420px] lg:min-h-[440px] lg:pb-12 lg:pt-4">
-            <div className="ether-line-label ether-micro mb-12">
-              CURRENTLY TRANSMITTING
+      <div className="flex-1 bg-gradient-to-br from-theme-bg-primary to-theme-bg-secondary dark:from-gray-900 dark:to-gray-800 min-h-0 h-full overflow-y-auto">
+        <div className="max-w-6xl mx-auto px-4 pt-20 pb-8">
+          {/* Header Section */}
+          <div className="text-center mb-16">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-theme-lg">
+              <img 
+                src="/hedron-bot.png" 
+                alt="Hedron Bot" 
+                className="w-20 h-20 object-cover rounded-full"
+              />
             </div>
-            <h2 className="ether-serif max-w-5xl text-5xl leading-none text-white/88 drop-shadow-sm md:text-7xl xl:text-8xl">
-              Xylem agent
+            <h2 className="text-3xl font-bold text-theme-text-primary mb-3">
+              Welcome to Xylem agent
             </h2>
-            <p className="ether-serif mt-8 text-2xl italic text-white/46 md:text-3xl">
-              hedera defi signal room
+            <p className="text-theme-text-secondary max-w-md mx-auto text-lg leading-relaxed">
+              Start a conversation with your AI assistant. Ask questions, get help, 
+              or just have a chat!
             </p>
-            <div className="ether-micro ether-label mt-10 flex items-center gap-3">
-              <span className="ether-signal-dot" />
-              <span>FREQUENCY 89.4 / {promptList.length.toLocaleString()} LISTENING</span>
-            </div>
-            <button
-              onClick={() => handlePromptClick(promptList[0].prompt)}
-              className="ether-button mt-12 max-w-full px-10 py-5 md:px-12"
-            >
-              TUNE IN SIMULTANEOUSLY
-            </button>
-          </section>
+          </div>
 
-          <section className="grid gap-5 pb-8 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:items-end lg:pb-10">
-            <div className="ether-micro ether-label hidden space-y-2 lg:block">
-              <div>DATA: STREAMING</div>
-              <div>ENCRYPTION: WALLET SIGNED</div>
-              <div>AESTHETIC: ANALOG</div>
+          {/* Example Prompts Grid */}
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {promptCategories.map((category, categoryIndex) => 
+                category.prompts.map((prompt, promptIndex) => (
+                  <button
+                    key={`${categoryIndex}-${promptIndex}`}
+                    onClick={() => handlePromptClick(prompt)}
+                    className="group bg-theme-bg-secondary dark:bg-gray-800 border border-theme-border-primary dark:border-gray-700 
+                             rounded-xl p-4 text-left hover:border-blue-500 dark:hover:border-blue-400 
+                             hover:shadow-theme-lg transition-all duration-200 hover:scale-[1.02] 
+                             active:scale-[0.98] cursor-pointer h-full"
+                  >
+                    <div className="flex items-start gap-2 mb-3">
+                      <span className="text-xl flex-shrink-0">{category.emoji}</span>
+                      <div className="flex-1">
+                        <h4 className="text-xs font-semibold text-theme-text-secondary dark:text-gray-400 mb-1">
+                          {category.title}
+                        </h4>
+                      </div>
+                    </div>
+                    <div className="text-theme-text-primary dark:text-white text-sm leading-relaxed mb-3">
+                      "{prompt}"
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-theme-text-tertiary">
+                        Click to send
+                      </span>
+                      <div className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full opacity-0 
+                                    group-hover:opacity-100 transition-opacity duration-200"></div>
+                    </div>
+                  </button>
+                ))
+              )}
             </div>
+          </div>
 
-            <div className="ether-scroll space-y-3 lg:max-h-[180px] lg:space-y-2 lg:overflow-y-auto lg:pr-1">
-              {promptList.map((item) => (
-                <button
-                  key={`${item.itemCode}-${item.prompt}`}
-                  onClick={() => handlePromptClick(item.prompt)}
-                  className="group grid w-full grid-cols-[34px_1fr] gap-4 text-left transition-transform duration-200 hover:-translate-x-1"
-                >
-                  <span className="ether-micro ether-faint pt-1">{item.itemCode}</span>
-                  <span>
-                    <span className="ether-micro block text-white/64">{item.title}</span>
-                    <span className="mt-1 block text-sm leading-relaxed text-white/78 lg:line-clamp-1">
-                      {item.prompt}
-                    </span>
-                  </span>
-                </button>
-              ))}
+          {/* Type message to begin section */}
+          <div className="mt-12 flex justify-center">
+            <div className="bg-theme-bg-secondary dark:bg-gray-800 px-6 py-3 rounded-full shadow-theme-md border border-theme-border-primary dark:border-gray-700">
+              <span className="text-sm text-theme-text-tertiary font-medium">Type a message to begin</span>
             </div>
-          </section>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-0 flex-1 overflow-hidden">
-      <div
-        className="ether-scroll h-full overflow-y-auto overflow-x-hidden"
-        style={{
+    <div className="flex-1 h-full bg-gradient-to-b from-theme-bg-primary/50 to-theme-bg-secondary dark:from-gray-900/50 dark:to-gray-800 overflow-hidden">
+      {/* Scrollable messages container */}
+      <div 
+        className="h-full overflow-y-auto overflow-x-hidden" 
+        style={{ 
           scrollbarWidth: 'thin',
-          scrollBehavior: 'smooth',
+          scrollBehavior: 'smooth'
         }}
       >
-        <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-6 lg:px-6">
+        <div className="w-full max-w-4xl mx-auto px-4 py-6 space-y-6">
+          {/* Messages */}
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} onExecuteSwap={onExecuteSwap} />
           ))}
-
+          
+          {/* Loading indicator */}
           {isLoading && (
             <div className="flex gap-4 group">
-              <div className="ether-panel h-10 w-10 flex-shrink-0 overflow-hidden rounded-full">
-                <img
-                  src="/hedron-bot.png"
-                  alt="Hedron 机器人"
-                  className="h-full w-full object-cover opacity-80"
+              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-theme-md">
+                <img 
+                  src="/hedron-bot.png" 
+                  alt="Hedron Bot" 
+                  className="w-10 h-10 object-cover rounded-full"
                 />
               </div>
-              <div className="max-w-[85%] flex-1">
-                <div className="ether-panel inline-block px-5 py-4">
+              <div className="flex-1 max-w-[85%]">
+                <div className="inline-block px-5 py-4 rounded-2xl rounded-bl-md bg-theme-bg-secondary dark:bg-gray-800 border border-theme-border-primary dark:border-gray-700 shadow-theme-sm">
                   <div className="flex gap-1.5">
-                    <div className="h-2.5 w-2.5 animate-bounce rounded-full bg-orange-200/80" />
-                    <div className="h-2.5 w-2.5 animate-bounce rounded-full bg-orange-200/80" style={{ animationDelay: '0.15s' }} />
-                    <div className="h-2.5 w-2.5 animate-bounce rounded-full bg-orange-200/80" style={{ animationDelay: '0.3s' }} />
+                    <div className="w-2.5 h-2.5 bg-blue-400 dark:bg-blue-500 rounded-full animate-bounce" />
+                    <div className="w-2.5 h-2.5 bg-blue-400 dark:bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
+                    <div className="w-2.5 h-2.5 bg-blue-400 dark:bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
                   </div>
                 </div>
               </div>
             </div>
           )}
-
+          
+          {/* Scroll target with more space */}
           <div ref={messagesEndRef} className="h-8" />
         </div>
       </div>

@@ -212,15 +212,15 @@ export const saucerswapApiQueryParameters = (context: Context = {}) => {
       SAUCERSWAP_API_OPERATIONS.ACCOUNT_FARMS,
       SAUCERSWAP_API_OPERATIONS.INFINITY_POOL_POSITION,
     ]).describe(
-      '要执行的 SaucerSwap API operation：general_stats、sss_stats、farms、account_farms 或 infinity_pool_position'
+      'The SaucerSwap API operation to perform: general_stats, sss_stats, farms, account_farms, or infinity_pool_position'
     ),
     accountId: z.string().optional().describe(
-      'Hedera 账户 ID，格式为 shard.realm.num（account_farms 和 infinity_pool_position operation 需要）'
+      'Hedera account ID in format shard.realm.num (required for account_farms and infinity_pool_position operations)'
     ),
     network: z.enum(['mainnet', 'testnet']).default(
       (process.env.HEDERA_NETWORK as 'mainnet' | 'testnet') || 'mainnet'
     ).describe(
-      '要查询的 Hedera 网络（默认使用 .env 中的 HEDERA_NETWORK）'
+      'The Hedera network to query (defaults to HEDERA_NETWORK from .env)'
     ),
   }) as any;
 };
@@ -232,49 +232,49 @@ const getSaucerSwapApiQueryPrompt = (context: Context = {}) => {
   return `
 ${contextSnippet}
 
-该工具通过 SaucerSwap 官方 REST API 查询实时交易数据、流动性统计和 farm 信息。
+This tool allows you to query SaucerSwap DEX protocol using their official REST API to get real-time trading data, liquidity statistics, and farm information.
 
-可用 operation:
+Available operations:
 
 1. **General Statistics** (general_stats):
-   - 查询整体协议统计
-   - 返回 SAUCE 流通量、swap 总量、TVL（USD）、volume（USD）
-   - 不需要额外参数
+   - Get overall protocol statistics
+   - Returns circulating SAUCE, swap totals, TVL (USD), volume (USD)
+   - No additional parameters needed
 
 2. **Single-Sided Staking Statistics** (sss_stats):
-   - 查询 Single-Sided Staking (SSS) 统计
-   - 返回 5 日平均 APY、SAUCE/xSAUCE 比例、质押数量
-   - 不需要额外参数
+   - Get Single-Sided Staking (SSS) statistics
+   - Returns 5-day average APY, SAUCE/xSAUCE ratio, staking amounts
+   - No additional parameters needed
 
 3. **Active Farms** (farms):
-   - 查询所有活跃 farm 列表
-   - 返回 farm ID、pool ID、SAUCE/HBAR 排放、总质押数量
-   - 不需要额外参数
+   - Get list of all active farms
+   - Returns farm IDs, pool IDs, SAUCE/HBAR emissions, total staked amounts
+   - No additional parameters needed
 
 4. **Account Farms** (account_farms):
-   - 按账户 ID 查询 farm 中的 LP token 数量
-   - 需要 accountId 参数
-   - 返回指定账户的 farm 详情和质押数量
+   - Get LP token amounts in farms by account ID
+   - Requires accountId parameter
+   - Returns farm details and staked amounts for specific account
 
 5. **Infinity Pool Position** (infinity_pool_position):
-   - 查询用户真实 Infinity Pool 质押仓位
-   - 结合 Mirror Node 的 xSAUCE 余额和 API 的 SAUCE/xSAUCE 比例
-   - 需要 accountId 参数
-   - 返回 xSAUCE 余额、可领取 SAUCE、当前比例和仓位价值
+   - Get user's actual Infinity Pool staking position
+   - Combines xSAUCE balance from Mirror Node + SAUCE/xSAUCE ratio from API
+   - Requires accountId parameter
+   - Returns xSAUCE balance, claimable SAUCE, current ratio, and position value
 
-参数:
-- operation (required): 要执行的 API operation
-- accountId (optional): account_farms 和 infinity_pool_position operation 需要
-- network (optional): mainnet 或 testnet（默认 mainnet）
+Parameters:
+- operation (required): The API operation to perform
+- accountId (optional): Required for account_farms and infinity_pool_position operations
+- network (optional): mainnet or testnet (defaults to mainnet)
 
 ${usageInstructions}
 
-示例:
-- 查询 general stats: operation="general_stats"
-- 查询 SSS stats: operation="sss_stats", network="mainnet"
-- 查询 active farms: operation="farms"
-- 查询 account farms: operation="account_farms", accountId="0.0.123456"
-- 查询 Infinity Pool position: operation="infinity_pool_position", accountId="0.0.123456"
+Examples:
+- Get general stats: operation="general_stats"
+- Get SSS stats: operation="sss_stats", network="mainnet"
+- Get active farms: operation="farms"
+- Get account farms: operation="account_farms", accountId="0.0.123456"
+- Get infinity pool position: operation="infinity_pool_position", accountId="0.0.123456"
 `;
 };
 
@@ -307,8 +307,8 @@ export const getSaucerSwapApiQuery = async (
          params.operation === SAUCERSWAP_API_OPERATIONS.INFINITY_POOL_POSITION) && 
         !params.accountId) {
       return {
-        error: `${params.operation} operation 需要 accountId`,
-        suggestion: '请提供格式为 shard.realm.num 的 Hedera 账户 ID（例如 "0.0.123456"）'
+        error: `accountId is required for ${params.operation} operation`,
+        suggestion: 'Provide a Hedera account ID in format shard.realm.num (e.g., "0.0.123456")'
       };
     }
 
@@ -407,24 +407,24 @@ export const getSaucerSwapApiQuery = async (
         console.error('❌ Infinity Pool position query failed:', error);
         
         return {
-          error: `查询 Infinity Pool 仓位时出错：${error instanceof Error ? error.message : '未知错误'}`,
+          error: `Error querying Infinity Pool position: ${error instanceof Error ? error.message : 'Unknown error'}`,
           operation: params.operation,
           network: network,
           timestamp: new Date().toISOString(),
-          suggestion: '请检查账户 ID 和网络配置，并确认 Mirror Node 与 SaucerSwap API 均可访问。',
+          suggestion: 'Check account ID and network configuration. Ensure both Mirror Node and SaucerSwap API are accessible.',
           troubleshooting: {
             common_causes: [
-              '账户 ID 格式无效',
-              '账户没有 xSAUCE token',
-              'Mirror Node 连接异常',
-              'SaucerSwap API 触发频率限制',
-              '网络不匹配（mainnet/testnet）'
+              'Invalid account ID format',
+              'Account has no xSAUCE tokens',
+              'Mirror Node connectivity issues', 
+              'SaucerSwap API rate limiting',
+              'Network mismatch (mainnet/testnet)'
             ],
             next_steps: [
-              '确认账户 ID 格式为 shard.realm.num',
-              '检查账户是否持有 xSAUCE token',
-              '稍等片刻后重试',
-              '确认网络设置与账户所在网络一致'
+              'Verify account ID format (shard.realm.num)',
+              'Check if account has xSAUCE tokens',
+              'Try again in a few moments',
+              'Verify network setting matches account network'
             ]
           }
         };
@@ -448,7 +448,7 @@ export const getSaucerSwapApiQuery = async (
         apiUrl += `${SAUCERSWAP_API_CONFIG.ENDPOINTS.ACCOUNT_FARMS}/${params.accountId}`;
         break;
       default:
-        throw new Error(`不支持的 operation：${params.operation}`);
+        throw new Error(`Unsupported operation: ${params.operation}`);
     }
 
     // Make API request with retry logic
@@ -478,28 +478,28 @@ export const getSaucerSwapApiQuery = async (
   } catch (error) {
     console.error('❌ SaucerSwap API query failed:', error);
     
-    const errorMessage = error instanceof Error ? error.message : '未知错误';
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     
     return {
-      error: `查询 SaucerSwap Finance API 时出错：${errorMessage}`,
+      error: `Error querying SaucerSwap Finance API: ${errorMessage}`,
       operation: params.operation,
       network: params.network || 'mainnet',
       timestamp: new Date().toISOString(),
-      suggestion: '请检查 API key 和网络配置，并确认 SaucerSwap API 可用。',
+      suggestion: 'Check your API key and network configuration. Verify the SaucerSwap API is available.',
       troubleshooting: {
         common_causes: [
-          'API key 无效或缺失',
-          '触发频率限制（请求过多）',
-          '网络连接异常',
-          '账户 ID 格式无效',
-          'API 暂时不可用'
+          'Invalid or missing API key',
+          'Rate limiting (too many requests)',
+          'Network connectivity issues',
+          'Invalid account ID format',
+          'API temporarily unavailable'
         ],
         solutions: [
-          '确认 .env 文件中的 API key 正确',
-          '等待 30-60 秒后再请求',
-          '检查账户 ID 格式是否为 shard.realm.num',
-          '尝试切换网络（mainnet/testnet）',
-          '确认互联网连接正常'
+          'Verify API key is correct in .env file',
+          'Wait 30-60 seconds before making another request',
+          'Check account ID format (shard.realm.num)',
+          'Try switching networks (mainnet/testnet)',
+          'Verify internet connection'
         ]
       },
       api_documentation: 'https://docs.saucerswap.finance/v/developer/rest-api'

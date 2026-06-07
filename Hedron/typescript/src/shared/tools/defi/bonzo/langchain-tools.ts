@@ -10,19 +10,19 @@ import { getBonzoApiQuery, BONZO_API_QUERY_TOOL, BONZO_API_OPERATIONS } from './
 export const createBonzoLangchainTool = (client: any, context: Context, userAccountId: string) => {
   return new DynamicStructuredTool({
     name: BONZO_API_QUERY_TOOL,
-    description: `通过 Bonzo Finance 官方 REST API 查询 DeFi 协议实时数据。
+    description: `Query Bonzo Finance DeFi protocol using their official REST API for real-time data.
 
-可用 operation:
-- Account Dashboard: 查询账户借贷仓位详情
-- Market Information: 查询所有支持 token 的当前市场数据
-- Pool Statistics: 查询 24 小时协议统计
-- Protocol Information: 查询协议配置和合约地址
-- BONZO Token: 查询 BONZO token 详情和 treasury 信息
-- BONZO Circulation: 查询当前流通供应量
+Available operations:
+- Account Dashboard: Get detailed account lending/borrowing positions
+- Market Information: Get current market data for all supported tokens  
+- Pool Statistics: Get 24-hour protocol statistics
+- Protocol Information: Get protocol configuration and contract addresses
+- BONZO Token: Get BONZO token details and treasury information
+- BONZO Circulation: Get current circulating supply
 
-该工具提供 Bonzo 借贷协议数据，包括 APY、利用率、流动性信息和账户仓位。
+This provides access to Bonzo's DeFi lending protocol data including APY rates, utilization percentages, liquidity info, and account positions.
 
-用户账户：${userAccountId}`,
+User Account: ${userAccountId}`,
     schema: z.object({
       operation: z.enum([
         BONZO_API_OPERATIONS.ACCOUNT_DASHBOARD,
@@ -32,47 +32,47 @@ export const createBonzoLangchainTool = (client: any, context: Context, userAcco
         BONZO_API_OPERATIONS.BONZO_TOKEN,
         BONZO_API_OPERATIONS.BONZO_CIRCULATION,
       ]).describe(
-        'Bonzo API operation：account_dashboard、market_info、pool_stats、protocol_info、bonzo_token 或 bonzo_circulation'
+        'The Bonzo API operation: account_dashboard, market_info, pool_stats, protocol_info, bonzo_token, or bonzo_circulation'
       ),
       accountId: z.string().optional().describe(
-        'Hedera 账户 ID，格式为 shard.realm.num（仅 account_dashboard 需要）'
+        'Hedera account ID in format shard.realm.num (required only for account_dashboard)'
       ),
     }),
     func: async (params: any) => {
       try {
-        console.log('Bonzo API 查询参数：', params);
-        console.log('用户账户 ID：', userAccountId);
+        console.log('🔍 Bonzo API query started with params:', params);
+        console.log('👤 User account ID:', userAccountId);
 
         // If no accountId provided for dashboard and we have user account, use it
         if (params.operation === BONZO_API_OPERATIONS.ACCOUNT_DASHBOARD && !params.accountId) {
           params.accountId = userAccountId;
-          console.log(`dashboard 使用用户账户 ID：${userAccountId}`);
+          console.log(`📋 Using user account ID for dashboard: ${userAccountId}`);
         }
 
         const result = await getBonzoApiQuery(client, context, params);
         return JSON.stringify(result, null, 2);
       } catch (error) {
-        console.error('Bonzo API 查询失败：', error);
-
-        const errorMessage = error instanceof Error ? error.message : '未知错误';
-
+        console.error('❌ Bonzo API query failed:', error);
+        
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        
         return JSON.stringify({
-          error: `查询 Bonzo Finance API 时出错：${errorMessage}`,
+          error: `Error querying Bonzo Finance API: ${errorMessage}`,
           operation: params.operation,
           timestamp: new Date().toISOString(),
           troubleshooting: {
-            issue: 'API 请求失败',
+            issue: 'API request failed',
             possible_causes: [
-              '网络连接异常',
-              'Bonzo Finance API 暂时不可用',
-              '账户 ID 格式无效',
-              '触发 API 频率限制'
+              'Network connectivity issues',
+              'Bonzo Finance API is temporarily unavailable',
+              'Invalid account ID format',
+              'Rate limiting'
             ],
             next_steps: [
-              '检查互联网连接',
-              '确认账户 ID 格式为 shard.realm.num',
-              '稍后重试',
-              '检查 Bonzo Finance 状态页'
+              'Check internet connection',
+              'Verify account ID format (shard.realm.num)',
+              'Try again in a few moments',
+              'Check Bonzo Finance status page'
             ]
           },
           api_documentation: 'https://docs.bonzo.finance/hub/developer/bonzo-v1-data-api'
@@ -94,4 +94,4 @@ export const createBonzoLangchainTools = (client: any, context: Context, userAcc
     // createBonzoMarketTool(client, context, userAccountId),
     // createBonzoProtocolTool(client, context, userAccountId),
   ];
-};
+}; 

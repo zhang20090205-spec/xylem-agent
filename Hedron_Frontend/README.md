@@ -1,48 +1,56 @@
-# Hedron 前端
+## Hedron Frontend
 
-这是 Hedron Agent 的 React + Vite + TypeScript 前端。它提供中文聊天界面，通过 WebSocket 连接 Hedera 后端，支持 WalletConnect/HashConnect 钱包连接、结构化 swap 报价卡片和 token 余额组件。
+A modern React + Vite TypeScript frontend for the Hedron Agent. It provides a conversational UI connected to a Hedera-enabled backend via WebSocket, WalletConnect/HashConnect wallet integration, and a live token balance widget.
 
-## 功能
-- 带会话管理、Markdown 渲染和富文本样式的聊天界面
-- 通过 HashConnect（WalletConnect v2）连接钱包
-- 自动重连和认证流程的 WebSocket 后端连接
-- 结构化 `SWAP_QUOTE` 消息渲染与执行入口
-- HBAR、SAUCE、USDC、BONZO、WHBAR 等余额展示和 USD 估值
-- 浅色/深色主题与响应式布局
+### Features
+- Chat interface with session management, Markdown rendering, and rich message styling
+- Wallet connection via HashConnect (WalletConnect v2) with robust lifecycle management
+- WebSocket connectivity to the Hedron Agent backend with auto-reconnect and auth flow
+- Structured swap quotes rendering (specialized quote card and execution hook)
+- Token balances (HBAR and common tokens) with USD estimates, updated periodically
+- Light/Dark theme toggle and responsive layout
 
-## 技术栈
-- React 18、TypeScript、Vite 5
-- TailwindCSS
-- HashConnect、Hedera SDK
-- lucide-react、react-markdown
+### Tech Stack
+- React 18, TypeScript, Vite 5
+- TailwindCSS for styling
+- HashConnect and Hedera SDK for wallet integration
+- lucide-react for icons, react-markdown for message rendering
 
-## 快速开始
-### 前置条件
-- Node.js 18+ 和 npm
-- 正在运行的 Hedron Agent WebSocket 后端
-- WalletConnect Project ID，可在 https://cloud.walletconnect.com 获取
+## Getting Started
 
-### 安装
-```bash
-npm install
-```
+### Prerequisites
+- Node.js 18+ and npm
+- A running Hedron Agent backend over WebSocket (local or hosted)
+- A WalletConnect Project ID (free from WalletConnect Cloud)
 
-在项目根目录创建 `.env`。
+### Installation
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Create a `.env` file in the project root (same level as `package.json`). See Environment Variables below.
 
-### 开发运行
+### Run (Development)
 ```bash
 npm run dev
 ```
+The app starts on the default Vite dev server (usually `http://localhost:5173`).
 
-Vite 默认使用 `http://localhost:5173`，端口被占用时会自动切换。
-
-### 构建与预览
+### Build & Preview
 ```bash
 npm run build
 npm run preview
 ```
 
-## 环境变量
+## Environment Variables
+Add these to your `.env` (or `.env.local`) as needed. All variables are read with the `VITE_` prefix.
+
+- `VITE_WALLETCONNECT_PROJECT_ID` (required): Your WalletConnect Cloud Project ID. Get one from [cloud.walletconnect.com](https://cloud.walletconnect.com).
+- `VITE_HEDERA_NETWORK` (optional): One of `mainnet`, `testnet`, or `previewnet`. Defaults to `mainnet`.
+- `VITE_WEBSOCKET_URL_LOCAL` (optional): Local WebSocket URL for development. Defaults to `ws://localhost:8080`.
+- `VITE_WEBSOCKET_URL_PRODUCTION` (optional): Production WebSocket URL. Defaults to `wss://hedron-production.up.railway.app`.
+
+Example `.env`:
 ```env
 VITE_WALLETCONNECT_PROJECT_ID=your-project-id
 VITE_HEDERA_NETWORK=testnet
@@ -50,34 +58,56 @@ VITE_WEBSOCKET_URL_LOCAL=ws://localhost:8080
 # VITE_WEBSOCKET_URL_PRODUCTION=wss://your-hosted-agent.example.com
 ```
 
-- `VITE_WALLETCONNECT_PROJECT_ID`：必填，WalletConnect Cloud Project ID
-- `VITE_HEDERA_NETWORK`：可选，`mainnet`、`testnet` 或 `previewnet`，默认 `mainnet`
-- `VITE_WEBSOCKET_URL_LOCAL`：可选，本地 WebSocket URL，默认 `ws://localhost:8080`
-- `VITE_WEBSOCKET_URL_PRODUCTION`：可选，生产 WebSocket URL
+## Project Structure (high-level)
+- `src/App.tsx`: Main layout, headers, connection status, and composition
+- `src/components/ChatArea.tsx`: Scrollable chat area with example prompt grid (when empty)
+- `src/components/ChatMessage.tsx`: Renders messages, Markdown, inline icons, tables, copy-to-clipboard, and transaction status
+- `src/components/ChatInput.tsx`: Input box with send actions
+- `src/components/WalletButton.tsx`: Connect/disconnect button with error and helper UI
+- `src/components/TokenBalances.tsx`: Balance widget (compact/full)
+- `src/components/TokenDebugger.tsx`: Development-only helper to inspect tokens
+- `src/hooks/useChat.ts`: Sessions, message handling, swap-quote detection, signing flow handoff
+- `src/hooks/useWebSocket.ts`: WebSocket connection, auth, reconnect, message dispatch
+- `src/hooks/useWallet.ts`: HashConnect singleton, pairing modal lifecycle, connect/disconnect helpers
+- `src/hooks/useTokenBalances.ts`: Mirror Node + price fetching and formatting
+- `src/config/hashconnect.ts`: HashConnect factory with network selection
 
-## 主要结构
-- `src/App.tsx`：主布局、连接状态和页面组合
-- `src/components/ChatArea.tsx`：聊天区和示例 prompt
-- `src/components/ChatMessage.tsx`：消息、Markdown、交易状态和复制按钮
-- `src/components/ChatInput.tsx`：输入框和发送逻辑
-- `src/components/WalletButton.tsx`：钱包连接、断开和配置提示
-- `src/components/TokenBalances.tsx`：余额组件
-- `src/hooks/useChat.ts`：会话、消息、报价解析和签名交接
-- `src/hooks/useWebSocket.ts`：WebSocket、认证和重连
-- `src/hooks/useWallet.ts`：HashConnect 单例和配对流程
-- `src/hooks/useTokenBalances.ts`：Mirror Node 与价格数据
+## WebSocket & Auth Flow
+- The URL is selected by build mode: development uses `VITE_WEBSOCKET_URL_LOCAL`, production uses `VITE_WEBSOCKET_URL_PRODUCTION` (with sensible defaults).
+- The app authenticates the WebSocket connection using the connected Hedera account ID.
+- Connection status is displayed in the header (connecting/disconnected/wallet required/authenticating/ready).
 
-## WebSocket 与钱包
-开发模式使用 `VITE_WEBSOCKET_URL_LOCAL`，生产模式使用 `VITE_WEBSOCKET_URL_PRODUCTION`。前端会在钱包连接后用账户 ID 发送 `CONNECTION_AUTH` 完成认证。
+## Wallet Integration (HashConnect)
+- Requires `VITE_WALLETCONNECT_PROJECT_ID`.
+- Network is selected via `VITE_HEDERA_NETWORK` (`mainnet`, `testnet`, `previewnet`).
+- The wallet pairing modal is managed defensively to avoid duplicate popups during hot reloads.
 
-## 常见问题
-- 钱包按钮提示需要配置：设置 `VITE_WALLETCONNECT_PROJECT_ID` 后重启 dev server
-- WebSocket 已断开：确认后端运行在 `VITE_WEBSOCKET_URL_LOCAL`
-- 余额网络不对：确认 `VITE_HEDERA_NETWORK` 与钱包账户网络一致
-- 图标不显示：确认图片存在于 `public/`
+## Token Balances
+- Uses Hedera Mirror Node REST API (network is selected by `VITE_HEDERA_NETWORK`).
+- Prices fetched from CoinGecko (HBAR, SAUCE) with fallbacks; updated every 5 minutes.
+- Known tokens (HBAR, SAUCE, USDC, BONZO, WHBAR) are preconfigured in `useTokenBalances`.
 
-## 脚本
-- `npm run dev`：启动开发服务器
-- `npm run build`：生产构建
-- `npm run preview`：本地预览构建结果
-- `npm run lint`：运行 ESLint
+## Swap Quotes
+- Structured `SWAP_QUOTE` messages render a dedicated `SwapQuoteCard` in the chat when present.
+- Free-form agent messages are also parsed heuristically for quote details.
+- Executing a quote triggers a message back to the agent; signing is routed to the wallet.
+
+## Development Notes
+- Token icons live in `public/` and are referenced by components and Markdown rendering.
+- `TokenDebugger` is only shown in development builds.
+- The signing flow in `useChat` uses HashConnect and includes a simulated success path if SDK type conflicts prevent direct result handling.
+
+## Scripts
+- `npm run dev`: Start Vite dev server
+- `npm run build`: Production build
+- `npm run preview`: Preview the production build locally
+- `npm run lint`: Run ESLint
+
+## Troubleshooting
+- Wallet button shows “Configuration Required”: set `VITE_WALLETCONNECT_PROJECT_ID` and restart the dev server.
+- WebSocket “Disconnected”: ensure your backend is running at `VITE_WEBSOCKET_URL_LOCAL` (default `ws://localhost:8080`).
+- Wrong network balances: verify `VITE_HEDERA_NETWORK` matches your account and tokens.
+- Icons not showing: confirm images exist in `public/` and paths match.
+
+## License
+No license specified.

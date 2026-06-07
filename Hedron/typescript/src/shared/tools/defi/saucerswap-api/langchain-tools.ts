@@ -10,24 +10,24 @@ import { getSaucerSwapApiQuery, SAUCERSWAP_API_QUERY_TOOL, SAUCERSWAP_API_OPERAT
 export const createSaucerSwapLangchainTool = (client: any, context: Context, userAccountId: string) => {
   return new DynamicStructuredTool({
     name: SAUCERSWAP_API_QUERY_TOOL,
-    description: `通过 SaucerSwap 官方 REST API 查询 DEX 协议的实时交易和流动性数据。
+    description: `Query SaucerSwap DEX protocol using their official REST API for real-time trading and liquidity data.
 
-可用 operation:
-- General Statistics: 查询整体协议统计（TVL、volume、swap 总量）
-- Single-Sided Staking Stats: 查询 SSS APY、兑换比例和质押总量
-- Active Farms: 查询所有活跃 farm、排放和质押信息
-- Account Farms: 查询指定账户在 farm 中的 LP token 数量
+Available operations:
+- General Statistics: Get overall protocol stats (TVL, volume, swap totals)
+- Single-Sided Staking Stats: Get SSS APY, ratios, and staking amounts
+- Active Farms: Get list of all active farms with emissions and staking info
+- Account Farms: Get LP token amounts in farms for specific account
 
-该工具可访问 SaucerSwap DEX 和 yield farming 数据，包括：
-- 以 USD 计价的 TVL
-- 交易量和 swap 统计
-- SAUCE 流通量和质押比例
-- Farm 排放（SAUCE 和 HBAR 奖励）
-- 账户级 farm 仓位和质押数量
+This provides access to SaucerSwap's DEX and yield farming data including:
+- Total Value Locked (TVL) in USD
+- Trading volume and swap statistics  
+- SAUCE token circulation and staking ratios
+- Farm emissions (SAUCE and HBAR rewards)
+- Account-specific farm positions and staking amounts
 
-支持 Hedera Mainnet 和 Testnet。
+Supports both Hedera Mainnet and Testnet networks.
 
-用户账户：${userAccountId}`,
+User Account: ${userAccountId}`,
     schema: z.object({
       operation: z.enum([
         SAUCERSWAP_API_OPERATIONS.GENERAL_STATS,
@@ -36,15 +36,15 @@ export const createSaucerSwapLangchainTool = (client: any, context: Context, use
         SAUCERSWAP_API_OPERATIONS.ACCOUNT_FARMS,
         SAUCERSWAP_API_OPERATIONS.INFINITY_POOL_POSITION,
       ]).describe(
-        'SaucerSwap API operation：general_stats、sss_stats、farms、account_farms 或 infinity_pool_position'
+        'The SaucerSwap API operation: general_stats, sss_stats, farms, account_farms, or infinity_pool_position'
       ),
       accountId: z.string().optional().describe(
-        'Hedera 账户 ID，格式为 shard.realm.num（account_farms 和 infinity_pool_position 需要）'
+        'Hedera account ID in format shard.realm.num (required for account_farms and infinity_pool_position)'
       ),
       network: z.enum(['mainnet', 'testnet']).default(
         (process.env.HEDERA_NETWORK as 'mainnet' | 'testnet') || 'mainnet'
       ).describe(
-        '要查询的 Hedera 网络（默认使用 .env 中的 HEDERA_NETWORK）'
+        'The Hedera network to query (defaults to HEDERA_NETWORK from .env)'
       ),
     }),
     func: async (params: any) => {
@@ -54,35 +54,35 @@ export const createSaucerSwapLangchainTool = (client: any, context: Context, use
              params.operation === SAUCERSWAP_API_OPERATIONS.INFINITY_POOL_POSITION) && 
             !params.accountId) {
           params.accountId = userAccountId;
-          console.log(`${params.operation} 使用用户账户 ID：${userAccountId}`);
+          console.log(`📋 Using user account ID for ${params.operation}: ${userAccountId}`);
         }
 
         const result = await getSaucerSwapApiQuery(client, context, params);
         return JSON.stringify(result, null, 2);
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : '未知错误';
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         return JSON.stringify({
-          error: `查询 SaucerSwap Finance API 时出错：${errorMessage}`,
+          error: `Error querying SaucerSwap Finance API: ${errorMessage}`,
           operation: params.operation,
           network: params.network || 'mainnet',
           timestamp: new Date().toISOString(),
           troubleshooting: {
-            issue: 'API 请求失败',
+            issue: 'API request failed',
             possible_causes: [
-              '环境变量中 API key 无效或缺失',
-              '网络连接异常',
-              'SaucerSwap API 暂时不可用',
-              '账户 ID 格式无效',
-              '触发频率限制（请求过多）',
-              '指定了错误网络'
+              'Invalid or missing API key in environment',
+              'Network connectivity issues',
+              'SaucerSwap API is temporarily unavailable',
+              'Invalid account ID format',
+              'Rate limiting (too many requests)',
+              'Wrong network specified'
             ],
             next_steps: [
-              '检查 .env 文件中的 API key 配置',
-              '确认互联网连接正常',
-              '确认账户 ID 格式为 shard.realm.num',
-              '尝试切换网络（mainnet/testnet）',
-              '稍等片刻后重试',
-              '检查 SaucerSwap API 状态'
+              'Check API key configuration in .env file',
+              'Verify internet connection',
+              'Verify account ID format (shard.realm.num)',
+              'Try switching networks (mainnet/testnet)',
+              'Wait a few moments before retrying',
+              'Check SaucerSwap API status'
             ],
             api_keys_location: {
               mainnet: 'SAUCERSWAP_MAINNET_API_KEY in .env',

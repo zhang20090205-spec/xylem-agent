@@ -22,7 +22,7 @@ export {
 export const SAUCERSWAP_ROUTER_TOOL_INFO = {
   name: 'SaucerSwap Router V2 Swap Quote Tool',
   version: '1.0.0',
-  description: '从 SaucerSwap V2 Router 合约获取实时 swap 报价，支持 Uniswap v3 风格路径',
+  description: 'Get real-time swap quotes from SaucerSwap V2 Router contract with Uniswap v3 style paths',
   contractId: {
     mainnet: '0.0.3949424',  // QuoterV2
     testnet: '0.0.1390002'   // QuoterV2
@@ -37,12 +37,12 @@ export const SAUCERSWAP_ROUTER_TOOL_INFO = {
   ],
   networks: ['mainnet', 'testnet'],
   features: [
-    'JSON-RPC QuoterV2 集成（不需要 operator）',
-    '包含 fee 的实时报价',
-    '支持 multi-hop routing',
-    '自动将 HBAR 转为 WHBAR',
-    'Uniswap v3 风格 path encoding',
-    '支持多个 fee tier',
-    '通过 Hashio RPC 提供稳定连接'
+    'JSON-RPC QuoterV2 integration (no operator required)',
+    'Real-time quotes with embedded fees',
+    'Multi-hop routing support',
+    'Automatic HBAR to WHBAR conversion',
+    'Uniswap v3 style path encoding',
+    'Multiple fee tier support',
+    'Hashio RPC for reliable connectivity'
   ]
 } as const;

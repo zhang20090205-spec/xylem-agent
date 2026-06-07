@@ -1,30 +1,90 @@
-# 钱包连接改进说明
+# HashConnect Wallet Hook Improvements
 
-前端钱包连接基于 HashConnect，并使用 WalletConnect v2 项目 ID。
+## Problem Solved
 
-## 改进点
-- HashConnect 单例管理，减少热更新时的重复初始化
-- 连接按钮区分“缺少配置”“连接中”“已连接”“未知网络”等状态
-- 钱包配对弹窗由生命周期保护，降低重复弹窗概率
-- WebSocket 认证依赖已连接账户 ID
-- 错误提示已面向用户中文化
+The original implementation suffered from multiple HashConnect initializations, causing:
+- Multiple modal popups when connecting
+- "No matching key" decode errors 
+- Stale sessions interfering with new connections
+- Memory leaks from improper cleanup
 
-## 必需配置
-```env
-VITE_WALLETCONNECT_PROJECT_ID=your-project-id
-VITE_HEDERA_NETWORK=testnet
+## Key Improvements
+
+### 1. Global Singleton Pattern
+- **Before**: New HashConnect instance per hook usage
+- **After**: Single global instance shared across all components
+- **Benefit**: Prevents multiple initializations during hot reloads and React StrictMode
+
+### 2. Proper Event Listener Management
+- **Before**: Event listeners added directly to instance
+- **After**: Event listeners with proper cleanup and mounted state checks
+- **Benefit**: Prevents memory leaks and state updates on unmounted components
+
+### 3. Improved Storage Management
+- **Before**: Basic localStorage clearing
+- **After**: Comprehensive WalletConnect storage cleanup
+- **Benefit**: Eliminates key mismatch errors from stale sessions
+
+### 4. Robust Error Handling
+- **Before**: Basic try-catch blocks
+- **After**: Granular error handling with recovery mechanisms
+- **Benefit**: Better user experience and debugging capabilities
+
+### 5. Modal State Management
+- **Before**: Simple ref with immediate reset
+- **After**: Timeout-based reset with event-driven cleanup
+- **Benefit**: Prevents multiple modals and UI stuck states
+
+## Usage
+
+The hook API remains the same for backward compatibility:
+
+```typescript
+const { 
+  connect, 
+  disconnect, 
+  isConnected, 
+  address, 
+  balance,
+  forceReset // New emergency function
+} = useWallet()
 ```
 
-## 用户流程
-1. 点击连接钱包
-2. HashConnect 打开 WalletConnect 配对
-3. 钱包确认连接
-4. 前端拿到账户 ID
-5. WebSocket 发送 `CONNECTION_AUTH`
-6. 后端认证成功后进入可用状态
+## New Features
 
-## 排障
-- `VITE_WALLETCONNECT_PROJECT_ID` 缺失：按钮会显示配置错误
-- 网络不匹配：检查 `VITE_HEDERA_NETWORK`
-- 弹窗没有出现：刷新页面，确认浏览器没有阻止弹窗
-- WebSocket 未认证：先确认钱包账户 ID 已获取
+### Force Reset Function
+For cases where the wallet gets stuck in an invalid state:
+
+```typescript
+const { forceReset } = useWallet()
+
+// Emergency reset - clears all state and storage
+forceReset()
+```
+
+## Expected Behavior
+
+### Development Mode
+- Single initialization log: "🚀 Creating new HashConnect instance"
+- Subsequent uses: "♻️ Reusing existing HashConnect instance"
+- Clean shutdowns: "✅ useWallet cleanup completed"
+
+### Production Mode
+- Same singleton behavior
+- Reduced logging
+- Optimal performance
+
+## Testing
+
+1. **Multiple Connections**: Try connecting/disconnecting rapidly - should not create multiple modals
+2. **Hot Reload**: Save file multiple times - should reuse existing instance
+3. **Page Refresh**: Full page reload should create new clean instance
+4. **Error Recovery**: Use `forceReset()` if any issues occur
+
+## Compatibility
+
+- ✅ React 18+ with StrictMode
+- ✅ Hot reload (Vite, Create React App)
+- ✅ TypeScript strict mode
+- ✅ HashConnect 3.0+
+- ✅ All Hedera networks (mainnet, testnet, previewnet)

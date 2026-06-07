@@ -122,7 +122,7 @@ const fetchTokenPrices = async (): Promise<TokenPrices> => {
         }
       }
     } catch (error) {
-    console.warn('从 CoinGecko 获取价格失败:', error)
+      console.warn('Failed to fetch from CoinGecko:', error)
     }
     
     // Set stable coin prices
@@ -345,7 +345,7 @@ export function useTokenBalances(accountId: string | null): UseTokenBalancesRetu
       setBalances(sortedBalances)
     } catch (err) {
       console.error('Error fetching token balances:', err)
-      setError(err instanceof Error ? err.message : '获取余额失败')
+      setError(err instanceof Error ? err.message : 'Failed to fetch balances')
     } finally {
       setIsLoading(false)
     }

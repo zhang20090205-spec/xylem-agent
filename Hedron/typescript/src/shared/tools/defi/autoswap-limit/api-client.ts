@@ -70,42 +70,42 @@ export const autoswapLimitParameters = (context: Context = {}) => {
       AUTOSWAP_LIMIT_OPERATIONS.GET_ROUTER_INFO,
       AUTOSWAP_LIMIT_OPERATIONS.GET_CONTRACT_BALANCE,
       AUTOSWAP_LIMIT_OPERATIONS.GET_NEXT_ORDER_ID,
-    ]).describe('要执行的 AutoSwapLimit operation'),
-
+    ]).describe('The AutoSwapLimit operation to perform'),
+    
     // Order creation parameters
     tokenOut: z.string().optional().describe(
-      '目标 token ID 或 symbol（例如 "SAUCE", "0.0.731861"）。create_swap_order 必需'
+      'Token ID or symbol to swap for (e.g., "SAUCE", "0.0.731861"). Required for create_swap_order'
     ),
-
+    
     amountIn: z.number().optional().describe(
-      '限价单投入的 HBAR 数量（HBAR 单位，例如 0.5 表示 0.5 HBAR）。create_swap_order 必需'
+      'Amount of HBAR to deposit for the limit order (in HBAR units, e.g., 0.5 for 0.5 HBAR). Required for create_swap_order'
     ),
-
+    
     minAmountOut: z.string().optional().describe(
-      '最少接收 token 数量（wei/最小单位）。create_swap_order 必需'
+      'Minimum amount of tokens to receive (in wei/smallest unit). Required for create_swap_order'
     ),
-
+    
     triggerPrice: z.string().optional().describe(
-      '触发价格（wei/最小单位）。市场价格达到该水平时订单执行。create_swap_order 必需'
+      'Trigger price in wei/smallest unit. Order executes when market price reaches this level. Required for create_swap_order'
     ),
-
+    
     expirationHours: z.number().min(1).max(168).default(24).describe(
-      '订单过期时间，单位小时（1-168 小时，默认 24）。用于 create_swap_order'
+      'Order expiration time in hours (1-168 hours, default 24). Used for create_swap_order'
     ),
-
+    
     // Query parameters
     orderId: z.number().optional().describe(
-      '要查询详情的订单 ID。get_order_details 必需'
+      'Order ID to query details for. Required for get_order_details'
     ),
-
+    
     network: z.enum(['mainnet', 'testnet']).default(
       (process.env.HEDERA_NETWORK as 'mainnet' | 'testnet') || 'mainnet'
     ).describe(
-      '执行所在网络（默认使用 .env 中的 HEDERA_NETWORK）'
+      'Network to execute on (defaults to HEDERA_NETWORK from .env)'
     ),
 
     userAccountId: z.string().optional().describe(
-      'operation 使用的用户账户 ID。未提供时使用 context.accountId'
+      'User account ID for the operation. If not provided, uses context.accountId'
     ),
   });
 };
@@ -175,11 +175,11 @@ type AutoSwapLimitResult = OrderCreationSuccess | QuerySuccess | AutoSwapLimitEr
 function getTokenIdFromSymbol(symbol: string, network: 'mainnet' | 'testnet'): string {
   const normalizedSymbol = symbol.toUpperCase();
   const networkTokens = TOKEN_MAPPINGS[network] as { [key: string]: string };
-
+  
   if (networkTokens[normalizedSymbol]) {
     return networkTokens[normalizedSymbol];
   }
-
+  
   // If not found in mappings, assume it's already a token ID
   return symbol;
 }
@@ -189,7 +189,7 @@ function getTokenIdFromSymbol(symbol: string, network: 'mainnet' | 'testnet'): s
  */
 function getTokenEvmAddress(tokenIdentifier: string, network: 'mainnet' | 'testnet'): string {
   const networkConfig = AUTOSWAP_LIMIT_CONTRACTS[network];
-
+  
   // Handle token symbols
   const normalizedSymbol = tokenIdentifier.toUpperCase();
   switch (normalizedSymbol) {
@@ -219,13 +219,13 @@ function getTokenEvmAddress(tokenIdentifier: string, network: 'mainnet' | 'testn
  */
 function getTokenSymbolFromId(tokenId: string, network: 'mainnet' | 'testnet'): string {
   const networkTokens = TOKEN_MAPPINGS[network] as { [key: string]: string };
-
+  
   for (const [symbol, id] of Object.entries(networkTokens)) {
     if (id === tokenId) {
       return symbol;
     }
   }
-
+  
   return tokenId; // Return token ID if symbol not found
 }
 
@@ -246,7 +246,7 @@ export async function getAutoSwapLimitQuery(
         (params as any).operation = AUTOSWAP_LIMIT_OPERATIONS.CREATE_SWAP_ORDER;
       }
     }
-
+    
     // Parameter validation
     const validation = validateAutoSwapLimitParameters(params);
     if (!validation.valid) {
@@ -256,19 +256,19 @@ export async function getAutoSwapLimitQuery(
         operation: params.operation,
         timestamp: new Date().toISOString(),
         troubleshooting: {
-          issue: '参数无效',
+          issue: 'Invalid parameters',
           possible_causes: [
-            '创建限价单缺少必需参数',
-            'token 格式无效（使用 "SAUCE" 或 token ID）',
-            '数量无效（amountIn 使用 HBAR，minAmountOut/triggerPrice 使用 wei）',
-            '参数不符合已验证的测试模式'
+            'Missing required parameters for limit order creation',
+            'Invalid token format (use "SAUCE" or token ID)',
+            'Invalid amounts (amountIn in HBAR, minAmountOut/triggerPrice in wei)',
+            'Parameters not matching successful test pattern'
           ],
           next_steps: [
-            '提供 tokenOut（例如 SAUCE token 使用 "SAUCE"）',
-            '使用 HBAR 单位设置 amountIn（例如 0.2 表示 0.2 HBAR）',
-            '使用 wei 设置 minAmountOut（最小值可用 "1"）',
-            '使用 wei 设置 triggerPrice（极低触发价可用 "1"）',
-            '已验证测试示例：tokenOut="SAUCE", amountIn=0.2, minAmountOut="1", triggerPrice="1"'
+            'Provide tokenOut (e.g., "SAUCE" for SAUCE token)',
+            'Set amountIn in HBAR units (e.g., 0.2 for 0.2 HBAR)', 
+            'Set minAmountOut in wei (use "1" for minimal amount)',
+            'Set triggerPrice in wei (use "1" for ultra-low trigger)',
+            'Example from working test: tokenOut="SAUCE", amountIn=0.2, minAmountOut="1", triggerPrice="1"'
           ]
         },
         contractInfo: {
@@ -281,9 +281,9 @@ export async function getAutoSwapLimitQuery(
     // Get network configuration
     const networkConfig = AUTOSWAP_LIMIT_CONTRACTS[params.network];
     const userAccountId = params.userAccountId || context.accountId;
-
+    
     if (!userAccountId) {
-      throw new Error('必须在参数或上下文中提供用户账户 ID');
+      throw new Error('User account ID is required either in params or context');
     }
 
     console.log(`📍 Contract: ${networkConfig.CONTRACT_ID}`);
@@ -293,49 +293,49 @@ export async function getAutoSwapLimitQuery(
     switch (params.operation) {
       case AUTOSWAP_LIMIT_OPERATIONS.CREATE_SWAP_ORDER:
         return await createSwapOrder(client, context, params, networkConfig, userAccountId);
-
+      
       case AUTOSWAP_LIMIT_OPERATIONS.GET_ORDER_DETAILS:
         return await getOrderDetails(client, context, params, networkConfig);
-
+      
       case AUTOSWAP_LIMIT_OPERATIONS.GET_CONTRACT_CONFIG:
         return await getContractConfig(client, context, params, networkConfig);
-
+      
       case AUTOSWAP_LIMIT_OPERATIONS.GET_ROUTER_INFO:
         return await getRouterInfo(client, context, params, networkConfig);
-
+      
       case AUTOSWAP_LIMIT_OPERATIONS.GET_CONTRACT_BALANCE:
         return await getContractBalance(client, context, params, networkConfig);
-
+      
       case AUTOSWAP_LIMIT_OPERATIONS.GET_NEXT_ORDER_ID:
         return await getNextOrderId(client, context, params, networkConfig);
-
+      
       default:
-        throw new Error(`不支持的 operation：${params.operation}`);
+        throw new Error(`Unsupported operation: ${params.operation}`);
     }
 
   } catch (error: any) {
     console.error('❌ AutoSwapLimit error:', error);
-
+    
     return {
       success: false,
-      error: `AutoSwapLimit operation 出错：${error.message}`,
+      error: `Error in AutoSwapLimit operation: ${error.message}`,
       operation: params.operation,
       timestamp: new Date().toISOString(),
       troubleshooting: {
-        issue: '合约交互失败',
+        issue: 'Contract interaction failed',
         possible_causes: [
-          '网络连接异常',
-          '合约参数无效',
-          'HBAR 余额不足',
-          '当前网络上合约不可用',
-          '账户配置不完整'
+          'Network connectivity issues',
+          'Invalid contract parameters',
+          'Insufficient HBAR balance',
+          'Contract not available on network',
+          'Account not properly configured'
         ],
         next_steps: [
-          '检查互联网连接',
-          '确认合约已部署在当前网络',
-          '确认账户 HBAR 余额充足',
-          '确认参数值在有效范围内',
-          '更换参数后重试'
+          'Check internet connection',
+          'Verify contract is deployed on the network',
+          'Ensure account has sufficient HBAR balance',
+          'Check parameter values are within valid ranges',
+          'Try with different parameters'
         ]
       },
       contractInfo: {
@@ -351,38 +351,38 @@ function validateAutoSwapLimitParameters(params: any): { valid: boolean; error?:
   // Check operation-specific parameter requirements
   if (params.operation === AUTOSWAP_LIMIT_OPERATIONS.CREATE_SWAP_ORDER) {
     if (!params.tokenOut) {
-      return { valid: false, error: 'create_swap_order operation 需要 tokenOut（例如 "SAUCE", "0.0.731861"）' };
+      return { valid: false, error: 'tokenOut is required for create_swap_order operation (e.g., "SAUCE", "0.0.731861")' };
     }
     if (!params.amountIn || params.amountIn <= 0) {
-      return { valid: false, error: 'create_swap_order operation 需要 amountIn，且必须大于 0（例如 0.5 表示 0.5 HBAR）' };
+      return { valid: false, error: 'amountIn is required and must be greater than 0 for create_swap_order operation (e.g., 0.5 for 0.5 HBAR)' };
     }
     // Make minAmountOut and triggerPrice more flexible - allow "1" for ultra-conservative orders
     if (params.minAmountOut === undefined || params.minAmountOut === null || params.minAmountOut === '') {
-      return { valid: false, error: 'create_swap_order operation 需要 minAmountOut（最小数量可用 "1"）' };
+      return { valid: false, error: 'minAmountOut is required for create_swap_order operation (use "1" for minimal amount)' };
     }
     if (params.triggerPrice === undefined || params.triggerPrice === null || params.triggerPrice === '') {
-      return { valid: false, error: 'create_swap_order operation 需要 triggerPrice（极低触发价可用 "1"）' };
+      return { valid: false, error: 'triggerPrice is required for create_swap_order operation (use "1" for ultra-low trigger)' };
     }
     // More flexible minimum amount check
     if (params.amountIn < 0.1) { // Reduced from 0.1 to allow smaller test amounts
-      return { valid: false, error: `真实订单的 amountIn 至少需要 0.1 HBAR（当前：${params.amountIn} HBAR）` };
+      return { valid: false, error: `amountIn must be at least 0.1 HBAR for real orders (current: ${params.amountIn} HBAR)` };
     }
-
+    
     // Validate that numeric strings are valid
     try {
       const minAmountOutNum = BigInt(params.minAmountOut);
       const triggerPriceNum = BigInt(params.triggerPrice);
       if (minAmountOutNum < 0n || triggerPriceNum < 0n) {
-        return { valid: false, error: 'minAmountOut 和 triggerPrice 必须是 wei 格式的正数' };
+        return { valid: false, error: 'minAmountOut and triggerPrice must be positive numbers in wei format' };
       }
     } catch {
-      return { valid: false, error: 'minAmountOut 和 triggerPrice 必须是有效 wei 格式数字字符串（例如 "1", "1000"）' };
+      return { valid: false, error: 'minAmountOut and triggerPrice must be valid numeric strings in wei format (e.g., "1", "1000")' };
     }
   }
-
+  
   if (params.operation === AUTOSWAP_LIMIT_OPERATIONS.GET_ORDER_DETAILS) {
     if (params.orderId === undefined || params.orderId === null) {
-      return { valid: false, error: 'get_order_details operation 需要 orderId' };
+      return { valid: false, error: 'orderId is required for get_order_details operation' };
     }
   }
 
@@ -404,16 +404,16 @@ async function createSwapOrder(
     const tokenId = getTokenIdFromSymbol(params.tokenOut, params.network);
     const tokenEvmAddress = getTokenEvmAddress(params.tokenOut, params.network);
     const tokenSymbol = getTokenSymbolFromId(tokenId, params.network);
-
+    
     console.log(`🎯 Creating limit order: ${params.amountIn} HBAR → ${tokenSymbol}`);
     console.log(`📍 Token ID: ${tokenId} → EVM: ${tokenEvmAddress}`);
-
+    
     // Calculate expiration time (following test pattern)
     const expirationTime = Math.floor(Date.now() / 1000) + (params.expirationHours * 3600);
-
+    
     // Convert HBAR amount to Hbar object (following test pattern)
     const payableAmount = Hbar.from(params.amountIn, HbarUnit.Hbar);
-
+    
     console.log(`💰 HBAR Amount: ${params.amountIn} HBAR`);
     console.log(`⏰ Expiration: ${new Date(expirationTime * 1000).toISOString()}`);
     console.log(`🎯 Trigger Price: ${params.triggerPrice} wei`);
@@ -428,7 +428,7 @@ async function createSwapOrder(
           .setContractId(networkConfig.CONTRACT_ID)
           .setGas(100000)
           .setFunction("nextOrderId");
-
+        
         const nextOrderIdResult = await nextOrderIdQuery.execute(client);
         nextOrderId = nextOrderIdResult.getUint256(0).toNumber();
         console.log(`📝 Next Order ID will be: ${nextOrderId}`);
@@ -444,7 +444,7 @@ async function createSwapOrder(
 
     // Create the contract execute transaction (exactly like the test)
     const contractId = ContractId.fromString(networkConfig.CONTRACT_ID);
-
+    
     const tx = new ContractExecuteTransaction()
       .setContractId(contractId)
       .setGas(AUTOSWAP_LIMIT_CONFIG.DEFAULT_GAS_LIMIT) // Test uses 1M gas
@@ -500,16 +500,16 @@ async function createSwapOrder(
         ...orderResult,
         bytes: result.bytes,
         result,
-        message: context.mode === 'returnBytes'
-          ? `AutoSwapLimit 订单已准备好，请签名：${params.amountIn} HBAR → ${tokenSymbol}，触发价 ${params.triggerPrice} wei`
-          : `已成功创建 AutoSwapLimit 订单：${params.amountIn} HBAR → ${tokenSymbol}`,
+        message: context.mode === 'returnBytes' 
+          ? `🎯 AutoSwapLimit order ready for signature: ${params.amountIn} HBAR → ${tokenSymbol} at trigger price ${params.triggerPrice} wei`
+          : `✅ Successfully created AutoSwapLimit order: ${params.amountIn} HBAR → ${tokenSymbol}`,
       };
     }
 
     return {
       ...orderResult,
       result,
-      message: `已成功创建 AutoSwapLimit 订单：${params.amountIn} HBAR → ${tokenSymbol}`,
+      message: `✅ Successfully created AutoSwapLimit order: ${params.amountIn} HBAR → ${tokenSymbol}`,
     };
 
   } catch (error: any) {
@@ -529,7 +529,7 @@ async function getOrderDetails(
 ): Promise<QuerySuccess> {
   try {
     console.log(`📋 Getting order details for ID: ${params.orderId}`);
-
+    
     // In RETURN_BYTES mode, we can't query contract directly
     // Return a placeholder response
     if (context.mode === 'returnBytes') {
@@ -540,8 +540,8 @@ async function getOrderDetails(
         timestamp: new Date().toISOString(),
         data: {
           orderId: params.orderId,
-          message: 'RETURN_BYTES 模式下无法查询订单详情。请在支持直接查询的环境中使用。',
-          note: '该 operation 需要直接访问合约，WebSocket 模式不可用'
+          message: 'Order details query not available in RETURN_BYTES mode. Use mainnet for direct queries.',
+          note: 'This operation requires direct contract access which is not available in WebSocket mode'
         },
         contract: {
           id: networkConfig.CONTRACT_ID,
@@ -550,9 +550,9 @@ async function getOrderDetails(
         source: 'AutoSwapLimit Contract',
       };
     }
-
+    
     const contractId = ContractId.fromString(networkConfig.CONTRACT_ID);
-
+    
     const query = new ContractCallQuery()
       .setContractId(contractId)
       .setGas(AUTOSWAP_LIMIT_CONFIG.QUERY_GAS_LIMIT)
@@ -561,7 +561,7 @@ async function getOrderDetails(
       );
 
     const result = await query.execute(client);
-
+    
     const orderData = {
       tokenOut: result.getAddress(0),
       amountIn: result.getUint256(1).toString(),
@@ -606,7 +606,7 @@ async function getContractConfig(
 ): Promise<QuerySuccess> {
   try {
     console.log(`⚙️ Getting contract configuration`);
-
+    
     // In RETURN_BYTES mode, we can't query contract directly
     // Return a placeholder response
     if (context.mode === 'returnBytes') {
@@ -616,8 +616,8 @@ async function getContractConfig(
         network: params.network,
         timestamp: new Date().toISOString(),
         data: {
-          message: 'RETURN_BYTES 模式下无法查询合约配置。请在支持直接查询的环境中使用。',
-          note: '该 operation 需要直接访问合约，WebSocket 模式不可用'
+          message: 'Contract configuration query not available in RETURN_BYTES mode. Use mainnet for direct queries.',
+          note: 'This operation requires direct contract access which is not available in WebSocket mode'
         },
         contract: {
           id: networkConfig.CONTRACT_ID,
@@ -626,16 +626,16 @@ async function getContractConfig(
         source: 'AutoSwapLimit Contract',
       };
     }
-
+    
     const contractId = ContractId.fromString(networkConfig.CONTRACT_ID);
-
+    
     const query = new ContractCallQuery()
       .setContractId(contractId)
       .setGas(AUTOSWAP_LIMIT_CONFIG.QUERY_GAS_LIMIT)
       .setFunction("getContractConfig");
 
     const result = await query.execute(client);
-
+    
     const configData = {
       executionFee: result.getUint256(0).toString(),
       minOrderAmount: result.getUint256(1).toString(),
@@ -677,7 +677,7 @@ async function getRouterInfo(
 ): Promise<QuerySuccess> {
   try {
     console.log(`🔗 Getting router information`);
-
+    
     // In RETURN_BYTES mode, we can't query contract directly
     // Return a placeholder response
     if (context.mode === 'returnBytes') {
@@ -687,8 +687,8 @@ async function getRouterInfo(
         network: params.network,
         timestamp: new Date().toISOString(),
         data: {
-          message: 'RETURN_BYTES 模式下无法查询 Router 信息。请在支持直接查询的环境中使用。',
-          note: '该 operation 需要直接访问合约，WebSocket 模式不可用'
+          message: 'Router information query not available in RETURN_BYTES mode. Use mainnet for direct queries.',
+          note: 'This operation requires direct contract access which is not available in WebSocket mode'
         },
         contract: {
           id: networkConfig.CONTRACT_ID,
@@ -697,16 +697,16 @@ async function getRouterInfo(
         source: 'AutoSwapLimit Contract',
       };
     }
-
+    
     const contractId = ContractId.fromString(networkConfig.CONTRACT_ID);
-
+    
     const query = new ContractCallQuery()
       .setContractId(contractId)
       .setGas(AUTOSWAP_LIMIT_CONFIG.QUERY_GAS_LIMIT)
       .setFunction("getRouterInfo");
 
     const result = await query.execute(client);
-
+    
     const routerData = {
       routerAddress: result.getAddress(0),
       whbarAddress: result.getAddress(1),
@@ -748,7 +748,7 @@ async function getContractBalance(
 ): Promise<QuerySuccess> {
   try {
     console.log(`💰 Getting contract balance`);
-
+    
     // In RETURN_BYTES mode, we can't query contract directly
     // Return a placeholder response
     if (context.mode === 'returnBytes') {
@@ -758,8 +758,8 @@ async function getContractBalance(
         network: params.network,
         timestamp: new Date().toISOString(),
         data: {
-          message: 'RETURN_BYTES 模式下无法查询合约余额。请在支持直接查询的环境中使用。',
-          note: '该 operation 需要直接访问合约，WebSocket 模式不可用'
+          message: 'Contract balance query not available in RETURN_BYTES mode. Use mainnet for direct queries.',
+          note: 'This operation requires direct contract access which is not available in WebSocket mode'
         },
         contract: {
           id: networkConfig.CONTRACT_ID,
@@ -768,9 +768,9 @@ async function getContractBalance(
         source: 'AutoSwapLimit Contract',
       };
     }
-
+    
     const contractId = ContractId.fromString(networkConfig.CONTRACT_ID);
-
+    
     const query = new ContractCallQuery()
       .setContractId(contractId)
       .setGas(AUTOSWAP_LIMIT_CONFIG.QUERY_GAS_LIMIT)
@@ -812,7 +812,7 @@ async function getNextOrderId(
 ): Promise<QuerySuccess> {
   try {
     console.log(`📝 Getting next order ID`);
-
+    
     // In RETURN_BYTES mode, we can't query contract directly
     // Return a placeholder response
     if (context.mode === 'returnBytes') {
@@ -822,8 +822,8 @@ async function getNextOrderId(
         network: params.network,
         timestamp: new Date().toISOString(),
         data: {
-          message: 'RETURN_BYTES 模式下无法查询下一个订单 ID。请在支持直接查询的环境中使用。',
-          note: '该 operation 需要直接访问合约，WebSocket 模式不可用'
+          message: 'Next order ID query not available in RETURN_BYTES mode. Use mainnet for direct queries.',
+          note: 'This operation requires direct contract access which is not available in WebSocket mode'
         },
         contract: {
           id: networkConfig.CONTRACT_ID,
@@ -832,9 +832,9 @@ async function getNextOrderId(
         source: 'AutoSwapLimit Contract',
       };
     }
-
+    
     const contractId = ContractId.fromString(networkConfig.CONTRACT_ID);
-
+    
     const query = new ContractCallQuery()
       .setContractId(contractId)
       .setGas(AUTOSWAP_LIMIT_CONFIG.QUERY_GAS_LIMIT)
@@ -868,23 +868,23 @@ async function getNextOrderId(
 const autoswapLimitTool = (context: Context): Tool => ({
   method: AUTOSWAP_LIMIT_TOOL,
   name: 'AutoSwapLimit Contract Operations',
-  description: `在 AutoSwapLimit 合约上创建和管理限价单，用于自动 token swap。
+  description: `Create and manage limit orders on AutoSwapLimit contract for automated token swaps.
 
-可用 operation:
-- Create Swap Order: 创建按指定价格将 HBAR swap 为 token 的限价单
-- Get Order Details: 按 ID 查询指定订单详情
-- Get Contract Config: 查询合约配置（费用、最小金额等）
-- Get Router Info: 查询合约使用的 router 和 token 地址
-- Get Contract Balance: 查询合约当前 HBAR 余额
-- Get Next Order ID: 查询下一个可用订单 ID
+Available operations:
+- Create Swap Order: Create a new limit order to swap HBAR for tokens at a specific price
+- Get Order Details: Retrieve details of a specific order by ID
+- Get Contract Config: Get contract configuration (fees, minimum amounts, etc.)
+- Get Router Info: Get router and token addresses used by the contract
+- Get Contract Balance: Get current HBAR balance of the contract
+- Get Next Order ID: Get the next available order ID
 
-支持 token: SAUCE、WHBAR 和其他 Hedera token
-网络: ${process.env.HEDERA_NETWORK || 'mainnet'}
+Supported tokens: SAUCE, WHBAR, and other Hedera tokens
+Network: ${process.env.HEDERA_NETWORK || 'mainnet'}
 
-示例：创建一个在 SAUCE 价格跌到 0.001 HBAR/SAUCE 时买入的限价单
-参数：tokenOut="SAUCE", amountIn=0.5, minAmountOut="1", triggerPrice="1000"`,
+Example: Create a limit order to buy SAUCE when price drops to 0.001 HBAR per SAUCE
+Parameters: tokenOut="SAUCE", amountIn=0.5, minAmountOut="1", triggerPrice="1000"`,
   parameters: autoswapLimitParameters(context),
   execute: getAutoSwapLimitQuery,
 });
 
-export default autoswapLimitTool;
+export default autoswapLimitTool; 

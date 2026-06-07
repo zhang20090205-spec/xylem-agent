@@ -18,18 +18,18 @@ export const SAUCERSWAP_INFINITY_POOL_STEP_TOOL = 'saucerswap_infinity_pool_step
  */
 export const infinityPoolStepParameters = (context: Context = {}) => {
   return z.object({
-    sauceAmount: z.number().describe('要处理的 SAUCE token 数量（例如 100.5 表示 100.5 SAUCE）'),
+    sauceAmount: z.number().describe('Amount of SAUCE tokens to process (e.g., 100.5 for 100.5 SAUCE)'),
     
     userAccountId: z.string().optional().describe(
       PromptGenerator.getAccountParameterDescription('userAccountId', context)
     ),
     
     referralCode: z.number().optional().describe(
-      'operation 的 referral code（可选）'
+      'Referral code for the operation (optional)'
     ),
     
     transactionMemo: z.string().optional().describe(
-      '交易可选 memo'
+      'Optional memo for the transaction'
     ),
   });
 };
@@ -48,34 +48,34 @@ const infinityPoolStepPrompt = (context: Context = {}) => {
   return `
 ${contextSnippet}
 
-该工具用于在 token association 和 approval 完成后，完成 SAUCE staking 步骤。
+This tool completes the SAUCE staking step after token association and approval are completed.
 
-**用途:**
-这是 Infinity Pool staking flow 中前序步骤确认后的后续工具。
+**PURPOSE:**
+This is a follow-up tool used after previous steps in the Infinity Pool staking flow have been confirmed.
 
-**使用时机:**
-- token association 交易确认后
-- SAUCE approval 交易确认后
-- 需要完成真实 SAUCE token staking 时
+**WHEN TO USE:**
+- After token association transaction is confirmed
+- After SAUCE approval transaction is confirmed
+- To complete the actual staking of SAUCE tokens
 
 **STAKING OPERATION:**
-该工具会调用 MotherShip 合约的 enter() 函数，质押 SAUCE token 并获得 xSAUCE。
+This tool will call the MotherShip contract's enter() function to stake your SAUCE tokens and receive xSAUCE.
 
-**参数:**
-- sauceAmount (number, required): 要质押的 SAUCE 数量（例如 100.5 表示 100.5 SAUCE）
+**Parameters:**
+- sauceAmount (number, required): Amount of SAUCE to stake (e.g., 100.5 for 100.5 SAUCE)
 - ${userAccountDesc}
-- referralCode (number, optional): staking operation 的 referral code
-- transactionMemo (string, optional): 交易可选 memo
+- referralCode (number, optional): Referral code for the staking operation
+- transactionMemo (string, optional): Optional memo for the transaction
 
-**前置条件:**
-- SAUCE 和 xSAUCE token 必须已关联到账户
-- SAUCE token 必须已授权给 MotherShip 合约
-- 账户中有足够 SAUCE 余额
+**Prerequisites:**
+- SAUCE and xSAUCE tokens must be associated to your account
+- SAUCE tokens must be approved for MotherShip contract spending
+- Sufficient SAUCE balance in your account
 
-**执行结果:**
-- 你的 SAUCE token 会质押到 Infinity Pool
-- 你会收到代表质押份额和未来奖励的 xSAUCE token
-- 奖励会随时间自动复利
+**What happens:**
+- Your SAUCE tokens are staked in the Infinity Pool
+- You receive xSAUCE tokens representing your stake + future rewards
+- Rewards automatically compound over time
 
 ${usageInstructions}
 `;
@@ -108,8 +108,8 @@ export const executeInfinityPoolStakingStep = async (
     
     return {
       ...stakeResult,
-      message: 'SAUCE staking 交易已准备好，请签名',
-      instructions: '请签名该交易，完成 Infinity Pool 中的 SAUCE staking',
+      message: 'SAUCE staking transaction ready for signature',
+      instructions: 'Sign this transaction to complete your SAUCE staking in the Infinity Pool',
     };
   } catch (error: any) {
     console.error('❌ Infinity Pool staking step failed:', error);

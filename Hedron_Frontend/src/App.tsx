@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { AlertCircle, Menu, PanelLeftOpen, Wallet, Wifi, WifiOff, X } from 'lucide-react';
+import { useState } from 'react';
+import { Menu, X, Wallet, PanelLeftOpen, Wifi, WifiOff, AlertCircle } from 'lucide-react';
 import ChatSidebar from './components/ChatSidebar';
 import ChatArea from './components/ChatArea';
 import ChatInput from './components/ChatInput';
@@ -14,22 +14,14 @@ import DefiDataHub from './pages/DefiDataHub';
 
 type ViewMode = 'agent' | 'defi';
 
-const formatUtcTime = () =>
-  new Date().toLocaleTimeString('en-US', {
-    hour12: false,
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    timeZone: 'UTC',
-  });
-
 function App() {
+  // Initialize theme
   useTheme();
-
-  const {
-    address,
-    isConnected: isWalletConnected,
-    chain,
+  
+  // Real wallet connection using HashConnect
+  const { 
+    address, 
+    isConnected: isWalletConnected
   } = useWallet();
 
   const {
@@ -51,12 +43,8 @@ function App() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isSidebarHidden, setIsSidebarHidden] = useState(false);
   const [activeView, setActiveView] = useState<ViewMode>('agent');
-  const [utcTime, setUtcTime] = useState(formatUtcTime);
 
-  useEffect(() => {
-    const timer = window.setInterval(() => setUtcTime(formatUtcTime()), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
+
 
   const handleSendMessage = async () => {
     if (message.trim() && !isLoading && isWSConnected && isAuthenticated && isWalletConnected) {
@@ -82,101 +70,66 @@ function App() {
     setIsMobileSidebarOpen(false);
   };
 
-  const statusCode = isWSConnecting
-    ? 'SYNC'
-    : !isWSConnected
-      ? 'OFFLINE'
-      : !isWalletConnected
-        ? 'AWAIT WALLET'
-        : !isAuthenticated
-          ? 'AUTH'
-          : 'NORMAL';
-
-  const statusTone = statusCode === 'NORMAL'
-    ? 'text-emerald-100'
-    : statusCode === 'OFFLINE'
-      ? 'text-red-200'
-      : 'text-orange-100';
-
-  const ConnectionStatus = ({
-    className = '',
-    compact = false,
-  }: {
-    className?: string;
-    compact?: boolean;
-  }) => {
-    const walletStatusLabel = compact ? 'WALLET / 钱包' : 'WALLET REQUIRED / 需要钱包';
-
+  // Connection status component
+  const ConnectionStatus = ({ className = "" }: { className?: string }) => {
     if (isWSConnecting) {
       return (
-        <div className={`ether-micro ether-label flex items-center gap-2 ${className}`}>
-          <Wifi size={14} className="animate-pulse" />
-          <span>SYNCING / 连接中</span>
+        <div className={`flex items-center gap-2 text-yellow-600 dark:text-yellow-400 ${className}`}>
+          <Wifi size={16} className="animate-pulse" />
+          <span className="text-xs font-medium">Connecting...</span>
         </div>
       );
     }
 
     if (!isWSConnected) {
       return (
-        <div className={`ether-micro text-red-200/80 flex items-center gap-2 ${className}`}>
-          <WifiOff size={14} />
-          <span>OFFLINE / 已断开</span>
+        <div className={`flex items-center gap-2 text-red-600 dark:text-red-400 ${className}`}>
+          <WifiOff size={16} />
+          <span className="text-xs font-medium">Disconnected</span>
         </div>
       );
     }
 
     if (!isWalletConnected) {
       return (
-        <div className={`ether-micro text-orange-100/80 flex items-center gap-2 ${className}`}>
-          <Wallet size={14} />
-          <span className="whitespace-nowrap">{walletStatusLabel}</span>
+        <div className={`flex items-center gap-2 text-orange-600 dark:text-orange-400 ${className}`}>
+          <Wallet size={16} />
+          <span className="text-xs font-medium">Wallet Required</span>
         </div>
       );
     }
 
     if (!isAuthenticated) {
       return (
-        <div className={`ether-micro text-sky-100/80 flex items-center gap-2 ${className}`}>
-          <Wifi size={14} className="animate-pulse" />
-          <span>AUTH / 认证中</span>
+        <div className={`flex items-center gap-2 text-blue-600 dark:text-blue-400 ${className}`}>
+          <Wifi size={16} className="animate-pulse" />
+          <span className="text-xs font-medium">Authenticating...</span>
         </div>
       );
     }
 
     return (
-      <div className={`ether-micro text-emerald-100/80 flex items-center gap-2 ${className}`}>
-        <Wifi size={14} />
-        <span>ONLINE / 可使用</span>
+      <div className={`flex items-center gap-2 text-green-600 dark:text-green-400 ${className}`}>
+        <Wifi size={16} />
+        <span className="text-xs font-medium">Connected & Ready</span>
       </div>
     );
   };
 
-  const ViewSwitcher = ({ className = '' }: { className?: string }) => (
-    <div className={`inline-flex items-center gap-1 border border-white/15 bg-white/5 px-1 py-1 backdrop-blur-md ${className}`}>
-      {[
-        { value: 'agent' as const, label: 'AI 助手', code: 'AGENT' },
-        { value: 'defi' as const, label: 'DeFi 直连', code: 'DEFI' },
-      ].map((item) => (
-        <button
-          key={item.value}
-          onClick={() => setActiveView(item.value)}
-          aria-pressed={activeView === item.value}
-          className={`ether-nav-button ether-micro px-3 py-1.5 transition-colors ${
-            activeView === item.value ? 'bg-white/12 text-white' : 'hover:bg-white/8'
-          }`}
-          title={item.label}
-        >
-          {item.code}
-        </button>
-      ))}
-    </div>
-  );
-
-  const StatusCluster = ({ compact = false }: { compact?: boolean }) => (
-    <div className={`ether-micro ${compact ? 'text-left' : 'text-right'} ether-label space-y-1`}>
-      <div className={`font-semibold ${statusTone}`}>SYS.OP. {statusCode}</div>
-      <div>{chain?.name ? `NET ${chain.name.toUpperCase()}` : 'NET HEDERA'}</div>
-      <div>{utcTime} UTC</div>
+  const ViewSwitcher = ({ className = "" }: { className?: string }) => (
+    <div className={`inline-flex rounded-full border border-theme-border-primary dark:border-gray-700 bg-theme-bg-secondary/60 dark:bg-gray-800/60 text-xs font-medium ${className}`}>
+      <button
+        onClick={() => setActiveView('agent')}
+        className={`px-3 py-1.5 rounded-full transition-all ${activeView === 'agent' ? 'bg-theme-bg-primary dark:bg-gray-900 text-theme-text-primary shadow-sm' : 'text-theme-text-secondary hover:text-theme-text-primary'}`}
+      >
+        Agente
+      </button>
+      <button
+        onClick={() => setActiveView('defi')}
+        className={`px-3 py-1.5 rounded-full transition-all ${activeView === 'defi' ? 'bg-theme-bg-primary dark:bg-gray-900 text-theme-text-primary shadow-sm' : 'text-theme-text-secondary hover:text-theme-text-primary'}`}
+      >
+        DeFi directo
+      </button>
     </div>
   );
 
@@ -193,137 +146,145 @@ function App() {
   }
 
   return (
-    <div className="ether-shell h-screen flex transition-colors duration-300 chat-container">
-      <div className="ether-content flex w-full">
-        <div className="lg:hidden fixed top-0 left-0 right-0 z-30 border-b border-white/12 bg-[#0e2530]/55 px-4 py-3 backdrop-blur-xl">
-          <div className="flex items-center justify-between gap-3">
-            <button
-              onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-              className="ether-button flex h-10 w-10 items-center justify-center"
-              aria-label={isMobileSidebarOpen ? '关闭侧边栏' : '打开侧边栏'}
-            >
-              {isMobileSidebarOpen ? <X size={18} /> : <Menu size={18} />}
-            </button>
-            <div className="min-w-0 flex-1">
-              <div className="ether-micro ether-label truncate">ETHER // XYLEM</div>
-              <div className="ether-serif truncate text-2xl text-white/90">
-                {currentSession?.title || 'Xylem agent'}
-              </div>
-              <div className="mt-1 flex flex-wrap items-center gap-2">
-                <ConnectionStatus compact />
-                <ViewSwitcher />
-              </div>
+    <div className="h-screen bg-theme-bg-primary dark:bg-gray-900 flex transition-colors duration-300 chat-container">
+      {/* Mobile header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-theme-bg-secondary/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-theme-border-primary dark:border-gray-700 px-4 py-2.5 shadow-theme-sm">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+            className="p-2 hover:bg-theme-bg-tertiary dark:hover:bg-gray-700 rounded-lg transition-all duration-200 hover:scale-105 text-theme-text-primary"
+          >
+            {isMobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+          <div className="flex-1 text-center mx-4">
+            <h1 className="font-bold text-theme-text-primary text-base truncate">
+              {currentSession?.title || 'Xylem agent'}
+            </h1>
+            <div className="flex flex-col items-center gap-1">
+              <ConnectionStatus />
+              {isWalletConnected && address && (
+                <TokenBalances accountId={address} variant="compact" />
+              )}
+              <ViewSwitcher className="mt-1" />
             </div>
-            <div className="flex items-center gap-2">
-              <ThemeToggle variant="compact" />
-              <WalletButton variant="compact" />
-            </div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <ThemeToggle variant="compact" />
+            <WalletButton variant="compact" />
           </div>
         </div>
+      </div>
 
-        {wsError && (
-          <div className="ether-panel fixed top-20 left-1/2 z-50 flex max-w-md -translate-x-1/2 items-center gap-2 px-4 py-2 text-red-100">
-            <AlertCircle size={16} />
-            <span className="text-sm font-medium">{wsError}</span>
-          </div>
-        )}
+      {/* Connection Error Alert */}
+      {wsError && (
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 max-w-md">
+          <AlertCircle size={16} />
+          <span className="text-sm font-medium">{wsError}</span>
+        </div>
+      )}
 
-        {!isSidebarHidden && (
-          <ChatSidebar
-            sessions={sessions}
-            currentSessionId={currentSession?.id || null}
-            onToggleSidebar={() => setIsSidebarHidden(true)}
-            onNewChat={handleNewChat}
-            onSelectChat={handleSelectChat}
-            onDeleteChat={deleteSession}
-            onRenameChat={renameSession}
-            isMobileOpen={isMobileSidebarOpen}
-            onCloseMobile={() => setIsMobileSidebarOpen(false)}
-          />
-        )}
+      {/* Sidebar */}
+      {!isSidebarHidden && (
+        <ChatSidebar
+          sessions={sessions}
+          currentSessionId={currentSession?.id || null}
+          onToggleSidebar={() => setIsSidebarHidden(true)}
+          onNewChat={handleNewChat}
+          onSelectChat={handleSelectChat}
+          onDeleteChat={deleteSession}
+          onRenameChat={renameSession}
+          isMobileOpen={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
 
-        <div className="flex min-w-0 flex-1 flex-col lg:ml-0">
-          <header className="hidden flex-shrink-0 px-8 py-6 lg:block">
-            <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-6">
-              <div className="space-y-6">
-                <div>
-                  <div className="ether-micro ether-label">ETHER // SYNCHRONOUS AGENT</div>
-                  <div className="mt-5 flex items-center gap-8">
-                    <button
-                      onClick={() => setIsSidebarHidden(!isSidebarHidden)}
-                      className="ether-micro ether-nav-button flex items-center gap-2"
-                      aria-label={isSidebarHidden ? '显示侧边栏' : '隐藏侧边栏'}
-                    >
-                      <PanelLeftOpen size={14} />
-                      ROOMS
-                    </button>
-                    <button onClick={handleNewChat} className="ether-micro ether-nav-button">
-                      NEW SIGNAL
-                    </button>
-                    <button onClick={() => setActiveView('defi')} className="ether-micro ether-nav-button">
-                      ARCHIVE
-                    </button>
-                  </div>
-                </div>
-                {isSidebarHidden && (
-                  <button onClick={handleNewChat} className="ether-button px-4 py-2">
-                    新对话
-                  </button>
-                )}
-              </div>
-
-              <div className="flex flex-col items-center gap-3">
-                <ViewSwitcher />
-                <div className="ether-micro ether-faint">
-                  {currentSession ? `${currentSession.messages.length} MESSAGES` : 'LISTENING STANDBY'}
-                </div>
-              </div>
-
-              <div className="flex flex-col items-end gap-4">
-                <StatusCluster />
-                <div className="flex flex-wrap justify-end gap-2">
-                  <ConnectionStatus />
-                  {isWalletConnected && address && (
-                    <TokenBalances accountId={address} variant="compact" />
+      {/* Main chat area */}
+      <div className="flex-1 flex flex-col lg:ml-0 min-w-0">
+        {/* Desktop header */}
+        <div className="hidden lg:block border-b border-theme-border-primary dark:border-gray-700 bg-theme-bg-secondary/95 dark:bg-gray-800/95 backdrop-blur-md px-8 py-4 shadow-theme-sm flex-shrink-0">
+          <div className="flex items-center justify-between">
+            {/* Left section with sidebar toggle */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsSidebarHidden(!isSidebarHidden)}
+                className="p-2 hover:bg-theme-bg-tertiary dark:hover:bg-gray-700 rounded-lg transition-all duration-200 hover:scale-105 text-theme-text-primary"
+                aria-label="Show sidebar"
+              >
+                <PanelLeftOpen size={18} />
+              </button>
+              
+              <div className="h-5 w-px bg-theme-border-primary dark:bg-gray-600" />
+              
+              <div className="flex-1 min-w-0 flex items-center justify-between">
+                <div className="flex flex-col">
+                  <h1 className="text-xl font-bold text-theme-text-primary truncate">
+                    {currentSession?.title || 'Xylem agent'}
+                  </h1>
+                  {currentSession && (
+                    <p className="text-xs text-theme-text-secondary font-medium mt-0.5">
+                      {currentSession.messages.length} messages
+                    </p>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <ThemeToggle />
-                  <WalletButton />
-                </div>
+                
+                {isWalletConnected && address && (
+                  <div className="flex-shrink-0 ml-4">
+                    <TokenBalances accountId={address} variant="compact" />
+                  </div>
+                )}
               </div>
             </div>
-          </header>
-
-          <div className="chat-messages-area flex min-h-0 flex-1 flex-col overflow-hidden pt-20 lg:pt-0">
-            <ChatArea
-              messages={currentSession?.messages || []}
-              isLoading={isLoading}
-              onExecuteSwap={async (swapMessage: string) => {
-                if (isWSConnected && isAuthenticated && isWalletConnected) {
-                  await sendMessage(swapMessage);
-                }
-              }}
-              onSendMessage={handleSendPrompt}
-            />
-
-            <div className="flex-shrink-0">
-              <ChatInput
-                message={message}
-                setMessage={setMessage}
-                onSendMessage={handleSendMessage}
-                isLoading={isLoading}
-                isConnected={isWSConnected}
-                isReady={isWSConnected && isAuthenticated && isWalletConnected}
-              />
+            
+            {/* Right section with controls */}
+            <div className="flex items-center gap-3 ml-4">
+              <ViewSwitcher />
+              <ConnectionStatus />
+              
+              {isSidebarHidden && (
+                <button
+                  onClick={handleNewChat}
+                  className="px-3 py-2 bg-theme-accent hover:bg-theme-accent-hover text-white rounded-lg transition-all duration-200 hover:scale-105 text-sm font-medium"
+                >
+                  New Chat
+                </button>
+              )}
+              
+              <ThemeToggle />
+              <WalletButton />
             </div>
           </div>
         </div>
 
-        {import.meta.env.DEV && (
-          <TokenDebugger accountId={address} />
-        )}
+        {/* Chat messages area */}
+        <div className="flex-1 flex flex-col pt-16 lg:pt-0 min-h-0 overflow-hidden chat-messages-area">
+          <ChatArea
+            messages={currentSession?.messages || []}
+            isLoading={isLoading}
+            onExecuteSwap={async (swapMessage: string) => {
+              if (isWSConnected && isAuthenticated && isWalletConnected) {
+                await sendMessage(swapMessage);
+              }
+            }}
+            onSendMessage={handleSendPrompt}
+          />
+
+          {/* Message input */}
+          <div className="flex-shrink-0">
+            <ChatInput
+              message={message}
+              setMessage={setMessage}
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading || !isWSConnected || !isAuthenticated || !isWalletConnected}
+              isConnected={isWSConnected && isAuthenticated && isWalletConnected}
+            />
+          </div>
+        </div>
       </div>
+
+      {/* Token Debugger - only show in development */}
+      {import.meta.env.DEV && (
+        <TokenDebugger accountId={address} />
+      )}
     </div>
   );
 }

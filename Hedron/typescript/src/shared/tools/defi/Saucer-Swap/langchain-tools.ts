@@ -25,26 +25,26 @@ export const createSaucerSwapRouterSwapLangchainTool = (
 ) => {
   return new DynamicStructuredTool({
     name: SAUCERSWAP_ROUTER_SWAP_TOOL,
-    description: `在 Hedera 网络上通过 UniswapV2Router02 合约执行真实 SaucerSwap DEX token swap。
+    description: `Execute real token swaps on SaucerSwap DEX using UniswapV2Router02 contract on Hedera network.
 
-**SWAP operation:**
-- **swap_exact_hbar_for_tokens**: 用精确 HBAR 数量换取 token（最常用）
-- **swap_exact_tokens_for_hbar**: 用精确 token 数量换取 HBAR
-- **swap_exact_tokens_for_tokens**: 用精确某 token 数量换取另一 token
-- **swap_hbar_for_exact_tokens**: 用 HBAR 换取精确 token 数量
-- **swap_tokens_for_exact_hbar**: 用 token 换取精确 HBAR 数量
-- **swap_tokens_for_exact_tokens**: 用 token 换取精确另一 token 数量
+**🔄 SWAP OPERATIONS:**
+- **swap_exact_hbar_for_tokens**: Swap exact HBAR amount for tokens (most common)
+- **swap_exact_tokens_for_hbar**: Swap exact token amount for HBAR
+- **swap_exact_tokens_for_tokens**: Swap exact amount of one token for another
+- **swap_hbar_for_exact_tokens**: Swap HBAR to get exact token amount
+- **swap_tokens_for_exact_hbar**: Swap tokens to get exact HBAR amount  
+- **swap_tokens_for_exact_tokens**: Swap tokens to get exact amount of another token
 
-**核心能力:**
-- 直接与 UniswapV2Router02 合约交互
-- 支持 HBAR 和 Hedera token swap
-- 为合约兼容性自动将 HBAR 转为 WHBAR
-- 内置滑点保护（mainnet 安全默认 2.0%）
-- 支持配置交易有效期 deadline
-- 支持 mainnet 和 testnet
-- 创建可供钱包签名的真实交易
+**🚀 KEY FEATURES:**
+- Direct contract interaction with UniswapV2Router02
+- Support for HBAR and any Hedera token swaps
+- Automatic HBAR to WHBAR conversion for contract compatibility
+- Built-in slippage protection (default 2.0% for mainnet safety)
+- Configurable deadlines for transaction validity
+- Support for both mainnet and testnet
+- Real transaction creation ready for signing
 
-**swap 示例:**
+**💰 SWAP EXAMPLES:**
 1. **HBAR to SAUCE**: 
    - operation: "swap_exact_hbar_for_tokens"
    - amountIn: "100000000" (1 HBAR with 8 decimals)
@@ -60,49 +60,49 @@ export const createSaucerSwapRouterSwapLangchainTool = (
    - amountIn: "1000000" (depends on token decimals)
    - tokenPath: ["0.0.111111", "0.0.222222"]
 
-**滑点与保护:**
-- 默认滑点：2.0%（mainnet 保守安全值）
-- 可调整范围：0.01% 到 50%
-- 波动较大 token 或大额交易可能需要更高滑点
-- 稳定币或小额交易可使用较低滑点
+**⚙️ SLIPPAGE & PROTECTION:**
+- Default slippage: 2.0% (conservative for mainnet safety)
+- Adjustable from 0.01% to 50%
+- Higher slippage for volatile tokens or large amounts
+- Lower slippage for stablecoins or small amounts
 
-**支持网络:**
+**📍 SUPPORTED NETWORKS:**
 - **Mainnet**: Router Contract 0.0.3045981
 - **Testnet**: Router Contract 0.0.1414040 (default)
 
-**Token 说明:**
-- HBAR: 使用 "HBAR"（swap 时自动转为 WHBAR）
+**🪙 TOKEN SPECIFICATIONS:**
+- HBAR: Use "HBAR" (automatically converts to WHBAR for swaps)
 - SAUCE Token: "0.0.731861" (mainnet) / "0.0.1183558" (testnet)
-- 其他 token: 使用 Hedera token ID 格式 "0.0.xxxxx"
-- Path 支持 multi-hop swap: ["tokenA", "tokenB", "tokenC"]
+- Other tokens: Use Hedera token ID format "0.0.xxxxx"
+- Path supports multi-hop swaps: ["tokenA", "tokenB", "tokenC"]
 
-**数量格式:**
-- HBAR: 8 decimals（100000000 = 1 HBAR）
-- SAUCE: 18 decimals（1000000000000000000 = 1 SAUCE）
-- 其他 token: 检查对应 token decimals
-- 始终使用最小单位（amount 中不要写小数点）
+**💡 AMOUNT FORMATTING:**
+- HBAR: 8 decimals (100000000 = 1 HBAR)
+- SAUCE: 18 decimals (1000000000000000000 = 1 SAUCE)
+- Other tokens: Check token-specific decimal places
+- Always use smallest unit (no decimal points in amounts)
 
-**交易流程:**
-1. 工具校验参数并构建交易
-2. 返回 transaction bytes 供用户签名
-3. 用户在钱包中签名
-4. 交易在 SaucerSwap DEX 执行 swap
-5. token 转入收款账户
+**⏰ TRANSACTION FLOW:**
+1. Tool validates parameters and builds transaction
+2. Returns transaction bytes for user signing
+3. User signs transaction in wallet
+4. Transaction executes swap on SaucerSwap DEX
+5. Tokens are transferred to recipient account
 
-**安全机制:**
-- 滑点保护降低超额损失风险
-- deadline 防止过期交易执行
-- 最小输出计算可降低 MEV/价格偏移影响
-- 所有交易都需要用户签名确认
+**🔐 SECURITY FEATURES:**
+- Slippage protection prevents excessive loss
+- Deadline protection prevents stale transactions
+- Minimum output calculation protects against MEV
+- All transactions require user signature approval
 
-**重要提示:**
-- 需要足够 token 余额和 HBAR 支付 gas
-- 接收新 token 前可能需要 token association
-- 请根据市场情况选择合适滑点
-- 大额 swap 可能带来更高 price impact
+**⚠️ IMPORTANT NOTES:**
+- Requires sufficient token balance and HBAR for gas
+- Token association may be required before receiving new tokens
+- Check current market conditions for optimal slippage settings
+- Large swaps may have higher price impact
 
-当前用户：${userAccountId}
-网络合约：Mainnet Router ${SAUCERSWAP_V2_ROUTER_CONTRACTS.mainnet.ROUTER_ID} | Testnet Router ${SAUCERSWAP_V2_ROUTER_CONTRACTS.testnet.ROUTER_ID}`,
+Current user: ${userAccountId}
+Network contracts: Mainnet Router ${SAUCERSWAP_V2_ROUTER_CONTRACTS.mainnet.ROUTER_ID} | Testnet Router ${SAUCERSWAP_V2_ROUTER_CONTRACTS.testnet.ROUTER_ID}`,
     
     schema: z.object({
       operation: z.enum([
@@ -112,32 +112,32 @@ export const createSaucerSwapRouterSwapLangchainTool = (
         SAUCERSWAP_ROUTER_SWAP_OPERATIONS.SWAP_HBAR_FOR_EXACT_TOKENS,
         SAUCERSWAP_ROUTER_SWAP_OPERATIONS.SWAP_TOKENS_FOR_EXACT_HBAR,
         SAUCERSWAP_ROUTER_SWAP_OPERATIONS.SWAP_TOKENS_FOR_EXACT_TOKENS,
-      ]).describe('要执行的 swap operation'),
+      ]).describe('The swap operation to perform'),
       
       amountIn: z.string().optional().describe(
-        '精确输入数量，使用最小单位（exact input swap 必需）。HBAR: 8 decimals，SAUCE: 18 decimals'
+        'Exact input amount in smallest unit (required for exact input swaps). HBAR: 8 decimals, SAUCE: 18 decimals'
       ),
       
       amountOut: z.string().optional().describe(
-        '精确输出数量，使用最小单位（exact output swap 必需）。请检查 token decimals'
+        'Exact output amount in smallest unit (required for exact output swaps). Check token decimals'
       ),
       
       tokenPath: z.array(z.string()).min(2).describe(
-        '由 token ID 数组表示的 swap path。HBAR 使用 "HBAR"。示例：mainnet HBAR→SAUCE 用 ["HBAR", "0.0.731861"]，testnet 用 ["HBAR", "0.0.1183558"]'
+        'Swap path as array of token IDs. Use "HBAR" for HBAR. Example: ["HBAR", "0.0.731861"] for HBAR→SAUCE on mainnet, ["HBAR", "0.0.1183558"] on testnet'
       ),
       
       slippagePercent: z.number().min(0.01).max(50).default(2.0).describe(
-        '最大滑点容忍度百分比（2.0 = 2.0%）。默认值偏保守，适合 mainnet 安全使用'
+        'Maximum slippage tolerance as percentage (2.0 = 2.0%). Conservative default for mainnet safety'
       ),
       
       network: z.enum(['mainnet', 'testnet']).default(
         (process.env.HEDERA_NETWORK as 'mainnet' | 'testnet') || 'mainnet'
       ).describe(
-        '执行 swap 的网络（默认使用 .env 中的 HEDERA_NETWORK）'
+        'Network for swap execution (defaults to HEDERA_NETWORK from .env)'
       ),
 
       recipientAccountId: z.string().optional().describe(
-        '接收 swap 后 token 的账户（未提供时默认使用交易签名者）'
+        'Account to receive swapped tokens (defaults to transaction signer if not provided)'
       ),
     }),
     
@@ -187,17 +187,17 @@ export const createSaucerSwapRouterSwapLangchainTool = (
               ready_to_sign: true,
             },
             next_steps: [
-              '1. 仔细检查 swap 详情',
-              '2. 确认滑点容忍度可接受',
-              '3. 确认余额充足',
-              '4. 钱包提示时签名交易',
-              '5. 等待交易确认'
+              '1. Review swap details carefully',
+              '2. Check slippage tolerance is acceptable', 
+              '3. Confirm you have sufficient balance',
+              '4. Sign the transaction when prompted',
+              '5. Wait for transaction confirmation'
             ],
             risk_warnings: [
-              '加密资产 swap 存在价格波动风险',
-              '滑点可能导致最终数量与预期不同',
-              '请确保有 HBAR 支付交易手续费',
-              '继续前请再次确认 token 地址'
+              'Cryptocurrency swaps involve price volatility risk',
+              'Slippage may result in different final amounts',
+              'Ensure you have HBAR for transaction fees',
+              'Double-check token addresses before proceeding'
             ]
           }, null, 2);
         } else {
@@ -212,11 +212,11 @@ export const createSaucerSwapRouterSwapLangchainTool = (
               status: 'failed'
             },
             helpful_tips: [
-              '确认所选网络下所有 token ID 正确',
-              '确认输入数量有足够余额',
-              '确认相关 token 已关联到账户',
-              '如果遇到流动性问题，尝试调整滑点',
-              '测试时可考虑使用更小金额'
+              'Verify all token IDs are correct for the selected network',
+              'Check that you have sufficient balance for the input amount',
+              'Ensure tokens are associated to your account',
+              'Try adjusting slippage tolerance if liquidity issues',
+              'Consider using smaller amounts for testing'
             ]
           }, null, 2);
         }
@@ -224,26 +224,26 @@ export const createSaucerSwapRouterSwapLangchainTool = (
         console.error(`❌ SaucerSwap Router swap error for ${userAccountId}:`, error);
         
         return JSON.stringify({
-          error: `执行 SaucerSwap Router swap 时出错：${error.message}`,
+          error: `Error executing SaucerSwap Router swap: ${error.message}`,
           operation: params.operation,
           user_account: userAccountId,
           timestamp: new Date().toISOString(),
           troubleshooting: {
-            issue: '工具执行失败',
+            issue: 'Tool execution failed',
             possible_causes: [
-              '网络连接异常',
-              '参数无效',
-              'SaucerSwap Router 合约不可用',
-              'token 流动性不足',
-              '账户配置不完整'
+              'Network connectivity issues',
+              'Invalid parameters provided',
+              'SaucerSwap Router contract unavailable',
+              'Insufficient token liquidity',
+              'Account not properly configured'
             ],
             next_steps: [
-              '检查互联网连接后重试',
-              '确认 token ID 存在于所选网络',
-              '确认账户余额充足',
-              '尝试使用不同滑点容忍度',
-              '检查 SaucerSwap 状态页',
-              '测试可优先使用 testnet'
+              'Check internet connection and try again',
+              'Verify token IDs exist on selected network',
+              'Ensure account has sufficient balance',
+              'Try with different slippage tolerance',
+              'Check SaucerSwap status page for issues',
+              'Consider using testnet for testing'
             ]
           },
           support: {

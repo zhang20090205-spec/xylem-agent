@@ -44,7 +44,7 @@ export default function TokenDebugger({ accountId }: TokenDebuggerProps) {
       }
     } catch (err) {
       console.error('🐛 Error fetching tokens:', err)
-          setError(err instanceof Error ? err.message : '获取 token 失败')
+      setError(err instanceof Error ? err.message : 'Failed to fetch tokens')
     } finally {
       setIsLoading(false)
     }
@@ -63,22 +63,22 @@ export default function TokenDebugger({ accountId }: TokenDebuggerProps) {
       <button
         onClick={() => setIsVisible(!isVisible)}
         className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg transition-colors"
-        title="切换 token 调试器"
+        title="Toggle token debugger"
       >
         {isVisible ? <EyeOff size={16} /> : <Eye size={16} />}
-        调试 Token
+        Debug Tokens
       </button>
 
       {isVisible && (
         <div className="absolute bottom-full right-0 mb-2 w-96 max-h-80 overflow-y-auto bg-gray-900 text-white p-4 rounded-lg shadow-xl border border-gray-700">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold">账户 Token 调试</h3>
+            <h3 className="font-semibold">Account Tokens Debug</h3>
             <button
               onClick={fetchAccountTokens}
               className="text-sm text-blue-400 hover:text-blue-300"
               disabled={isLoading}
             >
-              {isLoading ? '加载中...' : '刷新'}
+              {isLoading ? 'Loading...' : 'Refresh'}
             </button>
           </div>
 
@@ -91,16 +91,16 @@ export default function TokenDebugger({ accountId }: TokenDebuggerProps) {
 
           <div className="space-y-2">
             <div className="text-sm text-gray-400">
-              账户 ID：<span className="text-white font-mono">{accountId}</span>
+              Account ID: <span className="text-white font-mono">{accountId}</span>
             </div>
             
             {tokens.length > 0 ? (
               <div>
                 <div className="text-sm text-gray-400 mb-2">
-                  找到 {tokens.length} 个 token：
+                  Found {tokens.length} token(s):
                 </div>
                 {tokens.map((token, index) => {
-                  const tokenId = token.token_id || token.token || token.id || '未知'
+                  const tokenId = token.token_id || token.token || token.id || 'Unknown'
                   const balance = token.balance || '0'
                   
                   return (
@@ -109,10 +109,10 @@ export default function TokenDebugger({ accountId }: TokenDebuggerProps) {
                       className="p-2 bg-gray-800 rounded border border-gray-700"
                     >
                       <div className="text-sm">
-                        <div className="text-yellow-400">Token ID：{tokenId}</div>
-                        <div className="text-green-400">余额：{balance}</div>
+                        <div className="text-yellow-400">Token ID: {tokenId}</div>
+                        <div className="text-green-400">Balance: {balance}</div>
                         <div className="text-gray-500 text-xs mt-1">
-                          原始数据：{JSON.stringify(token)}
+                          Raw: {JSON.stringify(token)}
                         </div>
                       </div>
                     </div>
@@ -121,14 +121,14 @@ export default function TokenDebugger({ accountId }: TokenDebuggerProps) {
               </div>
             ) : (
               <div className="text-sm text-gray-400">
-                {isLoading ? '正在加载 token...' : '该账户暂无 token'}
+                {isLoading ? 'Loading tokens...' : 'No tokens found in this account'}
               </div>
             )}
           </div>
 
           <div className="mt-3 pt-3 border-t border-gray-700">
             <div className="text-xs text-gray-500">
-              详细日志请查看控制台
+              Check console for detailed logs
             </div>
           </div>
         </div>

@@ -50,7 +50,7 @@ export class AgentResponseUtils {
       // Fallback: first captured
       return candidates[0].bytes;
     } catch (e) {
-      console.error('解析 observation 交易 bytes 失败：', e);
+      console.error('Error parsing observation for bytes:', e);
     }
     return undefined;
   }
@@ -98,7 +98,7 @@ export class AgentResponseUtils {
       const first = candidates[0];
       return { bytes: first.bytes, operation: first.op, step: first.step, originalParams: first.originalParams };
     } catch (e) {
-      console.error('提取待签交易信息失败：', e);
+      console.error('Error extracting prepared tx info:', e);
       return undefined;
     }
   }
@@ -123,7 +123,7 @@ export class AgentResponseUtils {
           obsObj?.operation &&
           (obsObj.operation === 'get_amounts_out' || obsObj.operation === 'get_amounts_in')
         ) {
-          console.log('检测到 swap 报价：', obsObj.operation);
+          console.log('💱 DETECTED SWAP QUOTE:', obsObj.operation);
 
           const inputToken = this.getTokenName(obsObj.quote.input.token);
           const outputToken = this.getTokenName(obsObj.quote.output.token);
@@ -151,12 +151,12 @@ export class AgentResponseUtils {
               exchangeRate: obsObj.quote.exchangeRate || '0',
               gasEstimate: obsObj.gasEstimate,
             },
-            originalMessage: response?.output || 'Swap 报价可用',
+            originalMessage: response?.output || 'Swap quote available',
           };
         }
       }
     } catch (e) {
-      console.error('解析 swap 报价失败：', e);
+      console.error('Error parsing swap quote:', e);
     }
     return undefined;
   }
@@ -178,7 +178,7 @@ export class AgentResponseUtils {
         const obs = step.observation;
         const obsObj = typeof obs === 'string' ? JSON.parse(obs) : obs;
 
-        console.log('正在提取下一步 - 原始 observation：');
+        console.log('🔍 EXTRACTING NEXT STEP - RAW OBSERVATION:');
         console.log('   obsObj.nextStep:', obsObj?.nextStep);
         console.log('   obsObj.step:', obsObj?.step);
         console.log('   obsObj.operation:', obsObj?.operation);
@@ -221,7 +221,7 @@ export class AgentResponseUtils {
               originalParams: obsObj.originalParams || {},
               nextStepInstructions:
                 obsObj.instructions ||
-                'Token 关联已完成。下一步请为 MotherShip 合约授权 SAUCE。',
+                'Token association complete. Proceed to approve SAUCE for MotherShip contract.',
             };
             continue;
           }
@@ -238,7 +238,7 @@ export class AgentResponseUtils {
               originalParams: obsObj.originalParams || {},
               nextStepInstructions:
                 obsObj.instructions ||
-                '授权已确认。下一步请将 SAUCE 质押到 Infinity Pool。',
+                'Approval confirmed. Proceed to stake SAUCE into the Infinity Pool.',
             };
             continue;
           }
@@ -275,7 +275,7 @@ export class AgentResponseUtils {
 
       return detected;
     } catch (e) {
-      console.error('解析下一步失败：', e);
+      console.error('Error parsing next step:', e);
       return undefined;
     }
   }
@@ -353,7 +353,7 @@ export class AgentResponseUtils {
 
       return ctx;
     } catch (e) {
-      console.error('提取操作上下文失败：', e);
+      console.error('Error extracting operation context:', e);
       return undefined;
     }
   }

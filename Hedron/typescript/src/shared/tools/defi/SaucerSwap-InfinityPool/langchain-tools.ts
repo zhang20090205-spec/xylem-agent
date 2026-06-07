@@ -25,16 +25,16 @@ export const createSaucerswapInfinityPoolLangchainTool = (
 ) => {
   return new DynamicStructuredTool({
     name: SAUCERSWAP_INFINITY_POOL_TOOL,
-    description: `在 Hedera Mainnet 上将 SAUCE token 质押到 SaucerSwap Infinity Pool，以获得 xSAUCE。
+    description: `Stake SAUCE tokens in SaucerSwap's Infinity Pool to earn xSAUCE on Hedera Mainnet.
 
-**核心功能:**
-**Staking operation:**
-- 质押 SAUCE token → 获得 xSAUCE（计息 token）
-- 解除质押 xSAUCE token → 获得 SAUCE + 奖励
-- 为 SAUCE 和 xSAUCE 执行 token association
-- 为 MotherShip 合约执行 token approval
+**CORE FUNCTIONALITY:**
+🥩 **Staking Operations:**
+- Stake SAUCE tokens → Receive xSAUCE (interest-bearing tokens)
+- Unstake xSAUCE tokens → Receive SAUCE + rewards
+- Token association for SAUCE and xSAUCE
+- Token approval for MotherShip contract
 
-**可用 operation:**
+**AVAILABLE OPERATIONS:**
 - associate_tokens: Associate SAUCE and xSAUCE tokens to account
 - approve_sauce: Approve MotherShip contract to spend SAUCE tokens
 - stake_sauce: Stake SAUCE tokens to receive xSAUCE
@@ -42,23 +42,23 @@ export const createSaucerswapInfinityPoolLangchainTool = (
 - full_stake_flow: Complete staking process (association + approval + stake)
 - full_unstake_flow: Complete unstaking process
 
-**质押奖励:**
-- 奖励来自 SaucerSwap 交易手续费
-- xSAUCE token 代表你在池中的份额
-- 奖励会随时间自动复利
-- 无锁定期，可随时解除质押
+**STAKING REWARDS:**
+- Earn rewards from SaucerSwap trading fees
+- xSAUCE tokens represent your share of the pool
+- Rewards automatically compound over time
+- No lock-up period - unstake anytime
 
-**安全提示:**
-- 仅在 Hedera Mainnet 使用，涉及真实资金
-- 所有交易确认后不可逆
-- 确认前请仔细核对金额
+**SECURITY:**
+- Only works on Hedera Mainnet with real funds
+- All transactions are irreversible
+- Verify amounts before confirming
 
-**合约信息:**
+**CONTRACT INFO:**
 - MotherShip: ${getInfinityPoolConfig().MOTHERSHIP_CONTRACT_ID}
 - SAUCE Token: ${getInfinityPoolConfig().SAUCE_TOKEN_ID} (6 decimals)
 - xSAUCE Token: ${getInfinityPoolConfig().XSAUCE_TOKEN_ID} (6 decimals)
 
-用户账户：${userAccountId}`,
+User Account: ${userAccountId}`,
     
     schema: infinityPoolStakeParameters(context),
     
@@ -81,26 +81,26 @@ export const createSaucerswapInfinityPoolLangchainTool = (
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         return JSON.stringify({
-          error: `SaucerSwap Infinity Pool operation 出错：${errorMessage}`,
+          error: `Error in SaucerSwap Infinity Pool operation: ${errorMessage}`,
           operation: params.operation,
           timestamp: new Date().toISOString(),
           troubleshooting: {
-            issue: 'Infinity Pool operation 失败',
+            issue: 'Infinity Pool operation failed',
             possible_causes: [
-              '网络连接异常',
-              'token 余额不足',
-              'token 尚未关联到账户',
-              '尚未授予合约 approval',
-              '超出 gas limit',
-              '参数无效'
+              'Network connectivity issues',
+              'Insufficient token balance',
+              'Tokens not associated to account',
+              'Contract approval not granted',
+              'Gas limit exceeded',
+              'Invalid parameters'
             ],
             next_steps: [
-              '检查互联网连接',
-              '确认 SAUCE/xSAUCE token 余额',
-              '确认 token 已关联到账户',
-              '检查 SAUCE 是否已授权给 MotherShip 合约',
-              '确认 operation 参数',
-              '降低金额后重试'
+              'Check internet connection',
+              'Verify SAUCE/xSAUCE token balances',
+              'Ensure tokens are associated to your account',
+              'Check if SAUCE is approved for MotherShip contract',
+              'Verify operation parameters',
+              'Try again with lower amounts'
             ]
           }
         }, null, 2);
@@ -119,26 +119,26 @@ export const createSaucerswapInfinityPoolStepLangchainTool = (
 ) => {
   return new DynamicStructuredTool({
     name: SAUCERSWAP_INFINITY_POOL_STEP_TOOL,
-    description: `执行 SaucerSwap Infinity Pool operation 的单个步骤。用于 WebSocket 模式下的多步骤流程。
+    description: `Execute individual steps of SaucerSwap Infinity Pool operations. Used for multi-step flows in WebSocket mode.
 
-**用途:**
-该工具用于在前一步已签名并确认后，继续执行后续单步操作。
+**PURPOSE:**
+This tool is designed for completing individual steps after a previous step has been signed and confirmed.
 
-**使用场景:**
-- token association 交易确认后 → 用它继续 approval
-- approval 交易确认后 → 用它继续 staking
-- 需要对质押流程进行细粒度控制时
+**WHEN TO USE:**
+- After token association transaction is confirmed → Use this to proceed with approval
+- After approval transaction is confirmed → Use this to proceed with staking
+- For granular control over the staking process
 
-**step operation:**
-- approval: token association 后为 MotherShip 合约授权 SAUCE
-- stake: approval 确认后执行 SAUCE staking
+**STEP OPERATIONS:**
+- approval: Approve SAUCE for MotherShip contract after token association
+- stake: Execute SAUCE staking after approval is confirmed
 
-**参数:**
-- sauceAmount: 要 approval/stake 的 SAUCE 数量
-- approveAmount: 指定 approval 数量（可选）
-- userAccountId: 执行 operation 的账户
+**PARAMETERS:**
+- sauceAmount: Amount of SAUCE to approve/stake
+- approveAmount: Specific amount to approve (optional)
+- userAccountId: Account performing the operation
 
-用户账户：${userAccountId}`,
+User Account: ${userAccountId}`,
 
     schema: infinityPoolStepParameters(context),
 
@@ -159,9 +159,9 @@ export const createSaucerswapInfinityPoolStepLangchainTool = (
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         return JSON.stringify({
-          error: `Infinity Pool step operation 出错：${errorMessage}`,
+          error: `Error in Infinity Pool step operation: ${errorMessage}`,
           timestamp: new Date().toISOString(),
-          suggestion: '请确认前序步骤已成功完成，并且账户余额充足'
+          suggestion: 'Ensure previous steps were completed successfully and account has sufficient balances'
         }, null, 2);
       }
     },

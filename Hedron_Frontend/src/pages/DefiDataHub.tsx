@@ -57,7 +57,7 @@ type ActivityEntry = {
   id: string;
   source: string;
   query: string;
-  status: '已查询' | '处理中' | '需要钱包';
+  status: 'Consultado' | 'En proceso' | 'Requiere wallet';
   timestamp: string;
 };
 
@@ -77,57 +77,57 @@ const DATA_SOURCES: DataSource[] = [
     id: 'saucerswap',
     name: 'SaucerSwap',
     iconSrc: '/SauceIcon.png',
-    iconAlt: 'SaucerSwap 标志',
+    iconAlt: 'SaucerSwap logo',
     gradient: 'from-purple-500/90 via-blue-500/80 to-cyan-500/80',
     description:
-      '查询 TVL、交易量、farms 和报价。',
+      'Consulta TVL, volumen, farms y cotizaciones.',
     capabilities: [
-      'DEX + farming 统计',
-      'QuoterV2 报价',
-      'Pool 持仓',
+      'Stats DEX + farming',
+      'Cotizaciones QuoterV2',
+      'Posiciones en pools',
     ],
     workflows: [
-      '选择查询类型',
-      '填写必填字段',
-      '查看结果',
+      'Selecciona el tipo de consulta',
+      'Completa los campos requeridos',
+      'Visualiza los resultados',
     ],
   },
   {
     id: 'bonzo',
     name: 'Bonzo Finance',
     iconSrc: '/BonzoIcon.png',
-    iconAlt: 'Bonzo Finance 标志',
+    iconAlt: 'Bonzo Finance logo',
     gradient: 'from-slate-800 via-emerald-500/80 to-emerald-400/80',
     description:
-      '查看看板和市场指标。',
+      'Dashboard y métricas de mercados.',
     capabilities: [
-      '看板 + 健康度',
-      '市场与 APY',
-      '活跃持仓',
+      'Dashboard + health factor',
+      'Mercados y APYs',
+      'Posiciones activas',
     ],
     workflows: [
-      '选择市场',
-      '检查指标',
-      '分析持仓',
+      'Selecciona mercado',
+      'Revisa métricas',
+      'Analiza posiciones',
     ],
   },
   {
     id: 'autoswap',
     name: 'AutoSwapLimit',
     iconSrc: '/hedera-hbar-logo.png',
-    iconAlt: 'AutoSwapLimit 标志',
+    iconAlt: 'AutoSwapLimit logo',
     gradient: 'from-orange-500/80 via-amber-500/80 to-yellow-500/70',
     description:
-      '查询活跃限价单。',
+      'Consulta órdenes limitadas activas.',
     capabilities: [
-      '订单查询',
-      '状态与详情',
-      '合约配置',
+      'Consulta de órdenes',
+      'Estado y detalles',
+      'Configuración del contrato',
     ],
     workflows: [
-      '选择查询类型',
-      '查看活跃订单',
-      '分析订单状态',
+      'Selecciona tipo de consulta',
+      'Revisa las órdenes activas',
+      'Analiza el estado',
     ],
   },
 ];
@@ -136,16 +136,16 @@ const QUERY_BLUEPRINTS: Record<DataSource['id'], QueryBlueprint[]> = {
   saucerswap: [
     {
       id: 'dex-stats',
-      label: 'DEX 统计',
-      description: 'TVL、交易量、费用和全局持仓。',
+      label: 'Estadísticas DEX',
+      description: 'TVL, volumen, fees y posiciones globales.',
       fields: [
         {
           type: 'select',
           name: 'dataset',
-          label: '数据集',
+          label: 'Dataset',
           options: [
-            { label: '通用统计', value: 'stats' },
-            { label: '我的 farms', value: 'account_farms' },
+            { label: 'Estadísticas generales', value: 'stats' },
+            { label: 'Mis farms', value: 'account_farms' },
             { label: 'Infinity Pool', value: 'infinity_pool' },
           ],
           defaultValue: 'stats',
@@ -154,25 +154,25 @@ const QUERY_BLUEPRINTS: Record<DataSource['id'], QueryBlueprint[]> = {
     },
     {
       id: 'quote-builder',
-      label: 'Swap 报价',
-      description: '预览路径和兑换汇率。',
+      label: 'Cotización swap',
+      description: 'Previsualiza rutas y exchange rate.',
       fields: [
         {
           type: 'text',
           name: 'inputToken',
-          label: '输入 token',
+          label: 'Token origen',
           placeholder: '0.0.456858 (USDC)',
         },
         {
           type: 'text',
           name: 'outputToken',
-          label: '输出 token',
+          label: 'Token destino',
           placeholder: '0.0.1183558 (SAUCE)',
         },
         {
           type: 'text',
           name: 'amount',
-          label: '数量',
+          label: 'Monto',
           placeholder: '1000',
         },
       ],
@@ -181,15 +181,15 @@ const QUERY_BLUEPRINTS: Record<DataSource['id'], QueryBlueprint[]> = {
   bonzo: [
     {
       id: 'dashboard',
-      label: 'Bonzo 看板',
-      description: '账户健康度和市场快照。',
+      label: 'Dashboard',
+      description: 'Snapshot de salud y mercados.',
       fields: [
         {
           type: 'select',
           name: 'market',
-          label: '市场',
+          label: 'Mercado',
           options: [
-            { label: '全部', value: 'all' },
+            { label: 'Todos', value: 'all' },
             { label: 'WHBAR', value: 'whbar' },
             { label: 'SAUCE', value: 'sauce' },
             { label: 'xSAUCE', value: 'xsauce' },
@@ -203,16 +203,16 @@ const QUERY_BLUEPRINTS: Record<DataSource['id'], QueryBlueprint[]> = {
   autoswap: [
     {
       id: 'orders',
-      label: '我的订单',
-      description: '查询活跃订单。',
+      label: 'Mis órdenes',
+      description: 'Consulta órdenes activas.',
       fields: [
         {
           type: 'select',
           name: 'queryMode',
-          label: '查询类型',
+          label: 'Tipo de consulta',
           options: [
-            { label: '订单列表', value: 'getUserOrders' },
-            { label: '包含详情', value: 'getUserOrdersWithDetails' },
+            { label: 'Lista de órdenes', value: 'getUserOrders' },
+            { label: 'Con detalles', value: 'getUserOrdersWithDetails' },
           ],
           defaultValue: 'getUserOrders',
         },
@@ -220,8 +220,8 @@ const QUERY_BLUEPRINTS: Record<DataSource['id'], QueryBlueprint[]> = {
     },
     {
       id: 'config-check',
-      label: '配置',
-      description: '合约参数。',
+      label: 'Configuración',
+      description: 'Parámetros del contrato.',
       fields: [],
     },
   ],
@@ -229,20 +229,20 @@ const QUERY_BLUEPRINTS: Record<DataSource['id'], QueryBlueprint[]> = {
 
 const WORKFLOW_STEPS = [
   {
-    title: '1. 连接钱包',
-    detail: '用于查询你的账户信息。',
+    title: '1. Conecta wallet',
+    detail: 'Para consultar información de tu cuenta.',
   },
   {
-    title: '2. 选择数据源',
-    detail: '从 SaucerSwap、Bonzo 或 AutoSwapLimit 中选择。',
+    title: '2. Selecciona fuente',
+    detail: 'Elige entre SaucerSwap, Bonzo o AutoSwapLimit.',
   },
   {
-    title: '3. 配置查询',
-    detail: '填写所需字段。',
+    title: '3. Configura consulta',
+    detail: 'Completa los campos necesarios.',
   },
   {
-    title: '4. 查看结果',
-    detail: '获取请求的信息。',
+    title: '4. Visualiza resultados',
+    detail: 'Obtén la información solicitada.',
   },
 ];
 
@@ -250,22 +250,22 @@ const INITIAL_ACTIVITY: ActivityEntry[] = [
   {
     id: 'log-1',
     source: 'SaucerSwap',
-    query: 'DEX 统计',
-    status: '已查询',
+    query: 'Estadísticas DEX',
+    status: 'Consultado',
     timestamp: '08:42',
   },
   {
     id: 'log-2',
     source: 'Bonzo Finance',
-    query: 'Bonzo 看板',
-    status: '需要钱包',
+    query: 'Dashboard',
+    status: 'Requiere wallet',
     timestamp: '08:15',
   },
   {
     id: 'log-3',
     source: 'AutoSwapLimit',
-    query: '我的订单',
-    status: '处理中',
+    query: 'Mis órdenes',
+    status: 'En proceso',
     timestamp: '07:55',
   },
 ];
@@ -312,7 +312,7 @@ const DefiDataHub = ({
       id: crypto.randomUUID(),
       source: selectedSource.name,
       query: activePreset.label,
-      status: isWalletConnected ? '已查询' : '需要钱包',
+      status: isWalletConnected ? 'Consultado' : 'Requiere wallet',
       timestamp,
     };
 
@@ -326,17 +326,17 @@ const DefiDataHub = ({
 
     const recommendation =
       selectedSource.id === 'autoswap'
-        ? '检查订单状态和过期时间。'
+        ? 'Revisa el estado de las órdenes y sus expiraciones.'
         : selectedSource.id === 'bonzo'
-          ? '分析 health factor 和可用 APY。'
-          : '核对当前指标和报价。';
+          ? 'Analiza el health factor y los APYs disponibles.'
+          : 'Verifica las métricas y cotizaciones actuales.';
 
     const nextSteps =
       selectedSource.id === 'saucerswap'
-        ? ['查看 TVL 和交易量', '分析 farms 持仓', '比较报价']
+        ? ['Revisar TVL y volumen', 'Analizar posiciones en farms', 'Comparar cotizaciones']
         : selectedSource.id === 'bonzo'
-          ? ['检查 health factor', '比较各市场 APY', '查看活跃持仓']
-          : ['查看待处理订单', '检查过期时间', '分析触发价格'];
+          ? ['Verificar health factor', 'Comparar APYs entre mercados', 'Revisar posiciones activas']
+          : ['Revisar órdenes pendientes', 'Verificar fechas de expiración', 'Analizar precios trigger'];
 
     setResultPreview({
       title: activePreset.label,
@@ -348,21 +348,20 @@ const DefiDataHub = ({
   };
 
   return (
-    <div className="ether-shell min-h-screen text-white transition-colors duration-300">
-      <div className="ether-content min-h-screen">
-      <header className="sticky top-0 z-20 border-b border-white/12 bg-[#0e2530]/48 px-6 py-4 backdrop-blur-xl lg:px-10">
-        <div className="flex flex-col gap-3">
+    <div className="min-h-screen bg-theme-bg-primary dark:bg-gray-900 text-theme-text-primary transition-colors duration-300">
+      <header className="border-b border-theme-border-primary dark:border-gray-800 bg-theme-bg-secondary/80 dark:bg-gray-900/80 backdrop-blur px-6 lg:px-10 py-3 sticky top-0 z-20">
+        <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="ether-serif text-3xl text-white/90">Xylem 数据中心</h1>
-                  <span className="ether-micro border border-orange-100/20 bg-orange-200/10 px-2 py-0.5 text-orange-50/80">
-                    BETA
+                  <h1 className="text-xl font-semibold">Xylem Data Hub</h1>
+                  <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300">
+                    Beta
                   </span>
                 </div>
-                <p className="ether-micro ether-faint mt-1">
-                  DIRECT DEFI FREQUENCY / 不依赖 agent，直接查询 DeFi 数据
+                <p className="text-xs text-theme-text-secondary mt-0.5">
+                  Consulta DeFi sin depender del agente
                 </p>
               </div>
             </div>
@@ -370,10 +369,10 @@ const DefiDataHub = ({
               {viewSwitcher?.({ className: 'hidden md:flex' })}
               <button
                 onClick={onBackToAgent}
-                className="ether-button inline-flex items-center gap-1.5 px-3 py-2"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-theme-text-secondary hover:text-theme-text-primary transition-colors"
               >
                 <ArrowLeftCircle size={16} />
-                AI 助手
+                Agente
               </button>
               <ThemeToggle />
               <WalletButton />
@@ -388,16 +387,16 @@ const DefiDataHub = ({
                 <TokenBalances accountId={address} variant="compact" />
               </div>
             ) : (
-              <div className="ether-micro ether-label flex items-center gap-1.5 border border-dashed border-white/16 px-2.5 py-1">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-dashed border-theme-border-primary text-theme-text-secondary">
                 <Wallet size={12} />
-                <span>连接钱包</span>
+                <span>Conecta wallet</span>
               </div>
             )}
           </div>
         </div>
       </header>
 
-      <main className="space-y-6 px-6 py-6 lg:px-10">
+      <main className="px-6 lg:px-10 py-6 space-y-6">
         <section className="grid lg:grid-cols-3 gap-3">
           {DATA_SOURCES.map((source) => {
             const isActive = source.id === selectedSourceId;
@@ -410,37 +409,33 @@ const DefiDataHub = ({
                   const firstBlueprint = QUERY_BLUEPRINTS[source.id][0];
                   setActivePresetId(firstBlueprint.id);
                 }}
-                className={`ether-panel relative h-full w-full overflow-hidden p-4 text-left transition-all ${
+                className={`relative h-full w-full text-left rounded-xl border p-4 transition-all ${
                   isActive
-                    ? 'border-orange-100/38 ring-1 ring-orange-100/24'
-                    : 'hover:border-white/26'
+                    ? 'border-transparent ring-2 ring-emerald-400'
+                    : 'border-theme-border-primary dark:border-gray-800 hover:border-theme-border-primary/60'
                 }`}
               >
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${source.gradient} ${
-                    isActive ? 'opacity-[0.18]' : 'opacity-[0.1]'
-                  }`}
-                />
+                <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${source.gradient} opacity-10`} />
                 <div className="relative">
                   <div className="flex items-start justify-between gap-3">
                     <img
                       src={source.iconSrc}
                       alt={source.iconAlt}
-                      className="h-8 w-8 border border-white/20 bg-white/10 object-contain p-1"
+                      className="h-8 w-8 rounded-lg border border-theme-border-primary/40 dark:border-gray-700/40 bg-theme-bg-primary/40 object-contain p-1"
                       loading="lazy"
                     />
                     {isActive && (
-                      <span className="ether-micro bg-white/12 px-2 py-0.5 text-white/84">
-                        ON AIR
+                      <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-500 text-white">
+                        Activo
                       </span>
                     )}
                   </div>
-                  <h2 className="ether-serif mt-3 text-2xl text-white/90">{source.name}</h2>
-                  <p className="mt-1 line-clamp-2 text-sm text-white/58">{source.description}</p>
-                  <ul className="mt-3 space-y-1 text-xs text-white/58">
+                  <h2 className="text-base font-semibold mt-2">{source.name}</h2>
+                  <p className="text-xs text-theme-text-secondary mt-1 line-clamp-2">{source.description}</p>
+                  <ul className="mt-2 space-y-1 text-xs text-theme-text-secondary">
                     {source.capabilities.slice(0, 3).map((item) => (
                       <li key={item} className="flex items-start gap-1.5">
-                        <span className="mt-1 h-1 w-1 flex-shrink-0 rounded-full bg-orange-200/80" />
+                        <span className="mt-1 h-1 w-1 rounded-full bg-emerald-400 flex-shrink-0" />
                         <span className="line-clamp-1">{item}</span>
                       </li>
                     ))}
@@ -452,21 +447,21 @@ const DefiDataHub = ({
         </section>
 
         <section className="grid lg:grid-cols-[2fr_1fr] gap-4">
-          <div className="ether-panel p-4">
+          <div className="rounded-xl border border-theme-border-primary dark:border-gray-800 bg-theme-bg-secondary/40 dark:bg-gray-900/60 p-4">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div>
-                <h3 className="ether-serif text-2xl text-white/90">{selectedSource.name}</h3>
-                <p className="ether-micro ether-faint mt-1">{activePreset.description}</p>
+                <h3 className="text-base font-semibold">{selectedSource.name}</h3>
+                <p className="text-xs text-theme-text-secondary mt-0.5">{activePreset.description}</p>
               </div>
               <div className="flex gap-2 flex-wrap">
                 {queryPresets.map((preset) => (
                   <button
                     key={preset.id}
                     onClick={() => setActivePresetId(preset.id)}
-                    className={`ether-button px-3 py-1.5 ${
+                    className={`px-3 py-1.5 rounded-lg text-xs border transition-all ${
                       preset.id === activePreset.id
-                        ? 'border-orange-100/42 bg-white/12 text-white'
-                        : ''
+                        ? 'bg-emerald-500 text-white border-emerald-500'
+                        : 'border-theme-border-primary dark:border-gray-700 text-theme-text-secondary hover:text-theme-text-primary'
                     }`}
                   >
                     {preset.label}
@@ -479,12 +474,12 @@ const DefiDataHub = ({
               {activePreset.fields.length > 0 ? (
                 activePreset.fields.map((field) => (
                   <label key={field.name} className="flex flex-col gap-1.5 text-xs">
-                    <span className="ether-micro ether-label">{field.label}</span>
+                    <span className="font-medium text-theme-text-secondary">{field.label}</span>
                     {field.type === 'select' ? (
                       <select
                         value={formValues[field.name] ?? ''}
                         onChange={(event) => handleFieldChange(field.name, event.target.value)}
-                        className="ether-field px-2.5 py-2 text-sm"
+                        className="bg-theme-bg-primary/80 dark:bg-gray-800 border border-theme-border-primary dark:border-gray-700 rounded-lg px-2.5 py-2 text-sm text-theme-text-primary focus:outline-none focus:ring-2 focus:ring-emerald-400"
                       >
                         {field.options.map((option) => (
                           <option key={option.value} value={option.value}>
@@ -498,14 +493,14 @@ const DefiDataHub = ({
                         value={formValues[field.name] ?? ''}
                         onChange={(event) => handleFieldChange(field.name, event.target.value)}
                         placeholder={field.placeholder}
-                        className="ether-field px-2.5 py-2 text-sm"
+                        className="bg-theme-bg-primary/80 dark:bg-gray-800 border border-theme-border-primary dark:border-gray-700 rounded-lg px-2.5 py-2 text-sm text-theme-text-primary focus:outline-none focus:ring-2 focus:ring-emerald-400"
                       />
                     )}
                   </label>
                 ))
               ) : (
-                <div className="ether-micro ether-faint col-span-2 py-4 text-center">
-                  不需要额外参数
+                <div className="col-span-2 py-4 text-center text-xs text-theme-text-secondary">
+                  No requiere parámetros adicionales
                 </div>
               )}
             </div>
@@ -513,28 +508,28 @@ const DefiDataHub = ({
             <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
               <button
                 onClick={() => setResultPreview(null)}
-                className="ether-button px-3 py-1.5"
+                className="px-3 py-1.5 text-xs rounded-lg border border-theme-border-primary dark:border-gray-700 text-theme-text-secondary hover:text-theme-text-primary transition-colors"
               >
-                清空
+                Limpiar
               </button>
               <button
                 onClick={handlePreview}
-                className="ether-button flex items-center gap-1.5 px-3 py-1.5"
+                className="px-3 py-1.5 text-xs rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium flex items-center gap-1.5"
               >
                 <RefreshCcw size={14} />
-                查询
+                Consultar
               </button>
             </div>
           </div>
 
-          <div className="ether-panel flex flex-col gap-3 p-4">
+          <div className="rounded-xl border border-theme-border-primary dark:border-gray-800 bg-theme-bg-secondary/60 dark:bg-gray-900/70 p-4 flex flex-col gap-3">
             <div>
-              <h4 className="ether-micro text-white/82">SUGGESTED FLOW / 建议流程</h4>
+              <h4 className="text-sm font-semibold">Flujo sugerido</h4>
             </div>
             <ol className="space-y-2">
               {selectedSource.workflows.map((step, idx) => (
-                <li key={step} className="flex gap-2 text-xs text-white/58">
-                  <span className="flex-shrink-0 font-medium text-orange-100/82">{idx + 1}.</span>
+                <li key={step} className="flex gap-2 text-xs text-theme-text-secondary">
+                  <span className="font-medium text-emerald-400 flex-shrink-0">{idx + 1}.</span>
                   <span>{step.replace(/^\d+\.\s*/, '')}</span>
                 </li>
               ))}
@@ -543,46 +538,46 @@ const DefiDataHub = ({
         </section>
 
         <section className="grid lg:grid-cols-[2fr_1fr] gap-4">
-          <div className="ether-panel p-4">
+          <div className="rounded-xl border border-theme-border-primary dark:border-gray-800 bg-theme-bg-secondary/40 dark:bg-gray-900/60 p-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
-              <h4 className="ether-micro text-white/82">OUTPUT / 结果</h4>
+              <h4 className="text-sm font-semibold">Resultados</h4>
               <div className="flex gap-2">
-                <button className="ether-button px-2.5 py-1">
-                  复制
+                <button className="px-2.5 py-1 text-xs rounded-lg border border-theme-border-primary dark:border-gray-700 text-theme-text-secondary hover:text-theme-text-primary">
+                  Copiar
                 </button>
-                <button className="ether-button px-2.5 py-1">
-                  导出
+                <button className="px-2.5 py-1 text-xs rounded-lg border border-theme-border-primary dark:border-gray-700 text-theme-text-secondary hover:text-theme-text-primary">
+                  Exportar
                 </button>
               </div>
             </div>
 
             {resultPreview ? (
               <div className="mt-3 space-y-3">
-                <div className="border border-white/12 bg-white/6 p-3">
-                  <h5 className="text-sm font-semibold text-white/88">{resultPreview.title}</h5>
-                  <p className="mt-1 text-xs text-white/56">{resultPreview.summary}</p>
+                <div className="rounded-lg bg-theme-bg-primary/60 dark:bg-gray-900/70 border border-theme-border-primary dark:border-gray-800 p-3">
+                  <h5 className="text-sm font-semibold">{resultPreview.title}</h5>
+                  <p className="text-xs text-theme-text-secondary mt-1">{resultPreview.summary}</p>
                 </div>
                 <div className="grid md:grid-cols-3 gap-2">
                   {resultPreview.highlights.map((highlight) => (
                     <div
                       key={highlight.label}
-                      className="border border-white/12 bg-white/5 p-2.5"
+                      className="rounded-lg border border-theme-border-primary dark:border-gray-800 p-2.5"
                     >
-                      <p className="ether-micro ether-faint">
+                      <p className="text-xs text-theme-text-secondary">
                         {highlight.label}
                       </p>
-                      <p className="mt-1 break-all text-sm font-semibold text-white/86">{highlight.value}</p>
+                      <p className="text-sm font-semibold mt-0.5 break-all">{highlight.value}</p>
                     </div>
                   ))}
                 </div>
-                <div className="border border-emerald-100/20 bg-emerald-300/10 p-3">
-                  <p className="text-xs font-semibold text-emerald-50/88">
+                <div className="rounded-lg border border-emerald-300/40 dark:border-emerald-400/30 bg-emerald-50/60 dark:bg-emerald-500/10 p-3">
+                  <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-200">
                     {resultPreview.recommendation}
                   </p>
-                  <ul className="mt-2 space-y-0.5 text-xs text-emerald-50/72">
+                  <ul className="mt-2 space-y-0.5 text-xs text-emerald-700/80 dark:text-emerald-100/90">
                     {resultPreview.nextSteps.map((step) => (
                       <li key={step} className="flex items-center gap-1.5">
-                        <span className="h-1 w-1 flex-shrink-0 rounded-full bg-emerald-100/82" />
+                        <span className="h-1 w-1 rounded-full bg-emerald-500 flex-shrink-0" />
                         {step}
                       </li>
                     ))}
@@ -590,54 +585,54 @@ const DefiDataHub = ({
                 </div>
               </div>
             ) : (
-              <div className="mt-6 flex flex-col items-center justify-center gap-2 py-8 text-xs text-white/52">
-                <BarChart3 size={24} className="text-white/38" />
-                <p>执行查询后将在这里看到结果</p>
+              <div className="mt-6 flex flex-col items-center justify-center gap-2 text-theme-text-secondary text-xs py-8">
+                <BarChart3 size={24} className="text-theme-text-secondary/60" />
+                <p>Realiza una consulta para ver resultados</p>
               </div>
             )}
           </div>
 
           <div className="space-y-4">
-            <div className="ether-panel p-4">
-              <h4 className="ether-micro mb-3 text-white/82">OPERATING STEPS / 操作步骤</h4>
+            <div className="rounded-xl border border-theme-border-primary dark:border-gray-800 bg-theme-bg-secondary/60 dark:bg-gray-900/70 p-4">
+              <h4 className="text-sm font-semibold mb-3">Pasos operativos</h4>
               <div className="space-y-2">
                 {WORKFLOW_STEPS.map((step) => (
                   <div key={step.title} className="flex gap-2">
-                    <div className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-orange-100/82" />
+                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0" />
                     <div>
-                      <p className="text-xs font-semibold text-white/82">{step.title}</p>
-                      <p className="mt-0.5 text-xs text-white/54">{step.detail}</p>
+                      <p className="text-xs font-semibold">{step.title}</p>
+                      <p className="text-xs text-theme-text-secondary mt-0.5">{step.detail}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="ether-panel p-4">
-              <h4 className="ether-micro mb-3 text-white/82">RECENT LOG / 最近执行</h4>
+            <div className="rounded-xl border border-theme-border-primary dark:border-gray-800 bg-theme-bg-secondary/60 dark:bg-gray-900/70 p-4">
+              <h4 className="text-sm font-semibold mb-3">Últimas ejecuciones</h4>
               <ul className="space-y-2 text-xs">
                 {activityLog.map((entry) => (
                   <li
                     key={entry.id}
-                    className="flex items-center justify-between gap-2 border border-white/10 bg-white/5 px-2.5 py-2"
+                    className="flex items-center justify-between gap-2 rounded-lg border border-theme-border-primary dark:border-gray-800 px-2.5 py-2"
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium text-white/82">{entry.source}</p>
-                      <p className="truncate text-white/48">{entry.query}</p>
+                      <p className="font-medium text-theme-text-primary truncate">{entry.source}</p>
+                      <p className="text-theme-text-secondary truncate">{entry.query}</p>
                     </div>
                     <div className="flex flex-col items-end text-xs flex-shrink-0">
                       <span
                         className={`px-1.5 py-0.5 rounded text-xs ${
-                          entry.status === '已查询'
-                            ? 'bg-emerald-300/12 text-emerald-100'
-                            : entry.status === '需要钱包'
-                              ? 'bg-orange-300/12 text-orange-100'
-                              : 'bg-sky-300/12 text-sky-100'
+                          entry.status === 'Consultado'
+                            ? 'bg-emerald-500/15 text-emerald-500'
+                            : entry.status === 'Requiere wallet'
+                              ? 'bg-amber-500/15 text-amber-500'
+                              : 'bg-blue-500/15 text-blue-500'
                         }`}
                       >
                         {entry.status}
                       </span>
-                      <span className="mt-0.5 text-white/42">{entry.timestamp}</span>
+                      <span className="text-theme-text-secondary mt-0.5">{entry.timestamp}</span>
                     </div>
                   </li>
                 ))}
@@ -646,7 +641,6 @@ const DefiDataHub = ({
           </div>
         </section>
       </main>
-      </div>
     </div>
   );
 };

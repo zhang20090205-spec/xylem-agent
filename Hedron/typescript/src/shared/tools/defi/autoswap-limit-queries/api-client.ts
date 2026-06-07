@@ -74,7 +74,7 @@ function accountIdToEvmAddress(accountId: string): string {
     const account = AccountId.fromString(accountId);
     return account.toSolidityAddress();
   } catch (error) {
-    throw new Error(`账户 ID 格式无效：${accountId}`);
+    throw new Error(`Invalid account ID format: ${accountId}`);
   }
 }
 
@@ -135,14 +135,14 @@ export const autoswapLimitOrdersQueryParameters = (context: Context = {}) => {
       AUTOSWAP_LIMIT_ORDERS_OPERATIONS.GET_USER_ORDERS,
       AUTOSWAP_LIMIT_ORDERS_OPERATIONS.GET_ORDER_DETAILS, 
       AUTOSWAP_LIMIT_ORDERS_OPERATIONS.GET_USER_ORDERS_WITH_DETAILS,
-    ]).describe('要执行的查询 operation'),
+    ]).describe('Query operation to perform'),
     
     userAccountId: z.string().optional().describe(
-      '用户账户 ID，格式 0.0.1234（可选；未提供时使用当前用户）'
+      'User account ID in format 0.0.1234 (optional - will use current user if not provided)'
     ),
     
     orderId: z.number().optional().describe(
-      '要查询详情的指定订单 ID（仅 get_order_details operation 需要）'
+      'Specific order ID to query details for (required only for get_order_details operation)'
     ),
   });
 };
@@ -207,7 +207,7 @@ export const AUTOSWAP_LIMIT_ORDERS_OPERATIONS = {
 
 export const AUTOSWAP_LIMIT_ORDERS_CONFIG = {
   TOOL_NAME: 'AutoSwapLimit Orders Query',
-  DESCRIPTION: '查询用户在 AutoSwapLimit 合约上的限价单及详情',
+  DESCRIPTION: 'Query user limit orders and their details on AutoSwapLimit contract',
   OPERATIONS: AUTOSWAP_LIMIT_ORDERS_OPERATIONS,
 } as const;
 
@@ -257,7 +257,7 @@ async function getUserOrdersViaRPC(
           expirationDate: '',
           isExecuted: false
         })),
-        note: `通过 RPC 找到 ${orderIds.length} 个订单 ID。请使用 get_user_orders_with_details 获取完整信息。`
+        note: `Found ${orderIds.length} order IDs via RPC. Use get_user_orders_with_details for complete information.`
       },
       contract: {
         id: networkConfig.CONTRACT_ID,
@@ -286,21 +286,21 @@ async function getOrderDetailsViaRPC(
     console.log(`✅ Retrieved order details for order ${orderId}`);
     
     let canExecute = false;
-    let canExecuteReason = '执行状态未知';
+    let canExecuteReason = 'Unknown execution status';
     
     try {
       const currentTime = Math.floor(Date.now() / 1000);
       const expired = Number(expirationTime) < currentTime;
       const [canExec, reason] = expired 
-        ? [false, '订单已过期']
+        ? [false, 'Order has expired']
         : isActive && !isExecuted 
-          ? [true, '订单可以执行']
-          : [false, '订单未激活或已执行'];
+          ? [true, 'Order can be executed']
+          : [false, 'Order is not active or already executed'];
       
       canExecute = canExec;
       canExecuteReason = reason;
     } catch (error) {
-      canExecuteReason = '无法检查执行状态';
+      canExecuteReason = 'Unable to check execution status';
     }
 
     const orderDetails: OrderDetails = {
@@ -372,7 +372,7 @@ async function getUserOrdersWithDetailsViaRPC(
           expiredOrders: 0,
           executedOrders: 0,
           orders: [],
-          message: '该用户暂无限价单。'
+          message: 'No limit orders found for this user.'
         },
         contract: {
           id: networkConfig.CONTRACT_ID,
@@ -398,23 +398,23 @@ async function getUserOrdersWithDetailsViaRPC(
         const expired = Number(expirationTime) < currentTime;
         
         let canExecute = false;
-        let canExecuteReason = '执行状态未知';
+        let canExecuteReason = 'Unknown execution status';
         
         if (expired) {
           expiredOrders++;
           canExecute = false;
-          canExecuteReason = '订单已过期';
+          canExecuteReason = 'Order has expired';
         } else if (isExecuted) {
           executedOrders++;
           canExecute = false;
-          canExecuteReason = '订单已执行';
+          canExecuteReason = 'Order already executed';
         } else if (isActive) {
           activeOrders++;
           canExecute = true;
-          canExecuteReason = '订单可以执行';
+          canExecuteReason = 'Order can be executed';
         } else {
           canExecute = false;
-          canExecuteReason = '订单未激活';
+          canExecuteReason = 'Order is not active';
         }
 
         const orderDetails: OrderDetails = {
@@ -455,7 +455,7 @@ async function getUserOrdersWithDetailsViaRPC(
         expiredOrders,
         executedOrders,
         orders,
-        message: `已获取 ${orders.length}/${orderIds.length} 个订单的详情。`
+        message: `Retrieved ${orders.length} of ${orderIds.length} orders with details.`
       },
       contract: {
         id: networkConfig.CONTRACT_ID,
@@ -489,7 +489,7 @@ export async function getAutoSwapLimitOrdersQuery(
         
       case AUTOSWAP_LIMIT_ORDERS_OPERATIONS.GET_ORDER_DETAILS:
         if (!orderId) {
-          throw new Error('get_order_details operation 需要 orderId');
+          throw new Error('orderId is required for get_order_details operation');
         }
         return await getOrderDetailsViaRPC(orderId, targetAccountId, networkConfig);
         
@@ -497,14 +497,14 @@ export async function getAutoSwapLimitOrdersQuery(
         return await getUserOrdersWithDetailsViaRPC(targetAccountId, networkConfig);
         
       default:
-        throw new Error(`不支持的 operation：${operation}`);
+        throw new Error(`Unsupported operation: ${operation}`);
     }
   } catch (error: any) {
     console.error(`❌ Error in AutoSwapLimit orders query: ${error.message}`);
     
     return {
       success: false,
-      error: error.message || '发生未知错误',
+      error: error.message || 'Unknown error occurred',
       operation,
       timestamp: new Date().toISOString(),
     };
@@ -515,15 +515,15 @@ export async function getAutoSwapLimitOrdersQuery(
 const autoswapLimitOrdersQueryTool = (context: Context): Tool => ({
   name: AUTOSWAP_LIMIT_ORDERS_QUERY_TOOL,
   method: AUTOSWAP_LIMIT_ORDERS_QUERY_TOOL,
-  description: `查询 AutoSwapLimit 合约，获取用户限价单及其详情。
+  description: `Query AutoSwapLimit contract to get user's limit orders and their details.
 
-可用 operation:
-- get_user_orders: 获取用户订单 ID 列表（基础查询）
-- get_order_details: 获取指定订单 ID 的详细信息
-- get_user_orders_with_details: 获取用户所有订单及完整详情（推荐）
+Available operations:
+- get_user_orders: Get list of order IDs for a user (basic query)
+- get_order_details: Get detailed information for a specific order ID
+- get_user_orders_with_details: Get all user orders with complete details (recommended)
 
-该工具会自动将 Account ID（0.0.1234）转换为 EVM 地址用于合约查询。
-返回包含状态、过期时间和可执行性在内的完整订单信息。`,
+This tool automatically converts Account IDs (0.0.1234) to EVM addresses for contract queries.
+Returns comprehensive order information including status, expiration, and execution ability.`,
   parameters: autoswapLimitOrdersQueryParameters(context),
   execute: async (client: any, context: Context, params: any) => {
     // Get userAccountId from context if available, otherwise use a default

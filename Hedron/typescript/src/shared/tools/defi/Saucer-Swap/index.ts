@@ -26,7 +26,7 @@ export {
 export const SAUCERSWAP_ROUTER_SWAP_TOOL_INFO = {
   name: 'SaucerSwap Router V2 Swap Tool',
   version: '1.0.0',
-  description: '使用 UniswapV2Router02 合约在 SaucerSwap DEX 执行真实 token swap',
+  description: 'Execute real token swaps on SaucerSwap DEX using UniswapV2Router02 contract',
   contractId: {
     mainnet: '0.0.3045981',  // UniswapV2Router02
     testnet: '0.0.19264'     // UniswapV2Router02 (proxy)
@@ -45,33 +45,33 @@ export const SAUCERSWAP_ROUTER_SWAP_TOOL_INFO = {
   ],
   networks: ['mainnet', 'testnet'],
   features: [
-    '直接与 UniswapV2Router02 合约交互',
-    '创建真实 token swap 交易',
-    '自动将 HBAR 转为 WHBAR',
-    '滑点保护（0.01% 到 50%）',
-    '可配置 deadline',
-    '支持 multi-hop routing',
-    '支持 exact input 与 exact output swap',
-    '支持 mainnet 与 testnet'
+    'Direct UniswapV2Router02 contract interaction',
+    'Real token swaps with transaction creation', 
+    'HBAR to WHBAR automatic conversion',
+    'Slippage protection (0.01% to 50%)',
+    'Configurable deadlines',
+    'Multi-hop routing support',
+    'Both exact input and exact output swaps',
+    'Mainnet and testnet support'
   ],
   supportedTokens: {
     mainnet: {
-      HBAR: '原生 HBAR（自动转为 WHBAR）',
+      HBAR: 'Native HBAR (auto-converts to WHBAR)',
       SAUCE: '0.0.731861',
       WHBAR: '0.0.1456986'
     },
     testnet: {
-      HBAR: '原生 HBAR（自动转为 WHBAR）',
+      HBAR: 'Native HBAR (auto-converts to WHBAR)', 
       SAUCE: '0.0.1183558',  // Corrected from official docs
       WHBAR: '0.0.15058'     // Corrected from official docs
     }
   },
   riskWarnings: [
-    '加密资产 swap 存在价格波动风险',
-    '滑点可能导致最终数量与预期不同',
-    '大额 swap 可能产生显著 price impact',
-    'swap 前请务必确认 token 地址',
-    '请确保有足够 HBAR 支付 gas 费用'
+    'Cryptocurrency swaps involve price volatility risk',
+    'Slippage may result in different final amounts than expected',
+    'Large swaps may have significant price impact',
+    'Always verify token addresses before swapping',
+    'Ensure sufficient HBAR balance for gas fees'
   ],
   usageGuidelines: {
     slippage: {
@@ -84,14 +84,14 @@ export const SAUCERSWAP_ROUTER_SWAP_TOOL_INFO = {
     amounts: {
       hbar_decimals: 8,
       sauce_decimals: 18,
-      check_token_decimals: '务必确认 token decimal places'
+      check_token_decimals: 'Always verify token decimal places'
     },
     best_practices: [
-      '从小额测试开始',
-      '大额 swap 前检查市场情况',
-      '根据 token 波动性选择合适滑点',
-      '确认收款地址正确',
-      'swap 前确认已完成 token association'
+      'Start with small test amounts',
+      'Check market conditions before large swaps',
+      'Use appropriate slippage for token volatility',
+      'Verify recipient address is correct',
+      'Ensure token association before swapping'
     ]
   }
 } as const;

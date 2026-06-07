@@ -127,7 +127,7 @@ export function useChat() {
   } = useWebSocket();
 
   // Get wallet info
-  const { address, isConnected: isWalletConnected, hashconnect, isDemoWallet } = useWallet();
+  const { address, isConnected: isWalletConnected, hashconnect } = useWallet();
 
   const currentSession = sessions.find(s => s.id === currentSessionId);
 
@@ -230,7 +230,7 @@ export function useChat() {
   };
 
   const handleTransactionToSign = async (message: WSTransactionToSign, sessionId: string) => {
-    if (!isWalletConnected || !address || (!hashconnect && !isDemoWallet)) {
+    if (!isWalletConnected || !address || !hashconnect) {
       console.error('❌ Wallet not connected for transaction signing');
       setIsLoading(false); // Clear loading since we can't proceed
       return;
@@ -248,7 +248,7 @@ export function useChat() {
 
       const transactionMessage: Message = {
         id: generateId(),
-        content: `收到待签名交易：\n查询：${message.originalQuery}\n交易大小：${message.transactionBytes.length} bytes\n\n请在钱包中签名后继续。`,
+        content: `🔏 Transaction received for signing:\n📝 Query: ${message.originalQuery}\n📊 Transaction size: ${message.transactionBytes.length} bytes\n\nThis transaction needs to be signed to proceed.`,
         sender: 'system',
         timestamp: new Date(),
         hasTransaction: true,
@@ -276,7 +276,7 @@ export function useChat() {
       
       const errorMessage: Message = {
         id: generateId(),
-        content: `处理交易失败：${error instanceof Error ? error.message : '未知错误'}`,
+        content: `❌ Failed to process transaction: ${error instanceof Error ? error.message : 'Unknown error'}`,
         sender: 'system',
         timestamp: new Date()
       };
@@ -297,47 +297,8 @@ export function useChat() {
   };
 
   const signTransactionWithWallet = async (messageId: string, transactionBytesArray: number[]) => {
-    if (isDemoWallet && address) {
-      const mockTransactionId = `${address}@${Date.now()}.000000001`;
-
-      await new Promise(resolve => setTimeout(resolve, 900));
-
-      sendTransactionResult({
-        success: true,
-        transactionId: mockTransactionId,
-        status: 'SUCCESS',
-        timestamp: Date.now()
-      });
-
-      setSessions(prev => prev.map(session => ({
-        ...session,
-        messages: session.messages.map(msg =>
-          msg.id === messageId && msg.transactionData
-            ? {
-                ...msg,
-                content: `${msg.content}\n\nDemo wallet auto-signed this transaction for the hackathon preview.`,
-                transactionData: {
-                  ...msg.transactionData,
-                  status: 'success',
-                  transactionId: mockTransactionId
-                }
-              }
-            : msg
-        )
-      })));
-
-      setPendingTransactions(prev => {
-        const newMap = new Map(prev);
-        newMap.delete(messageId);
-        return newMap;
-      });
-
-      setIsLoading(false);
-      return;
-    }
-
     if (!hashconnect || !address) {
-      throw new Error('钱包未连接');
+      throw new Error('Wallet not connected');
     }
 
     try {
@@ -394,7 +355,7 @@ export function useChat() {
           msg.id === messageId && msg.transactionData
             ? {
                 ...msg,
-                content: msg.content + '\n\n交易已签名并执行成功！',
+                content: msg.content + '\n\n✅ Transaction signed and executed successfully!',
                 transactionData: {
                   ...msg.transactionData,
                   status: 'success',
@@ -433,7 +394,7 @@ export function useChat() {
           msg.id === messageId && msg.transactionData
             ? {
                 ...msg,
-                content: msg.content + `\n\n交易签名失败：${error instanceof Error ? error.message : '未知错误'}`,
+                content: msg.content + `\n\n❌ Transaction signing failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
                 transactionData: {
                   ...msg.transactionData,
                   status: 'failed'
@@ -465,7 +426,7 @@ export function useChat() {
   const createNewSession = useCallback(() => {
     const newSession: ChatSession = {
       id: generateId(),
-      title: '新对话',
+      title: 'New Chat',
       messages: [],
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -603,7 +564,7 @@ export function useChat() {
       // Add error message to chat
       const errorMessage: Message = {
         id: generateId(),
-        content: '消息发送到后端失败，请检查连接。',
+        content: 'Failed to send message to backend. Please check your connection.',
         sender: 'system',
         timestamp: new Date(),
       };
