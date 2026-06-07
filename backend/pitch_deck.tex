@@ -1,0 +1,725 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{fontawesome5}
+% Fallback icon definitions for missing icons in fontawesome5 package
+\providecommand{\faMissed}{\faTimesCircle}
+\providecommand{\faExchangeAlt}{\faSync}
+\providecommand{\faExpandArrowsAlt}{\ensuremath{\leftrightarrow}}
+\providecommand{\faShieldAlt}{\faLock}
+\providecommand{\faUserCog}{\faUser}
+\providecommand{\faUsersCog}{\faUsers}
+\providecommand{\faNetworkWired}{\faCogs}
+\providecommand{\faLayerGroup}{\faCogs}
+\providecommand{\faSearchDollar}{\faDollarSign}
+\providecommand{\faCheckDouble}{\faCheck}
+\providecommand{\faExchange}{\faSync}
+\providecommand{\faShield}{\faLock}
+\usepackage{xcolor}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{shadowtext}
+
+% Define elegant color palette
+\definecolor{primary}{RGB}{47, 79, 79}      % Dark slate gray
+\definecolor{secondary}{RGB}{70, 130, 180}   % Steel blue  
+\definecolor{accent}{RGB}{95, 158, 160}      % Cadet blue
+\definecolor{light}{RGB}{245, 248, 250}     % Light gray-blue
+\definecolor{text}{RGB}{44, 62, 80}         % Dark blue-gray
+\definecolor{success}{RGB}{39, 174, 96}     % Elegant green
+
+% Modern minimalist theme
+\usetheme{default}
+\useinnertheme{rounded}
+\useoutertheme{infolines}
+
+% Remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% Color configuration
+\setbeamercolor{palette primary}{bg=primary,fg=white}
+\setbeamercolor{palette secondary}{bg=secondary,fg=white}
+\setbeamercolor{frametitle}{bg=primary,fg=white}
+\setbeamercolor{title}{bg=primary,fg=white}
+\setbeamercolor{structure}{fg=secondary}
+\setbeamercolor{normal text}{fg=text}
+\setbeamercolor{block title}{bg=secondary,fg=white}
+\setbeamercolor{block body}{bg=light,fg=text}
+\setbeamercolor{item}{fg=accent}
+
+% Font configuration - Smaller sizes
+\setbeamerfont{title}{size=\small,series=\bfseries}
+\setbeamerfont{frametitle}{size=\small,series=\bfseries}
+\setbeamerfont{block title}{size=\footnotesize,series=\bfseries}
+
+% Better spacing configuration - Minimal spacing
+\setlength{\parskip}{0em}
+\setbeamertemplate{itemize/enumerate body begin}{\tiny}
+\setbeamertemplate{itemize/enumerate subbody begin}{\tiny}
+
+% Block spacing - Minimal
+\addtobeamertemplate{block begin}{}{\vspace{0em}}
+\addtobeamertemplate{block end}{\vspace{0em}}{}
+
+% Increase margins further to prevent overfull hbox
+\setbeamersize{text margin left=0.9cm,text margin right=0.9cm}
+
+\title{Hedron DeFi AI Agent}
+\subtitle{AI-powered DeFi navigator \& educator \\ democratizing Hedera Hashgraph DeFi}
+\author{Sebastian Diaz \& Ashutosh Kumar}
+\institute{Hello Future Hackathon}
+\date{\today}
+
+\begin{document}
+
+% Title slide
+\begin{frame}
+\titlepage
+\end{frame}
+
+% Table of contents
+\begin{frame}{Agenda}
+\tableofcontents
+\end{frame}
+
+\section{Team Introduction}
+
+\begin{frame}{Meet Our Team}
+\vspace{0.05cm}
+\begin{columns}[c]
+\column{0.43\textwidth}
+\begin{center}
+\begin{tikzpicture}
+\node[circle, fill=secondary, text=white, minimum size=0.6cm] at (0,0) {\small \faUser};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.05cm}
+
+\begin{block}{Ashutosh Kumar}
+\centering
+\vspace{0.05cm}
+\textbf{\normalsize \color{secondary}Developer Relations} \\
+\vspace{0.05cm}
+\textsc{\normalsize India} \\
+\vspace{0.05cm}
+\begin{itemize}
+\setlength\itemsep{0em}
+\setlength\leftmargin{1em}
+\item Community Building
+\item Developer Advocacy  
+\item Technical Docs
+\end{itemize}
+\vspace{0.05cm}
+\end{block}
+
+\column{0.14\textwidth}
+% Spacer column
+
+\column{0.43\textwidth}
+\begin{center}
+\begin{tikzpicture}
+\node[circle, fill=accent, text=white, minimum size=0.6cm] at (0,0) {\small \faCode};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.05cm}
+
+\begin{block}{Sebastian Diaz}
+\centering
+\vspace{0.05cm}
+\textbf{\normalsize \color{accent}Lead Developer} \\
+\vspace{0.05cm}
+\textsc{\normalsize Colombia} \\
+\vspace{0.05cm}
+\begin{itemize}
+\setlength\itemsep{0em}
+\setlength\leftmargin{1em}
+\item Full-Stack Development
+\item AI/ML Integration
+\item Smart Contracts
+\end{itemize}
+\vspace{0.05cm}
+\end{block}
+\end{columns}
+
+\vspace{0.05cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.6]
+\node[rectangle, rounded corners, fill=light, text=text, minimum width=7cm, minimum height=0.6cm] at (0,0) {
+\footnotesize \textbf{Expertise:} Blockchain, AI, DeFi \& Communities
+};
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\section{Project Overview}
+
+\begin{frame}{The Problem We're Solving}
+\vspace{0.05cm}
+\begin{columns}[c]
+\column{0.43\textwidth}
+\begin{center}
+\begin{tikzpicture}
+\node[circle, fill=secondary, text=white, minimum size=0.8cm] at (0,0) {\normalsize \faUserGraduate};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.05cm}
+
+\begin{block}{Novice Users Challenges}
+\vspace{0.05cm}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\setlength\leftmargin{1em}
+\item[\color{accent}\faExclamationTriangle] \textbf{DeFi ecosystem complexity} overwhelming new users
+\item[\color{accent}\faQuestion] \textbf{Technical knowledge barriers} prevent participation
+\item[\color{accent}\faExclamation] \textbf{High risk of losses} from uninformed decisions
+\item[\color{accent}\faPuzzlePiece] \textbf{Fragmented information} across platforms
+\item[\color{accent}\faGraduationCap] \textbf{Lack of educational guidance} for DeFi concepts
+\end{itemize}
+\vspace{0.05cm}
+\end{block}
+
+\column{0.14\textwidth}
+% Spacer column
+
+\column{0.43\textwidth}
+\begin{center}
+\begin{tikzpicture}
+\node[circle, fill=accent, text=white, minimum size=0.6cm] at (0,0) {\small \faUserTie};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.05cm}
+
+\begin{block}{Expert Users Pain Points}
+\vspace{0.05cm}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\setlength\leftmargin{1em}
+\item[\color{secondary}\faClock] \textbf{Inefficient manual monitoring} of multiple protocols
+\item[\color{secondary}\faMissed] \textbf{Missed arbitrage opportunities} in fast markets
+\item[\color{secondary}\faChartBar] \textbf{Complex comparative analysis} between protocols
+\item[\color{secondary}\faRobot] \textbf{Lack of automation tools} for data-driven decisions
+\item[\color{secondary}\faSearchDollar] \textbf{Time-consuming yield optimization} research
+\end{itemize}
+\vspace{0.05cm}
+\end{block}
+\end{columns}
+
+\vspace{0.05cm}
+\begin{center}
+\begin{tikzpicture}
+\node[rectangle, rounded corners, fill=primary, text=white, minimum width=7cm, minimum height=0.6cm] at (0,0) {
+\footnotesize \textbf{Result:} DeFi remains inaccessible to novices while experts waste time on manual tasks
+};
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}{Our Solution: Hedron DeFi AI Agent}
+\vspace{0.05cm}
+\begin{center}
+\begin{tikzpicture}
+\node[circle, fill=success, text=white, minimum size=1.2cm] at (0,0) {\small \faRobot};
+\node[below=0.2cm] at (0,-0.8) {\footnotesize \textbf{\color{primary}AI-Powered DeFi Navigator \& Educator}};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.05cm}
+
+\begin{columns}[c]
+\column{0.28\textwidth}
+\begin{center}
+\begin{tikzpicture}
+\node[circle, fill=secondary, text=white, minimum size=0.8cm] at (0,0) {\normalsize \faComments};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.05cm}
+
+\begin{block}{Conversational AI Interface}
+\vspace{0.05cm}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\setlength\leftmargin{1em}
+\item[\color{accent}\faComment] Real-time WebSocket communication
+\item[\color{accent}\faWifi] Natural language queries
+\item[\color{accent}\faBrain] Contextual educational guidance
+\item[\color{accent}\faUserCog] Step-by-step DeFi tutorials
+\end{itemize}
+\vspace{0.05cm}
+\end{block}
+
+\column{0.28\textwidth}
+\begin{center}
+\begin{tikzpicture}
+\node[circle, fill=accent, text=white, minimum size=0.6cm] at (0,0) {\small \faChartLine};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.05cm}
+
+\begin{block}{Multi-Protocol Analysis}
+\vspace{0.05cm}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\setlength\leftmargin{1em}
+\item[\color{success}\faCheckCircle] SaucerSwap DEX (+44\% TVL)
+\item[\color{success}\faCheckCircle] Bonzo Finance lending (~\$38M)
+\item[\color{success}\faCheckCircle] AutoSwapLimit orders
+\item[\color{success}\faCheckCircle] Infinity Pool staking
+\end{itemize}
+\vspace{0.05cm}
+\end{block}
+
+\column{0.28\textwidth}
+\begin{center}
+\begin{tikzpicture}
+\node[circle, fill=primary, text=white, minimum size=0.6cm] at (0,0) {\small \faShieldAlt};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.05cm}
+
+\begin{block}{Smart Automation}
+\vspace{0.05cm}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\setlength\leftmargin{1em}
+\item[\color{primary}\faLock] Non-custodial security
+\item[\color{primary}\faSignature] External transaction signing
+\item[\color{primary}\faChartPie] Automated yield optimization
+\item[\color{primary}\faUserShield] Risk assessment tools
+\end{itemize}
+\vspace{0.05cm}
+\end{block}
+\end{columns}
+\end{frame}
+
+\section{Technical Innovation}
+
+\begin{frame}{Technical Architecture \& Innovation}
+\vspace{0.05cm}
+\begin{columns}
+\column{0.45\textwidth}
+\begin{block}{Real-Time Communication \hfill
+\begin{tikzpicture}[baseline]
+\node[circle, fill=secondary, text=white, minimum size=0.5cm] at (0,0) {\tiny \faWifi};
+\end{tikzpicture}}
+\begin{itemize}
+\item[\color{accent}\faPlug] WebSocket persistent connections
+\item[\color{accent}\faUsersCog] Multi-user session management
+\item[\color{accent}\faExchangeAlt] 7 message types flow
+\item[\color{accent}\faNetworkWired] Scalable real-time architecture
+\end{itemize}
+\end{block}
+
+\begin{block}{DeFi Integration Suite \hfill
+\begin{tikzpicture}[baseline]
+\node[circle, fill=accent, text=white, minimum size=0.5cm] at (0,0) {\tiny \faCode};
+\end{tikzpicture}}
+\begin{itemize}
+\item[\color{secondary}\faCogs] 25+ specialized tools
+\item[\color{secondary}\faShieldAlt] REST APIs \& Smart contracts
+\item[\color{secondary}\faExclamationCircle] Rate limiting \& optimization
+\item[\color{secondary}\faExpandArrowsAlt] Native HTS/HCS support
+\end{itemize}
+\end{block}
+
+\column{0.45\textwidth}
+\begin{block}{AI Intelligence Layer \hfill
+\begin{tikzpicture}[baseline]
+\node[circle, fill=primary, text=white, minimum size=0.5cm] at (0,0) {\tiny \faDatabase};
+\end{tikzpicture}}
+\begin{itemize}
+\item[\color{success}\faStopwatch] Persistent conversation memory
+\item[\color{success}\faChartLine] Educational guidance system
+\item[\color{success}\faLayerGroup] Intent-based tool routing
+\item[\color{success}\faLink] Contextual learning feedback
+\end{itemize}
+\end{block}
+
+\begin{block}{Security \& Performance \hfill
+\begin{tikzpicture}[baseline]
+\node[circle, fill=success, text=white, minimum size=0.5cm] at (0,0) {\tiny \faHashtag};
+\end{tikzpicture}}
+\begin{itemize}
+\item[\color{primary}\faCoins] Non-custodial external signing
+\item[\color{primary}\faComments] 30-second smart caching
+\item[\color{primary}\faSearchDollar] TypeScript \& Zod validation
+\item[\color{primary}\faSync] Intelligent rate limiting
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+\section{Market Integration \& Success}
+
+\begin{frame}{Comprehensive DeFi Platform Integration}
+\vspace{0.05cm}
+\begin{columns}
+\column{0.32\textwidth}
+\begin{block}{SaucerSwap Integration}
+\begin{center}
+\begin{tikzpicture}
+\node[circle, fill=secondary, text=white, minimum size=0.8cm] at (0,0) {\small \faExchange};
+\end{tikzpicture}
+\end{center}
+\vspace{0.05cm}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\item[\color{secondary}\faCheckCircle] \textbf{+44\% Hedera DeFi TVL}
+\item[\color{secondary}\faUsers] \textbf{+60\% unique wallets}
+\item[\color{secondary}\faCoins] Token swap quotes \& execution
+\item[\color{secondary}\faChartLine] Real-time price discovery
+\item[\color{secondary}\faLayerGroup] Infinity Pools staking
+\end{itemize}
+\end{block}
+
+\column{0.32\textwidth}
+\begin{block}{Bonzo Finance Integration}
+\begin{center}
+\begin{tikzpicture}
+\node[circle, fill=accent, text=white, minimum size=0.8cm] at (0,0) {\small \faUniversity};
+\end{tikzpicture}
+\end{center}
+\vspace{0.05cm}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\item[\color{accent}\faCheckCircle] \textbf{~\$38M TVL} (Q4 2024)
+\item[\color{accent}\faCogs] Aave V2 fork architecture
+\item[\color{accent}\faPercent] Supply assets for interest
+\item[\color{accent}\faChartBar] Real-time lending rates
+\item[\color{accent}\faShield] Risk assessment tools
+\end{itemize}
+\end{block}
+
+\column{0.32\textwidth}
+\begin{block}{AutoSwapLimit Features}
+\begin{center}
+\begin{tikzpicture}
+\node[circle, fill=primary, text=white, minimum size=0.8cm] at (0,0) {\small \faRobot};
+\end{tikzpicture}
+\end{center}
+\vspace{0.05cm}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\item[\color{primary}\faCheckCircle] Advanced limit order system
+\item[\color{primary}\faClock] Automated execution
+\item[\color{primary}\faBell] Price monitoring \& alerts
+\item[\color{primary}\faCog] Order management
+\item[\color{primary}\faChartLine] Strategic trading automation
+\end{itemize}
+\end{block}
+\end{columns}
+
+\vspace{0.2cm}
+\begin{center}
+\begin{tikzpicture}
+\node[rectangle, rounded corners=5pt, fill=success, text=white, minimum width=9cm, minimum height=0.8cm] at (0,0) {
+\small \textbf{Result: Comprehensive DeFi ecosystem coverage with educational guidance}
+};
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}{Comprehensive Use Cases}
+\vspace{0.05cm}
+\begin{columns}
+\column{0.47\textwidth}
+\begin{block}{\faUserGraduate\ Novice User Scenarios}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\item[\color{accent}\faQuestion] \textbf{"What are the best yield opportunities on SaucerSwap?"}
+\item[\color{accent}\faGraduationCap] \textbf{"How does lending work on Bonzo Finance?"}
+\item[\color{accent}\faLightbulb] \textbf{"What are limit orders and how can I use them?"}
+\item[\color{accent}\faShield] \textbf{"Explain DeFi risks and safety practices"}
+\item[\color{accent}\faChartLine] \textbf{"Guide me through my first yield farming"}
+\end{itemize}
+\end{block}
+
+\column{0.47\textwidth}
+\begin{block}{\faUserTie\ Expert User Scenarios}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\item[\color{secondary}\faChartBar] \textbf{"Show me best APYs between SaucerSwap and Bonzo"}
+\item[\color{secondary}\faRobot] \textbf{"Set up automated limit orders for my strategy"}
+\item[\color{secondary}\faChartPie] \textbf{"Analyze my positions across all protocols"}
+\item[\color{secondary}\faBell] \textbf{"Alert me when HBAR drops below \$0.10"}
+\item[\color{secondary}\faCoins] \textbf{"Find arbitrage opportunities in real-time"}
+\end{itemize}
+\end{block}
+\end{columns}
+
+\vspace{0.1cm}
+\begin{center}
+\begin{tikzpicture}
+\node[rectangle, rounded corners=5pt, fill=primary, text=white, minimum width=9cm, minimum height=0.8cm] at (0,0) {
+\small \textbf{From education to automation: serving both learning and earning goals}
+};
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}{Success Metrics \& Validation}
+\begin{columns}
+\column{0.47\textwidth}
+\begin{block}{\faCheckCircle\ Technical Implementation}
+\begin{itemize}
+\item \textbf{WebSocket Agent:} Multi-user real-time system
+\item \textbf{25+ DeFi Tools:} Complete integration suite
+\item \textbf{AI Intelligence:} LLM with persistent memory
+\item \textbf{7 Message Types:} Comprehensive communication
+\end{itemize}
+\end{block}
+
+\column{0.47\textwidth}
+\begin{block}{\faUsers\ Market Innovation}
+\begin{itemize}
+\item \textbf{First AI agent} with AutoSwapLimit integration
+\item \textbf{Natural language} DeFi operations
+\item \textbf{Intent-based routing} to specialized tools
+\item \textbf{External signing} for maximum security
+\end{itemize}
+\end{block}
+\end{columns}
+
+\vspace{0.05cm}
+\begin{center}
+\footnotesize \textbf{Result:} Production-ready AI agent with comprehensive Hedera DeFi integration
+\end{center}
+\end{frame}
+
+\begin{frame}{Key Benefits \& Value Proposition}
+\begin{columns}
+\column{0.47\textwidth}
+\begin{block}{\faClock\ Time \& Efficiency}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\item[\color{success}\faCheckCircle] \textbf{Time savings:} Automated analysis vs manual research
+\item[\color{success}\faRocket] \textbf{Maximized yields:} AI identifies best opportunities
+\item[\color{success}\faChartLine] \textbf{Real-time optimization:} Continuous monitoring
+\item[\color{success}\faSync] \textbf{Multi-protocol analysis:} Unified dashboard view
+\end{itemize}
+\end{block}
+
+\begin{block}{\faShieldAlt\ Security \& Education}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\item[\color{primary}\faLock] \textbf{Non-custodial:} Never holds user funds
+\item[\color{primary}\faGraduationCap] \textbf{Educational layer:} Learn while earning
+\item[\color{primary}\faExclamationTriangle] \textbf{Risk reduction:} Comparative protocol analysis
+\item[\color{primary}\faUserShield] \textbf{External signing:} Maximum security
+\end{itemize}
+\end{block}
+
+\column{0.47\textwidth}
+\begin{block}{\faUsers\ Accessibility \& Automation}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\item[\color{accent}\faHeart] \textbf{Democratizes DeFi:} Access for all skill levels
+\item[\color{accent}\faComments] \textbf{Natural language:} No technical jargon required
+\item[\color{accent}\faRobot] \textbf{Smart automation:} Intent-based tool routing
+\item[\color{accent}\faChartPie] \textbf{Contextual guidance:} Step-by-step tutorials
+\end{itemize}
+\end{block}
+
+\begin{block}{\faGlobe\ Market Impact}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\item[\color{secondary}\faArrowUp] \textbf{Increases Hedera adoption:} Easier DeFi UX
+\item[\color{secondary}\faLightbulb] \textbf{Innovation leadership:} First AI agent with AutoSwapLimit
+\item[\color{secondary}\faHandshake] \textbf{Community building:} Educational content creation
+\item[\color{secondary}\faCode] \textbf{Open source:} Contributions back to ecosystem
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+\section{Future Roadmap}
+
+\begin{frame}{Enhanced Future Roadmap}
+\begin{columns}
+\column{0.47\textwidth}
+\begin{block}{\faRocket\ Phase 1: Enhanced Features}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\item \textbf{Advanced SaucerSwap:} Liquidity pool analytics \& farming optimization
+\item \textbf{Smart alerts:} Automatic notifications for opportunities
+\item \textbf{Web dashboard:} Graphical interface complement
+\item \textbf{Enhanced tutorials:} Interactive DeFi learning modules
+\end{itemize}
+\end{block}
+
+\begin{block}{\faRobot\ Phase 2: Advanced Intelligence}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\item \textbf{Expanded Bonzo tools:} Liquidation monitoring \& advanced strategies
+\item \textbf{AutoSwapLimit improvements:} Sophisticated order types
+\item \textbf{ML predictions:} AI-powered yield forecasting
+\item \textbf{Portfolio optimization:} Automated rebalancing
+\end{itemize}
+\end{block}
+
+\column{0.47\textwidth}
+\begin{block}{\faGlobe\ Phase 3: Ecosystem Expansion}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\item \textbf{Additional protocols:} HeliSwap, Stader Labs integration
+\item \textbf{Advanced analytics:} Cross-protocol yield comparison
+\item \textbf{API access:} Third-party integrations
+\item \textbf{Enterprise solutions:} Professional trader tools
+\end{itemize}
+\end{block}
+
+\begin{block}{\faHeart\ Community Impact Goals}
+\begin{itemize}
+\setlength\itemsep{-0.1em}
+\item \textbf{Democratize DeFi:} Making complex protocols accessible
+\item \textbf{Educational mission:} Comprehensive DeFi literacy program
+\item \textbf{Hedera growth:} Driving ecosystem adoption
+\item \textbf{Open source:} Contributing tools back to community
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+\section{Demo \& Live Showcase}
+
+\begin{frame}{Live Demo Showcase}
+\begin{center}
+\large \faPlay\ \textbf{WebSocket Agent Demo}
+\end{center}
+
+\vspace{0.05cm}
+
+\begin{columns}
+\column{0.47\textwidth}
+\begin{block}{\faDesktop\ Agent Interactions}
+\begin{itemize}
+\item \textbf{CONNECTION\_AUTH:} User authentication
+\item \textbf{Natural language:} "Show me SaucerSwap yields"
+\item \textbf{SWAP\_QUOTE:} Structured price data
+\item \textbf{AutoSwapLimit:} "Set limit order 1000 SAUCE"
+\item \textbf{Multi-step flows:} Bonzo deposits
+\end{itemize}
+\end{block}
+
+\column{0.47\textwidth}
+\begin{block}{\faCode\ Technical Demo Points}
+\begin{itemize}
+\item \textbf{WebSocket messages:} Real-time communication
+\item \textbf{25+ DeFi tools:} Intelligent routing
+\item \textbf{Memory persistence:} Context awareness
+\item \textbf{Transaction flow:} External signing
+\item \textbf{Error handling:} Graceful failures
+\end{itemize}
+\end{block}
+\end{columns}
+
+\vspace{0.05cm}
+\begin{center}
+\footnotesize \textbf{Demo Command:} \texttt{npm run start:websocket}
+\end{center}
+\end{frame}
+
+\section{Conclusion}
+
+\begin{frame}{Why Hedera DeFi AI Agent Wins}
+\begin{columns}
+\column{0.47\textwidth}
+\begin{block}{\faLightbulb\ Innovation}
+\begin{itemize}
+\item \textbf{First AI WebSocket agent} for Hedera DeFi
+\item \textbf{25+ specialized tools} integration
+\item \textbf{Intent-based routing} system
+\end{itemize}
+\end{block}
+
+\begin{block}{\faCogs\ Technical Architecture}
+\begin{itemize}
+\item \textbf{Real-time WebSocket} communication
+\item \textbf{Persistent memory} for context
+\item \textbf{Multi-user sessions} support
+\end{itemize}
+\end{block}
+
+\begin{block}{\faRocket\ DeFi Integration}
+\begin{itemize}
+\item \textbf{SaucerSwap:} DEX, quotes \& Infinity Pools
+\item \textbf{Bonzo Finance:} Lending \& borrowing
+\item \textbf{AutoSwapLimit:} Advanced limit orders
+\end{itemize}
+\end{block}
+
+\column{0.47\textwidth}
+\begin{block}{\faPlug\ Agent Capabilities}
+\begin{itemize}
+\item \textbf{Natural language} DeFi operations
+\item \textbf{7 message types} for comprehensive flow
+\item \textbf{External transaction} signing
+\end{itemize}
+\end{block}
+
+\begin{block}{\faTrophy\ Market Impact}
+\begin{itemize}
+\item \textbf{Democratizes DeFi} access for all users
+\item \textbf{Reduces complexity} through AI assistance
+\item \textbf{Enables automation} without custody
+\end{itemize}
+\end{block}
+
+\begin{block}{\faCheckDouble\ Production Ready}
+\begin{itemize}
+\item \textbf{TypeScript \& Zod} validation
+\item \textbf{Comprehensive error} handling
+\item \textbf{Smart caching} \& rate limiting
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Thank You!}
+\begin{center}
+\large \faHeart\ \textbf{Thank You!}
+
+\vspace{0.2cm}
+
+\small \textbf{Questions \& Discussion}
+
+\vspace{0.3cm}
+
+\begin{columns}
+\hspace{2.5cm}
+\column{0.38\textwidth}
+\textbf{\footnotesize Sebastian Diaz}\\
+\vspace{0.05cm}
+\footnotesize Lead Developer\\
+\vspace{0.05cm}
+\footnotesize \faEnvelope\ sebas.2023@gmail.com\\
+\footnotesize \faGithub\ @rofergon
+
+\column{0.38\textwidth}
+\textbf{\footnotesize Ashutosh Kumar}\\
+\vspace{0.05cm}
+\footnotesize Developer Relations\\
+\vspace{0.05cm}
+\footnotesize \faEnvelope\ ashutosh666be@gmail.com
+\\
+\footnotesize \faGithub\ @itskumar666
+\end{columns}
+
+\vspace{0.3cm}
+
+\textbf{\footnotesize GitHub:} \hspace{0.2cm} \texttt{\footnotesize github.com/rofergon/Hedron}
+
+\vspace{0.1cm}
+
+\textbf{\footnotesize Demo:} \texttt{\footnotesize https://youtu.be/mDIc\_fJEbsw}
+\end{center}
+\end{frame}
+
+\end{document}

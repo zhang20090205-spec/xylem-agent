@@ -1,0 +1,97 @@
+name: Agent Kit Feature Request
+description: Request new functionality for the Hedera Agent Kit SDK
+title: "[FEATURE REQUEST] - "
+labels: ["feature-request"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to request a new feature for the Hedera Agent Toolkit!
+        
+        [Join the Hedera Discord Server](https://discord.gg/DNx3r3CW)
+  
+  - type: input
+    id: github-username
+    attributes:
+      label: GitHub Username
+      description: Your GitHub username for follow-up
+      placeholder: "@username"
+    validations:
+      required: false
+  
+  - type: input
+    id: discord-handle
+    attributes:
+      label: Discord Handle
+      description: Your Discord handle for community discussion
+      placeholder: "username#1234"
+    validations:
+      required: false
+  
+  - type: checkboxes
+    id: hedera-feature
+    attributes:
+      label: Feature Category
+      description: Which Hedera service(s) does this feature request relate to?
+      options:
+        - label: "HTS - Tokens & NFTs"
+        - label: "HCS - Consensus & Messaging"
+        - label: "HFS - File Storage"
+        - label: "HSCS - Smart Contracts"
+        - label: "Account/HBAR - Transfers & Management"
+        - label: "Cross-Service - Multiple services"
+        - label: "Other - Other functionality"
+    validations:
+      required: true
+  
+  - type: input
+    id: other-feature
+    attributes:
+      label: Other
+      description: If you selected "Other" above, please specify
+      placeholder: "Specify what functionality you would like to see added"
+    validations:
+      required: false
+  
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Describe your use case in the format provided
+      placeholder: "As a developer, I would like to create an application that can _______ using [Hedera Service] so that users can _______."
+      value: "As a developer, I would like to create an application that can _______ using [Hedera Service] so that users can _______."
+    validations:
+      required: true
+  
+  - type: textarea
+    id: functionality
+    attributes:
+      label: What should this tool do?
+      description: Brief description of the functionality
+      placeholder: "Describe the specific functionality you'd like to see added..."
+    validations:
+      required: true
+  
+  - type: textarea
+    id: example-usage
+    attributes:
+      label: Example Usage
+      description: How would someone use this with the conversational agent?
+      placeholder: |
+        **User:** "..."
+        **Agent:** "..."
+      value: |
+        **User:** "..."
+        **Agent:** "..."
+    validations:
+      required: true
+  
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any relevant links, similar tools, or technical details
+      placeholder: "Provide any additional context, links, or technical details that might be helpful..."
+    validations:
+      required: false

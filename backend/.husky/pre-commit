@@ -1,0 +1,31 @@
+# Load NVM and ensure Node.js version is 20 or higher
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Load the Node.js version from .node-version file
+if [ -f ".node-version" ]; then
+  NODE_VERSION=$(cat .node-version)
+  nvm use "$NODE_VERSION" 2>/dev/null || nvm install "$NODE_VERSION"
+fi
+
+# Use Node 20 if installed, else error
+REQUIRED_MAJOR=20
+CURRENT_MAJOR=$(node -v | sed 's/v\([0-9]*\).*/\1/')
+
+if [ "$CURRENT_MAJOR" -lt "$REQUIRED_MAJOR" ]; then
+  echo "❌ Node.js version $REQUIRED_MAJOR+ is required. Current version: $(node -v)"
+  echo "👉 Please run 'nvm install 20' and try again."
+  exit 1
+fi
+
+echo "✅ Node.js version $(node -v) meets requirement."
+
+cd ./typescript
+
+# Run checks
+npm test
+npm run format
+npm run lint
+
+# Stage any formatting/lint fixes
+git add .

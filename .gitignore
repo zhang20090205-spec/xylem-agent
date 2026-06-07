@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+coverage/
+*.tsbuildinfo
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+.railway-env
+
+# Logs and runtime files
+logs/
+*.log
+*.pid
+*.pid.lock
+pids/
+
+# Tooling and editor files
+.cache/
+.railway/
+.playwright-cli/
+.omx/
+.cursor/
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
