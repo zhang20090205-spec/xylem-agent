@@ -356,7 +356,7 @@ const DefiDataHub = ({
             <div className="flex items-center gap-3">
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="ether-serif text-3xl text-white/90">Xylem agent 数据中心</h1>
+                  <h1 className="ether-serif text-3xl text-white/90">Xylem 数据中心</h1>
                   <span className="ether-micro border border-orange-100/20 bg-orange-200/10 px-2 py-0.5 text-orange-50/80">
                     BETA
                   </span>

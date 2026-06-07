@@ -1,80 +1,50 @@
 # Xylem agent
 
-Xylem agent is a Hedera DeFi AI assistant with a React/Vite frontend and a WebSocket backend.
-
-## Live Server
-
-- Frontend: http://162.211.181.13/
-- Backend health: http://162.211.181.13/health
-- WebSocket: ws://162.211.181.13/ws
+Xylem agent is a Hedera DeFi AI demo with a React/Vite frontend and a TypeScript WebSocket backend.
 
 ## Project Structure
 
-- `frontend/` - React, Vite, TypeScript UI
-- `backend/` - Hedera WebSocket agent backend
-- `deploy/` - Rainyun/Nginx deployment assets
-- `ecosystem.config.cjs` - PM2 process config
+- `frontend/` - React + Vite frontend for the Xylem agent chat and DeFi data views.
+- `backend/` - Hedera agent backend and TypeScript examples, including the LangChain WebSocket agent.
 
-## Local Development
+## Local Demo
 
-Backend:
+Start the backend:
 
 ```bash
-cd backend/typescript
+cd backend/typescript/examples/langchain
 npm install
-cd examples/langchain
-npm install
-PORT=8080 HEDERA_NETWORK=testnet npm run start:websocket
+npm run websocket
 ```
 
-Frontend:
+Start the frontend:
 
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev -- --host 127.0.0.1 --port 5174
 ```
 
-## Production Build
+Open:
 
-Create real `.env` files on the server only. Do not commit secrets.
-
-Frontend production values:
-
-```env
-VITE_HEDERA_NETWORK=testnet
-VITE_WEBSOCKET_URL_PRODUCTION=ws://162.211.181.13/ws
+```text
+http://127.0.0.1:5174/
 ```
 
-Backend production values:
+The Vite dev server proxies:
 
-```env
-PORT=8080
-NODE_ENV=production
-HEDERA_NETWORK=testnet
-OPENAI_API_KEY=your_openai_key
-```
+- `/health` to `http://127.0.0.1:8080/health`
+- `/ws` to `ws://127.0.0.1:8080`
 
-## Rainyun Deployment
+For a hackathon demo, expose `http://127.0.0.1:5174` with a tunnel such as Cloudflare Tunnel. The frontend will use the public origin's `/ws` endpoint automatically.
 
-The intended server path is `/opt/xylem-agent`.
+## Environment
+
+Copy example files before running locally:
 
 ```bash
-git clone https://github.com/zhang20090205-spec/xylem-agent.git /opt/xylem-agent
-cd /opt/xylem-agent/backend/typescript
-npm install
-cd /opt/xylem-agent/backend/typescript/examples/langchain
-npm install
-cd /opt/xylem-agent/frontend
-npm install
-npm run build
-cd /opt/xylem-agent
-pm2 start ecosystem.config.cjs
-pm2 save
-cp deploy/nginx-xylem-agent.conf /etc/nginx/sites-available/xylem-agent
-ln -sf /etc/nginx/sites-available/xylem-agent /etc/nginx/sites-enabled/xylem-agent
-nginx -t
-systemctl reload nginx
+cp frontend/.env.example frontend/.env
+cp backend/typescript/examples/langchain/.env.example backend/typescript/examples/langchain/.env
 ```
 
-After deployment, rotate any temporary root password and prefer SSH key login.
+Do not commit real `.env` files. This public repository only keeps safe `.env.example` placeholders.

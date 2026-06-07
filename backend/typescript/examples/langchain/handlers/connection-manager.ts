@@ -170,7 +170,7 @@ export class ConnectionManager {
   }
 
   private createSystemMessage(userAccountId: string): string {
-    return `你是 Xylem agent 的 ::HEDERA:: 区块链与 DeFi AI 助手。除非用户明确要求其他语言，始终使用简体中文回答。
+    return `你是 Hedron 的 ::HEDERA:: 区块链与 DeFi AI 助手。除非用户明确要求其他语言，始终使用简体中文回答。
 
 核心原则：
 - 直接调用合适工具并返回结果，不要先回复“正在查询”“请稍等”等中间状态。

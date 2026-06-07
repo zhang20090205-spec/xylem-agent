@@ -137,7 +137,7 @@ export default function ChatArea({ messages, isLoading, onExecuteSwap, onSendMes
               <div className="ether-panel h-10 w-10 flex-shrink-0 overflow-hidden rounded-full">
                 <img
                   src="/hedron-bot.png"
-                  alt="Xylem agent avatar"
+                  alt="Hedron 机器人"
                   className="h-full w-full object-cover opacity-80"
                 />
               </div>

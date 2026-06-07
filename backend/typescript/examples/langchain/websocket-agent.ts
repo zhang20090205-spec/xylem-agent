@@ -41,13 +41,13 @@ class HederaWebSocketAgent {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           status: 'healthy',
-          service: 'xylem-agent-backend',
+          service: 'hedera-websocket-agent',
           timestamp: new Date().toISOString(),
           connections: this.connectionManager?.getConnectionCount() || 0
         }));
       } else {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('Xylem agent WebSocket backend - connect through port ' + port);
+        res.end('Hedron WebSocket Agent - 请通过端口 ' + port + ' 建立 WebSocket 连接');
       }
     });
 
@@ -231,8 +231,7 @@ SWAP_QUOTE 结构:
 
 // Initialize and run the agent
 async function main(): Promise<void> {
-  const port = Number(process.env.PORT || 8080);
-  const agent = new HederaWebSocketAgent(port);
+  const agent = new HederaWebSocketAgent(8080);
 
   try {
     await agent.initialize();

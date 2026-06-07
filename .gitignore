@@ -1,38 +1,36 @@
 # Dependencies
 node_modules/
-**/node_modules/
 
-# Build outputs
+# Build output
 dist/
-dist-ssr/
 build/
 coverage/
-*.tsbuildinfo
+.cache/
+.turbo/
+.vite/
+.next/
 
-# Environment and secrets
+# Environment files
 .env
 .env.*
 !.env.example
-!.env.*.example
-.railway-env
 
-# Logs and runtime files
+# Logs
 logs/
 *.log
-*.pid
-*.pid.lock
-pids/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Tooling and editor files
-.cache/
-.railway/
-.playwright-cli/
-.omx/
+# Local tools and tunnels
+.tools/
+.demo-tunnel/
+.cloudflared/
+
+# Editor and OS files
 .cursor/
-.idea/
 .vscode/
-
-# OS files
+.idea/
 .DS_Store
 Thumbs.db
-ehthumbs.db

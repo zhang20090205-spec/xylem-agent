@@ -1,6 +1,6 @@
-# Xylem agent frontend
+# Hedron 前端
 
-这是 Xylem agent 的 React + Vite + TypeScript 前端。它提供中文聊天界面，通过 WebSocket 连接 Hedera 后端，支持 WalletConnect/HashConnect 钱包连接、结构化 swap 报价卡片和 token 余额组件。
+这是 Hedron Agent 的 React + Vite + TypeScript 前端。它提供中文聊天界面，通过 WebSocket 连接 Hedera 后端，支持 WalletConnect/HashConnect 钱包连接、结构化 swap 报价卡片和 token 余额组件。
 
 ## 功能
 - 带会话管理、Markdown 渲染和富文本样式的聊天界面
@@ -19,7 +19,7 @@
 ## 快速开始
 ### 前置条件
 - Node.js 18+ 和 npm
-- 正在运行的 Xylem agent WebSocket 后端
+- 正在运行的 Hedron Agent WebSocket 后端
 - WalletConnect Project ID，可在 https://cloud.walletconnect.com 获取
 
 ### 安装

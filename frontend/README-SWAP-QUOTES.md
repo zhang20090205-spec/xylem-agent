@@ -1,6 +1,6 @@
 # 前端结构化 Swap 报价
 
-本文说明前端如何处理 Xylem agent WebSocket 后端发送的结构化 `SWAP_QUOTE` 消息。
+本文说明前端如何处理 Hedron WebSocket 后端发送的结构化 `SWAP_QUOTE` 消息。
 
 ## 消息类型
 当用户请求 swap 报价，例如“报价 10 HBAR 换 SAUCE”，后端可能发送：

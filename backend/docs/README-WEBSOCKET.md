@@ -1,6 +1,6 @@
 # WebSocket Agent 文档
 
-Xylem agent WebSocket backend 默认运行在 `8080` 端口，同时提供 `/health` 健康检查。
+Hedron WebSocket Agent 默认运行在 `8080` 端口，同时提供 `/health` 健康检查。
 
 ## 启动
 ```bash

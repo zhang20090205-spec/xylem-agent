@@ -19,8 +19,16 @@ function getWebSocketUrl(): string {
   // - 'production' when running npm run build
   const isProduction = import.meta.env.PROD; // boolean: true in production
 
-  const localUrl = import.meta.env.VITE_WEBSOCKET_URL_LOCAL || 'ws://localhost:8080';
-  const productionUrl = import.meta.env.VITE_WEBSOCKET_URL_PRODUCTION || 'ws://162.211.181.13/ws';
+  const sameOriginUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`
+      : 'ws://localhost:8080';
+  const isLocalBrowserHost =
+    typeof window !== 'undefined' &&
+    ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+  const configuredLocalUrl = import.meta.env.VITE_WEBSOCKET_URL_LOCAL || 'ws://localhost:8080';
+  const localUrl = isLocalBrowserHost ? configuredLocalUrl : sameOriginUrl;
+  const productionUrl = import.meta.env.VITE_WEBSOCKET_URL_PRODUCTION || sameOriginUrl;
 
   const selectedUrl = isProduction ? productionUrl : localUrl;
   console.log(`🌍 Environment: ${import.meta.env.MODE}, WebSocket URL: ${selectedUrl}`);

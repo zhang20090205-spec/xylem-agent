@@ -555,7 +555,7 @@ export default function ChatMessage({ message, onExecuteSwap }: ChatMessageProps
         // For bot messages, show image directly without container
         <img
           src="/hedron-bot.png"
-          alt="Xylem agent avatar"
+          alt="Hedron 机器人"
           className="h-10 w-10 flex-shrink-0 rounded-full border border-white/20 object-cover opacity-86 shadow-[0_0_30px_rgb(255_255_255_/_0.08)] transition-transform duration-200 group-hover:scale-105"
         />
       ) : (
