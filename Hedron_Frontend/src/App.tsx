@@ -312,8 +312,9 @@ function App() {
                 message={message}
                 setMessage={setMessage}
                 onSendMessage={handleSendMessage}
-                isLoading={isLoading || !isWSConnected || !isAuthenticated || !isWalletConnected}
-                isConnected={isWSConnected && isAuthenticated && isWalletConnected}
+                isLoading={isLoading}
+                isConnected={isWSConnected}
+                isReady={isWSConnected && isAuthenticated && isWalletConnected}
               />
             </div>
           </div>

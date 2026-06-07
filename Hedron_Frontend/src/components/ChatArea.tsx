@@ -65,12 +65,12 @@ export default function ChatArea({ messages, isLoading, onExecuteSwap, onSendMes
   if (messages.length === 0) {
     return (
       <div className="ether-scroll min-h-0 flex-1 overflow-y-auto">
-        <div className="relative mx-auto flex min-h-full max-w-7xl flex-col px-5 py-6 lg:px-8">
-          <section className="flex min-h-[calc(100vh-300px)] flex-1 flex-col items-center justify-center pb-20 pt-14 text-center lg:min-h-[500px] lg:pb-16 lg:pt-0">
+        <div className="relative mx-auto flex min-h-full max-w-7xl flex-col px-5 py-6 lg:px-8 lg:py-8">
+          <section className="flex min-h-[340px] flex-1 flex-col items-center justify-center pb-10 pt-12 text-center md:min-h-[420px] lg:min-h-[440px] lg:pb-12 lg:pt-4">
             <div className="ether-line-label ether-micro mb-12">
               CURRENTLY TRANSMITTING
             </div>
-            <h2 className="ether-serif max-w-5xl text-6xl leading-none text-white/88 drop-shadow-sm md:text-7xl lg:text-8xl">
+            <h2 className="ether-serif max-w-5xl text-5xl leading-none text-white/88 drop-shadow-sm md:text-7xl xl:text-8xl">
               Xylem agent
             </h2>
             <p className="ether-serif mt-8 text-2xl italic text-white/46 md:text-3xl">
@@ -82,20 +82,20 @@ export default function ChatArea({ messages, isLoading, onExecuteSwap, onSendMes
             </div>
             <button
               onClick={() => handlePromptClick(promptList[0].prompt)}
-              className="ether-button mt-12 px-12 py-5"
+              className="ether-button mt-12 max-w-full px-10 py-5 md:px-12"
             >
               TUNE IN SIMULTANEOUSLY
             </button>
           </section>
 
-            <section className="grid gap-5 pb-6 lg:pointer-events-none lg:fixed lg:bottom-44 lg:left-[22rem] lg:right-8 lg:z-10 lg:grid-cols-[1fr_360px] lg:items-end lg:pb-0">
+          <section className="grid gap-5 pb-8 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:items-end lg:pb-10">
             <div className="ether-micro ether-label hidden space-y-2 lg:block">
               <div>DATA: STREAMING</div>
               <div>ENCRYPTION: WALLET SIGNED</div>
               <div>AESTHETIC: ANALOG</div>
             </div>
 
-              <div className="ether-scroll space-y-3 lg:pointer-events-auto lg:max-h-[168px] lg:space-y-2 lg:overflow-y-auto lg:pr-1">
+            <div className="ether-scroll space-y-3 lg:max-h-[180px] lg:space-y-2 lg:overflow-y-auto lg:pr-1">
               {promptList.map((item) => (
                 <button
                   key={`${item.itemCode}-${item.prompt}`}

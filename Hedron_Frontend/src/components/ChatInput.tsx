@@ -7,6 +7,7 @@ interface ChatInputProps {
   onSendMessage: () => void;
   isLoading: boolean;
   isConnected?: boolean;
+  isReady?: boolean;
 }
 
 export default function ChatInput({
@@ -15,11 +16,12 @@ export default function ChatInput({
   onSendMessage,
   isLoading,
   isConnected = true,
+  isReady = isConnected,
 }: ChatInputProps) {
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      if (message.trim() && !isLoading && isConnected) {
+      if (message.trim() && !isLoading && isReady) {
         onSendMessage();
       }
     }
@@ -27,7 +29,10 @@ export default function ChatInput({
 
   const getPlaceholder = () => {
     if (!isConnected) {
-      return '请先连接钱包并完成认证...';
+      return '正在连接后端...';
+    }
+    if (!isReady) {
+      return '正在自动连接 demo 钱包并认证...';
     }
     if (isLoading) {
       return 'Agent 正在回复...';
@@ -40,14 +45,14 @@ export default function ChatInput({
       <div className="mx-auto max-w-4xl">
         <div className="ether-micro ether-label mb-2 flex items-center justify-between gap-3">
           <span>TRANSMISSION INPUT</span>
-          <span>{isConnected ? 'CHANNEL OPEN' : 'CHANNEL LOCKED'}</span>
+          <span>{isReady ? 'CHANNEL OPEN' : isConnected ? 'AUTHORIZING' : 'CHANNEL LOCKED'}</span>
         </div>
         <div className="flex items-end gap-3">
           <div className="relative flex-1">
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyDown}
               placeholder={getPlaceholder()}
               className="ether-field ether-scroll w-full resize-none px-5 py-4 pr-12 text-sm leading-relaxed text-white placeholder-white/42 disabled:cursor-not-allowed disabled:opacity-50"
               rows={1}
@@ -61,13 +66,13 @@ export default function ChatInput({
                 target.style.height = 'auto';
                 target.style.height = `${Math.min(target.scrollHeight, 128)}px`;
               }}
-              disabled={isLoading || !isConnected}
+              disabled={isLoading || !isReady}
             />
           </div>
 
           <button
             onClick={onSendMessage}
-            disabled={!message.trim() || isLoading || !isConnected}
+            disabled={!message.trim() || isLoading || !isReady}
             className="ether-button flex h-[54px] min-w-[54px] flex-shrink-0 items-center justify-center px-4"
             aria-label="发送消息"
           >
