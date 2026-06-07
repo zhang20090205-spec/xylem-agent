@@ -182,7 +182,7 @@ ws.onmessage = async (event) => {
 ```bash
 ACCOUNT_ID=0.0.xxxxx           # Your testnet Account ID
 PRIVATE_KEY=0x...              # Your ECDSA private key
-OPENAI_API_KEY=sk-proj-...     # Your OpenAI API key
+OPENAI_API_KEY=your-openai-api-key     # Your OpenAI-compatible API key
 ```
 
 ### WebSocket Port

@@ -1,6 +1,6 @@
 # Token Balance Display
 
-This document describes the token balance functionality added to the Hedron Frontend application.
+This document describes the token balance functionality in the Xylem agent frontend application.
 
 ## Features
 

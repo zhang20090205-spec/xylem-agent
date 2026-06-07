@@ -554,8 +554,8 @@ export default function ChatMessage({ message, onExecuteSwap }: ChatMessageProps
       {!isUser && !isSystem ? (
         // For bot messages, show image directly without container
         <img 
-          src="/hedron-bot.png" 
-          alt="Hedron Bot" 
+          src="/xylem-agent.png" 
+          alt="Xylem agent" 
           className="w-10 h-10 object-cover rounded-full flex-shrink-0 shadow-md transition-transform duration-200 group-hover:scale-105"
         />
       ) : (

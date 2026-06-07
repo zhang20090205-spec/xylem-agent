@@ -1,262 +1,143 @@
 # Xylem agent
 
-Xylem agent## 🔗 Related Repositories
+Xylem agent is an AI-powered Hedera DeFi assistant for real-time market insight, wallet-aware chat, and transaction preparation across SaucerSwap, Bonzo Finance, and AutoSwapLimit strategies.
 
-- **Frontend**: [Hedron Frontend](https://github.com/rofergon/Hedron_Frontend) - User interface for the Hedera DeFi AI Agent
-- **AutoSwapLimit Contract**: [AutomationSwapLimit](https://github.com/rofergon/AutomationSwapLimit) - Intermediate contract for limit orders
+The product is built for users who want to understand Hedera DeFi activity quickly, compare opportunities, and prepare on-chain actions through a natural-language interface while keeping transaction signing inside their own wallet.
 
-## 📜 Deployed Contracts
+## Project Description
 
-- **MockPriceOracle**: [0.0.6506125](https://hashscan.io/testnet/contract/0.0.6506125)
-- **AutoSwapLimit**: [0.0.6506134](https://hashscan.io/testnet/contract/0.0.6506134)
+Xylem agent combines a conversational AI backend with a wallet-connected web interface. The backend streams agent responses over WebSocket, loads Hedera and DeFi tools, and returns structured messages for quotes, transaction requests, system status, and normal chat responses.
 
-## 📋 Project Description
+The frontend provides the product interface: chat sessions, wallet connection through HashConnect and WalletConnect, token balances, structured swap quote cards, theme controls, and WebSocket connection status.
 
-An artificial intelligence agent specialized in the Hedera Hashgraph DeFi ecosystem that helps both novice and experienced users navigate and optimize their investments through integrated SaucerSwap DEX operations, Bonzo Finance lending protocols, and advanced AutoSwapLimit trading strategies. The agent provides real-time analysis and automated execution capabilities.
+## What It Solves
 
-## 🚀 Quick Access
+For new users, Hedera DeFi can feel fragmented across many protocols, dashboards, and contract interactions. Xylem agent turns common research and action flows into natural questions and guided responses.
 
-| 🔗 **Quick Navigation** | 📂 **Path** | 📄 **Description** |
-|------------------------|-------------|-------------------|
-| 🏦 **DeFi Tools** | [typescript/src/shared/tools/defi/](typescript/src/shared/tools/defi/) | Complete DeFi integration suite |
-| 🤖 **WebSocket Agent** | [typescript/examples/langchain/websocket-agent.ts](typescript/examples/langchain/websocket-agent.ts) | Main AI agent server |
-| 🔧 **Message Handlers** | [typescript/examples/langchain/handlers/](typescript/examples/langchain/handlers/) | WebSocket message processing |
+For experienced users, Xylem agent reduces manual monitoring by combining live protocol data, portfolio context, and transaction preparation in one interface.
 
+## Core Capabilities
 
+- AI DeFi chat for Hedera market and portfolio questions.
+- Real-time WebSocket agent responses.
+- Wallet authentication with a real Hedera account.
+- SaucerSwap token quotes and swap preparation.
+- Bonzo Finance lending and borrowing analysis.
+- AutoSwapLimit order analysis and transaction preparation.
+- Token balance display for HBAR and supported assets.
+- Session memory for ongoing conversations.
 
+## DeFi Integrations
 
-## 🎯 Problem Solved
+### SaucerSwap
 
-### For Novice Users:
-- **Complexity of the DeFi ecosystem**: New users feel overwhelmed by the number of protocols and available options
-- **Lack of technical knowledge**: Difficulty understanding concepts like liquidity mining, yield farming, lending, staking
-- **Risk of losses**: Making investment decisions without enough information can result in significant losses
-- **Fragmented information**: Data is scattered across multiple platforms without a unified view
+- Token swap quotes and execution preparation.
+- Price discovery and liquidity analysis.
+- Infinity Pool and farming opportunity research.
+- Advanced trading flows through AutoSwapLimit.
 
-### For Experienced Users:
-- **Inefficient manual monitoring**: Manually reviewing multiple protocols consumes valuable time
-- **Missed opportunities**: The best arbitrage and yield opportunities can go unnoticed
-- **Complex comparative analysis**: Comparing yields, risks, and features between protocols takes a lot of time
-- **Lack of automation**: Need for tools that facilitate data-driven decision making
+### Bonzo Finance
 
-## 💡 How It Solves the Problem
+- Lending and borrowing market data.
+- Interest rate and reserve analysis.
+- Portfolio-oriented recommendations.
+- Risk and opportunity comparison.
 
-### 🤖 Intelligent AI Agent
-- **Automated analysis**: Continuous monitoring of SaucerSwap, Bonzo Finance, and AutoSwapLimit
-- **Personalized recommendations**: Suggestions based on the user's risk profile and objectives
-- **Conversational interface**: Natural interaction via WebSocket for real-time queries
-- **Persistent context**: Conversation memory that maintains session context
+### AutoSwapLimit
 
-### 📊 Real-Time Multi-Protocol Analysis
+- Limit order preparation.
+- Order monitoring concepts.
+- Strategy-oriented trading workflows.
 
-#### Integration with APIs and Smart Contracts:
-- **REST APIs**: Direct connection to platform data endpoints
-- **Smart contracts**: Native interaction with on-chain protocols
-- **Intelligent rate limiting**: Optimized request management to avoid limitations
-- **Smart cache**: 30-second cache system to optimize performance
+## Deployed Testnet Contracts
 
-### 🏦 Integrated DeFi Platforms
+- MockPriceOracle: [0.0.6506125](https://hashscan.io/testnet/contract/0.0.6506125)
+- AutoSwapLimit: [0.0.6506134](https://hashscan.io/testnet/contract/0.0.6506134)
 
-#### 🥇 SaucerSwap
-- **Type**: DEX with AMM (Automated Market Maker)
-- **Features**: 
-  - Token swap quotes and execution
-  - Real-time price discovery
-  - Single-sided staking (Infinity Pools)
-  - Liquidity analysis
-  - Advanced trading with AutoSwapLimit orders
-- **Dominance**: +44% of total Hedera DeFi TVL and +60% of unique active wallets
+## Repository Layout
 
-#### 💰 Bonzo Finance
-- **Type**: Lending & borrowing protocol (Aave V2 fork)
-- **Features**:
-  - Supply assets to earn interest
-  - Real-time lending rates monitoring
-  - Portfolio analysis and optimization
-  - Risk assessment tools
-- **TVL**: Steady growth post-launch (~$25M in Q4 2024, later ~$38M)
+| Area | Path | Purpose |
+| --- | --- | --- |
+| Agent backend | [Hedron/typescript/examples/langchain](Hedron/typescript/examples/langchain) | WebSocket AI server and message handlers |
+| DeFi tools | [Hedron/typescript/src/shared/tools/defi](Hedron/typescript/src/shared/tools/defi) | SaucerSwap, Bonzo Finance, and AutoSwapLimit tools |
+| Frontend app | [Hedron_Frontend](Hedron_Frontend) | React, Vite, wallet connection, chat, and DeFi UI |
 
-#### 🎯 AutoSwapLimit (SaucerSwap Integration)
-- **Type**: Advanced limit order system
-- **Features**:
-  - Automated limit orders execution
-  - Price monitoring and alerts
-  - Order management and cancellation
-  - Strategic trading automation
-
-## 🛠️ Technical Architecture
-
-### 🔄 Agent Flow Diagram
-
-```mermaid
-graph TD
-    A[Client connects WebSocket] --> B{Message type}
-    
-    B -->|CONNECTION_AUTH| C[Authenticate User]
-    C --> D[Create User Connection]
-    D --> E[Initialize LLM Agent]
-    E --> F[Load Hedera Tools]
-    F --> G[Load DeFi Tools]
-    G --> H[User Authenticated ✅]
-    
-    B -->|USER_MESSAGE| I[Process User Message]
-    I --> J[Verify Authentication]
-    J --> K{User Authenticated?}
-    K -->|No| L[Send Authentication Error]
-    K -->|Yes| M[Load Conversation Memory]
-    M --> N[Execute LLM Agent]
-    N --> O[Agent analyzes message with tools]
-    
-    O --> P{Response type?}
-    P -->|Text response| Q[AGENT_RESPONSE]
-    P -->|Transaction required| R[TRANSACTION_TO_SIGN]
-    P -->|Swap quote| S[SWAP_QUOTE]
-    P -->|System message| T[SYSTEM_MESSAGE]
-    
-    Q --> U[Send response to client]
-    R --> V[Client signs transaction]
-    S --> W[Show structured quote]
-    T --> X[Show system message]
-    
-    V --> Y[TRANSACTION_RESULT]
-    B -->|TRANSACTION_RESULT| Z[Process transaction result]
-    Z --> AA[Update agent state]
-    AA --> U
-    
-    G --> BB[DeFi Tools Loading]
-    BB --> CC[🏦 Bonzo Finance<br/>- Lending/Borrowing<br/>- Portfolio Analysis<br/>- Interest Rates]
-    BB --> DD[🥇 SaucerSwap<br/>- Token Swaps<br/>- Liquidity Pools<br/>- Price Quotes]
-    BB --> EE[🎯 AutoSwapLimit<br/>- Limit Orders<br/>- Order Management<br/>- Trading Automation]
-    BB --> FF[📊 Analytics<br/>- Real-time Data<br/>- Account Balances<br/>- Market Monitoring]
-    
-    CC --> GG[Hedera Native Tools]
-    DD --> GG
-    EE --> GG
-    FF --> GG
-    
-    GG --> HH[🔗 HTS - Token Operations<br/>🗣️ HCS - Consensus Messages<br/>💰 HBAR - Transfers & Balances<br/>📋 Account Queries]
-```
-
-### 🔌 WebSocket Communication Flow
-
-1. **Connection Establishment**: Client connects to WebSocket server
-2. **Authentication**: User sends `CONNECTION_AUTH` with their Hedera account ID
-3. **Agent Initialization**: System creates personalized agent with tools and memory
-4. **Message Processing**: Agent processes user queries using integrated DeFi and Hedera tools
-5. **Response Generation**: AI generates responses, quotes, or transaction requests
-6. **Transaction Handling**: Client signs transactions externally, reports results back
-
-### 🧰 Integrated Tools Architecture
-
-#### **🏦 DeFi Tools Suite** → [📂 Browse DeFi Tools](typescript/src/shared/tools/defi/)
-
-- **[Bonzo Finance](typescript/src/shared/tools/defi/bonzo/)**: Lending & borrowing protocol integration
-- **[SaucerSwap API](typescript/src/shared/tools/defi/saucerswap-api/)**: DEX market data and analytics
-- **[SaucerSwap Quote](typescript/src/shared/tools/defi/SaucerSwap-Quote/)**: Real-time swap price quotes
-- **[SaucerSwap Router](typescript/src/shared/tools/defi/Saucer-Swap/)**: Swap execution tools
-- **[Infinity Pools](typescript/src/shared/tools/defi/SaucerSwap-InfinityPool/)**: Single-sided staking
-- **[AutoSwapLimit](typescript/src/shared/tools/defi/autoswap-limit/)**: Advanced limit order system
-- **[AutoSwap Queries](typescript/src/shared/tools/defi/autoswap-limit-queries/)**: Order monitoring tools
-
-#### **🔗 Hedera Native Tools**
-- **HTS (Hedera Token Service)**: Token operations and management
-- **HCS (Hedera Consensus Service)**: Messaging and consensus
-- **HBAR Operations**: Transfers, balance queries, account management
-- **Account Queries**: Real-time account information and token balances
-
-### 📡 WebSocket Message Types
+## WebSocket Message Types
 
 | Message Type | Direction | Purpose |
-|-------------|-----------|---------|
-| `CONNECTION_AUTH` | Client → Agent | User authentication with account ID |
-| `USER_MESSAGE` | Client → Agent | User queries and instructions |
-| `AGENT_RESPONSE` | Agent → Client | AI-generated text responses |
-| `SWAP_QUOTE` | Agent → Client | Structured swap quotation data |
-| `TRANSACTION_TO_SIGN` | Agent → Client | Transaction bytes requiring signature |
-| `TRANSACTION_RESULT` | Client → Agent | Signed transaction confirmation |
-| `SYSTEM_MESSAGE` | Agent → Client | System notifications and errors |
+| --- | --- | --- |
+| `CONNECTION_AUTH` | Client to agent | Authenticate with the connected Hedera account ID |
+| `USER_MESSAGE` | Client to agent | Send a user prompt or DeFi instruction |
+| `AGENT_RESPONSE` | Agent to client | Stream or return AI-generated text |
+| `SWAP_QUOTE` | Agent to client | Return structured swap quote data |
+| `TRANSACTION_TO_SIGN` | Agent to client | Return transaction bytes for wallet signing |
+| `TRANSACTION_RESULT` | Client to agent | Report the signed transaction result |
+| `SYSTEM_MESSAGE` | Agent to client | Return status, authentication, or error information |
 
-### 🧠 Memory Management
-- **Persistent Context**: Each user maintains conversation history
-- **Token Management**: Intelligent memory pruning to optimize performance
-- **Session Isolation**: Each WebSocket connection has independent context
-- **Auto Cleanup**: Memory cleared on disconnection
+## Quick Start
 
-### 🤖 How the Agent Works
+### Backend
 
-The Hedera DeFi AI Agent operates as an intelligent middleware between users and the Hedera DeFi ecosystem:
-
-1. **🔐 Authentication**: Users authenticate with their Hedera account ID
-2. **🧠 Personalization**: Each user gets a dedicated agent instance with memory
-3. **🔧 Tool Loading**: Agent loads 25+ specialized tools for DeFi operations
-4. **💬 Natural Language**: Users interact in plain language - no technical knowledge required
-5. **🎯 Intelligent Routing**: AI determines which tools to use based on user intent
-6. **📊 Real-time Data**: Tools fetch live data from protocols and mirror nodes
-7. **⚡ Smart Execution**: Multi-step operations handled automatically
-8. **🔒 Secure Transactions**: Users sign transactions on their side - agent never holds keys
-
-#### **Example User Journey:**
-```
-User: "Show me the best yield opportunities on SaucerSwap"
-├── Agent analyzes intent: yield opportunities + SaucerSwap
-├── Calls SaucerSwap API tools for pool data
-├── Calls Infinity Pool tools for staking rewards
-├── Processes and ranks opportunities
-└── Returns formatted analysis with APYs and risks
-
-User: "Set up a limit order to sell 1000 SAUCE at $0.15"
-├── Agent processes: limit order + SAUCE + price target
-├── Calls AutoSwapLimit tools to prepare order
-├── Generates transaction bytes
-├── Sends TRANSACTION_TO_SIGN message
-├── User signs transaction externally
-└── Agent confirms order creation
+```bash
+cd Hedron/typescript/examples/langchain
+npm install
+cp .env.example .env
+npm run start:websocket
 ```
 
+The backend listens on `ws://localhost:8080` by default.
 
-## 🚀 Quick Start
+### Frontend
 
-### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn package manager
+```bash
+cd Hedron_Frontend
+npm install
+cp .env.example .env
+npm run dev
+```
 
-### Installation & Startup
+The frontend starts on the Vite development URL printed in the terminal, usually `http://localhost:5173`.
 
-1. **Navigate to the langchain directory:**
-   ```bash
-   cd typescript/examples/langchain
-   ```
+## Environment Variables
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+Backend `.env`:
 
-3. **Start the WebSocket agent:**
-   ```bash
-   npm run start:websocket
-   ```
+```env
+OPENAI_API_KEY=your-openai-compatible-api-key
+OPENAI_BASE_URL=https://modcon.top
+LLM_MODEL=gpt-4o-mini
+ACCOUNT_ID=your-hedera-account-id
+PRIVATE_KEY=your-hedera-private-key
+HEDERA_NETWORK=testnet
+PORT=8080
+```
 
-The agent will start and be ready to accept WebSocket connections for real-time DeFi analysis and recommendations.
----
+Frontend `.env`:
 
-## 📄 License
+```env
+VITE_WALLETCONNECT_PROJECT_ID=your-walletconnect-project-id
+VITE_HEDERA_NETWORK=testnet
+VITE_WEBSOCKET_URL_LOCAL=ws://localhost:8080
+# VITE_WEBSOCKET_URL_PRODUCTION=wss://your-public-demo-host/ws
+```
 
-This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0)**.
+Xylem agent requires a real wallet connection for authenticated chat and transaction signing. The public repository only includes `.env.example` files. Real API keys, wallet keys, and deployment secrets must stay in local `.env` files.
 
-### What this means:
+## Local Demo Checklist
 
-✅ **You can:**
-- Share and redistribute the code
-- Adapt and modify the code
-- Use for personal, educational, and research purposes
+1. Start the backend and confirm the WebSocket server is listening on port `8080`.
+2. Start the frontend with `npm run dev`.
+3. Open the Vite URL in a browser.
+4. Connect a Hedera wallet through HashConnect.
+5. Send a prompt such as `Show me SaucerSwap farming opportunities`.
+6. Confirm the frontend receives `AGENT_RESPONSE`, `SWAP_QUOTE`, or `TRANSACTION_TO_SIGN` messages as appropriate.
 
-❌ **You cannot:**
-- Use for commercial purposes without explicit permission
-- Distribute modified versions under a different license
+## Security Notes
 
-### For Commercial Use:
-If you want to use this project for commercial purposes, please contact the project maintainers for licensing options.
+- Do not commit `.env`, `.env.production`, private keys, API keys, logs, `node_modules`, or `dist`.
+- The agent prepares transactions, but users sign transactions from their wallet.
+- For public demos, use testnet accounts and rotate temporary keys after the event.
 
-### Attribution:
-When using this project, please provide appropriate credit and link to this repository.
+## License And Credits
+
+Xylem agent uses open-source Hedera ecosystem tooling and third-party packages. Package-level licenses are preserved in the relevant package metadata.

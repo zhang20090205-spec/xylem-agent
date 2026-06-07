@@ -62,8 +62,8 @@ export default function ChatArea({ messages, isLoading, onExecuteSwap, onSendMes
           <div className="text-center mb-16">
             <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-theme-lg">
               <img 
-                src="/hedron-bot.png" 
-                alt="Hedron Bot" 
+                src="/xylem-agent.png" 
+                alt="Xylem agent" 
                 className="w-20 h-20 object-cover rounded-full"
               />
             </div>
@@ -145,8 +145,8 @@ export default function ChatArea({ messages, isLoading, onExecuteSwap, onSendMes
             <div className="flex gap-4 group">
               <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-theme-md">
                 <img 
-                  src="/hedron-bot.png" 
-                  alt="Hedron Bot" 
+                  src="/xylem-agent.png" 
+                  alt="Xylem agent" 
                   className="w-10 h-10 object-cover rounded-full"
                 />
               </div>

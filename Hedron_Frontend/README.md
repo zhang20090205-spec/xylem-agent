@@ -1,113 +1,79 @@
-## Hedron Frontend
+## Xylem agent frontend
 
-A modern React + Vite TypeScript frontend for the Hedron Agent. It provides a conversational UI connected to a Hedera-enabled backend via WebSocket, WalletConnect/HashConnect wallet integration, and a live token balance widget.
+The Xylem agent frontend is a React, Vite, and TypeScript interface for the Hedera DeFi AI agent. It provides wallet connection, chat sessions, WebSocket authentication, token balances, structured swap quote rendering, and transaction signing handoff.
 
 ### Features
-- Chat interface with session management, Markdown rendering, and rich message styling
-- Wallet connection via HashConnect (WalletConnect v2) with robust lifecycle management
-- WebSocket connectivity to the Hedron Agent backend with auto-reconnect and auth flow
-- Structured swap quotes rendering (specialized quote card and execution hook)
-- Token balances (HBAR and common tokens) with USD estimates, updated periodically
-- Light/Dark theme toggle and responsive layout
+
+- Chat interface with session management and Markdown rendering.
+- Wallet connection through HashConnect and WalletConnect v2.
+- WebSocket connectivity to the Xylem agent backend with reconnect and auth flow.
+- Structured swap quote cards and transaction signing handoff.
+- HBAR and token balance display with USD estimates.
+- Light and dark theme support.
 
 ### Tech Stack
-- React 18, TypeScript, Vite 5
-- TailwindCSS for styling
-- HashConnect and Hedera SDK for wallet integration
-- lucide-react for icons, react-markdown for message rendering
+
+- React 18, TypeScript, Vite 5.
+- TailwindCSS for styling.
+- HashConnect and Hedera SDK for wallet integration.
+- lucide-react for icons and react-markdown for message rendering.
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+ and npm
-- A running Hedron Agent backend over WebSocket (local or hosted)
-- A WalletConnect Project ID (free from WalletConnect Cloud)
+
+- Node.js 18+ and npm.
+- A running Xylem agent backend over WebSocket.
+- A WalletConnect Project ID from WalletConnect Cloud.
 
 ### Installation
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Create a `.env` file in the project root (same level as `package.json`). See Environment Variables below.
 
-### Run (Development)
 ```bash
+npm install
+cp .env.example .env
 npm run dev
 ```
-The app starts on the default Vite dev server (usually `http://localhost:5173`).
 
-### Build & Preview
+The app starts on the default Vite dev server, usually `http://localhost:5173`.
+
+### Build And Preview
+
 ```bash
 npm run build
 npm run preview
 ```
 
 ## Environment Variables
-Add these to your `.env` (or `.env.local`) as needed. All variables are read with the `VITE_` prefix.
 
-- `VITE_WALLETCONNECT_PROJECT_ID` (required): Your WalletConnect Cloud Project ID. Get one from [cloud.walletconnect.com](https://cloud.walletconnect.com).
-- `VITE_HEDERA_NETWORK` (optional): One of `mainnet`, `testnet`, or `previewnet`. Defaults to `mainnet`.
-- `VITE_WEBSOCKET_URL_LOCAL` (optional): Local WebSocket URL for development. Defaults to `ws://localhost:8080`.
-- `VITE_WEBSOCKET_URL_PRODUCTION` (optional): Production WebSocket URL. Defaults to `wss://hedron-production.up.railway.app`.
-
-Example `.env`:
 ```env
 VITE_WALLETCONNECT_PROJECT_ID=your-project-id
 VITE_HEDERA_NETWORK=testnet
 VITE_WEBSOCKET_URL_LOCAL=ws://localhost:8080
-# VITE_WEBSOCKET_URL_PRODUCTION=wss://your-hosted-agent.example.com
+# VITE_WEBSOCKET_URL_PRODUCTION=wss://your-public-demo-host/ws
 ```
 
-## Project Structure (high-level)
-- `src/App.tsx`: Main layout, headers, connection status, and composition
-- `src/components/ChatArea.tsx`: Scrollable chat area with example prompt grid (when empty)
-- `src/components/ChatMessage.tsx`: Renders messages, Markdown, inline icons, tables, copy-to-clipboard, and transaction status
-- `src/components/ChatInput.tsx`: Input box with send actions
-- `src/components/WalletButton.tsx`: Connect/disconnect button with error and helper UI
-- `src/components/TokenBalances.tsx`: Balance widget (compact/full)
-- `src/components/TokenDebugger.tsx`: Development-only helper to inspect tokens
-- `src/hooks/useChat.ts`: Sessions, message handling, swap-quote detection, signing flow handoff
-- `src/hooks/useWebSocket.ts`: WebSocket connection, auth, reconnect, message dispatch
-- `src/hooks/useWallet.ts`: HashConnect singleton, pairing modal lifecycle, connect/disconnect helpers
-- `src/hooks/useTokenBalances.ts`: Mirror Node + price fetching and formatting
-- `src/config/hashconnect.ts`: HashConnect factory with network selection
+`VITE_WALLETCONNECT_PROJECT_ID` is required for wallet connection. The app uses `VITE_WEBSOCKET_URL_LOCAL` during development and `VITE_WEBSOCKET_URL_PRODUCTION` for production builds.
 
-## WebSocket & Auth Flow
-- The URL is selected by build mode: development uses `VITE_WEBSOCKET_URL_LOCAL`, production uses `VITE_WEBSOCKET_URL_PRODUCTION` (with sensible defaults).
-- The app authenticates the WebSocket connection using the connected Hedera account ID.
-- Connection status is displayed in the header (connecting/disconnected/wallet required/authenticating/ready).
+## Project Structure
 
-## Wallet Integration (HashConnect)
-- Requires `VITE_WALLETCONNECT_PROJECT_ID`.
-- Network is selected via `VITE_HEDERA_NETWORK` (`mainnet`, `testnet`, `previewnet`).
-- The wallet pairing modal is managed defensively to avoid duplicate popups during hot reloads.
+- `src/App.tsx`: Main layout, status, and product composition.
+- `src/components/ChatArea.tsx`: Scrollable chat area with example prompts.
+- `src/components/ChatMessage.tsx`: Rich message rendering and transaction status.
+- `src/components/ChatInput.tsx`: Prompt input and send controls.
+- `src/components/WalletButton.tsx`: Connect and disconnect wallet actions.
+- `src/components/TokenBalances.tsx`: Token balance display.
+- `src/hooks/useChat.ts`: Sessions, message handling, quote detection, and signing handoff.
+- `src/hooks/useWebSocket.ts`: WebSocket connection, auth, reconnect, and message dispatch.
+- `src/hooks/useWallet.ts`: HashConnect lifecycle and wallet helpers.
+- `src/hooks/useTokenBalances.ts`: Mirror Node and price fetching.
+- `src/config/hashconnect.ts`: Wallet metadata and network selection.
 
-## Token Balances
-- Uses Hedera Mirror Node REST API (network is selected by `VITE_HEDERA_NETWORK`).
-- Prices fetched from CoinGecko (HBAR, SAUCE) with fallbacks; updated every 5 minutes.
-- Known tokens (HBAR, SAUCE, USDC, BONZO, WHBAR) are preconfigured in `useTokenBalances`.
+## Wallet Flow
 
-## Swap Quotes
-- Structured `SWAP_QUOTE` messages render a dedicated `SwapQuoteCard` in the chat when present.
-- Free-form agent messages are also parsed heuristically for quote details.
-- Executing a quote triggers a message back to the agent; signing is routed to the wallet.
+Xylem agent requires a real wallet connection. After the wallet connects, the frontend sends `CONNECTION_AUTH` with the Hedera account ID and unlocks chat interaction when the backend confirms authentication.
 
-## Development Notes
-- Token icons live in `public/` and are referenced by components and Markdown rendering.
-- `TokenDebugger` is only shown in development builds.
-- The signing flow in `useChat` uses HashConnect and includes a simulated success path if SDK type conflicts prevent direct result handling.
+## Security Notes
 
-## Scripts
-- `npm run dev`: Start Vite dev server
-- `npm run build`: Production build
-- `npm run preview`: Preview the production build locally
-- `npm run lint`: Run ESLint
-
-## Troubleshooting
-- Wallet button shows “Configuration Required”: set `VITE_WALLETCONNECT_PROJECT_ID` and restart the dev server.
-- WebSocket “Disconnected”: ensure your backend is running at `VITE_WEBSOCKET_URL_LOCAL` (default `ws://localhost:8080`).
-- Wrong network balances: verify `VITE_HEDERA_NETWORK` matches your account and tokens.
-- Icons not showing: confirm images exist in `public/` and paths match.
-
-## License
-No license specified.
+- Do not commit real `.env` files.
+- Do not put API keys in frontend code.
+- Use testnet accounts for demos and rotate temporary credentials after the event.

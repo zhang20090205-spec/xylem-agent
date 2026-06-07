@@ -42,7 +42,7 @@ Set the network and operator credentials as usual for Hedera SDK usage.
 ```bash
 HEDERA_NETWORK=testnet # or mainnet
 HEDERA_ACCOUNT_ID=0.0.xxxxxxx
-PRIVATE_KEY=302e0201... # ECDSA private key
+PRIVATE_KEY=your-hedera-private-key # ECDSA private key
 ```
 
 ### Installation

@@ -1,7 +1,7 @@
 {
-  "name": "hedron-websocket-agent",
+  "name": "xylem-agent-backend",
   "version": "1.0.0",
-  "description": "Hedera WebSocket Agent deployment for Railway",
+  "description": "Xylem agent WebSocket backend",
   "main": "typescript/examples/langchain/websocket-agent.ts",
   "scripts": {
     "build": "echo Build complete",
@@ -30,6 +30,6 @@
     "agent",
     "blockchain"
   ],
-  "author": "Hedron Team",
+  "author": "Xylem agent team",
   "license": "Apache-2.0"
 }

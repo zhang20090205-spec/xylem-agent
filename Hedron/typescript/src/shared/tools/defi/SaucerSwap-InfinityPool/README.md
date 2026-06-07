@@ -99,7 +99,7 @@ Required for Hedera SDK usage (operator for direct execution mode):
 ```bash
 HEDERA_NETWORK=mainnet # or testnet
 HEDERA_ACCOUNT_ID=0.0.xxxxxxx
-PRIVATE_KEY=302e0201...    # ED25519 or ECDSA private key for Hedera SDK
+PRIVATE_KEY=your-hedera-private-key    # ED25519 or ECDSA private key for Hedera SDK
 ```
 
 Additional (only for direct EVM transaction signing path used by this tool):
