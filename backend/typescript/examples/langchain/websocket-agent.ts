@@ -18,7 +18,9 @@ const FORCE_CLEAR_MEMORY = process.env.FORCE_CLEAR_MEMORY === 'true';
 
 // Enhanced LLM Configuration Constants
 const MAX_TOKENS = parseInt(process.env.LLM_MAX_TOKENS || '12000');
-const MODEL_NAME = process.env.LLM_MODEL || 'gpt-5-mini';
+const MODEL_NAME = process.env.LLM_MODEL || 'gpt-5.4';
+const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || process.env.OPENAI_API_BASE_URL;
+const OPENAI_USE_RESPONSES_API = process.env.OPENAI_USE_RESPONSES_API === 'true';
 // GPT-5 models only support temperature=1 (default), so we use 1 for GPT-5 models
 const TEMPERATURE = MODEL_NAME.startsWith('gpt-5') ? 1 : parseFloat(process.env.LLM_TEMPERATURE || '0.7');
 
@@ -65,6 +67,9 @@ class HederaWebSocketAgent {
     // Log enhanced configuration
     console.log(`LLM 配置：`);
     console.log(`   - Model: ${MODEL_NAME}`);
+    console.log(`   - Base URL: ${OPENAI_BASE_URL || 'default OpenAI endpoint'}`);
+    console.log(`   - API Key: ${process.env.OPENAI_API_KEY ? 'configured' : 'missing'}`);
+    console.log(`   - Responses API: ${OPENAI_USE_RESPONSES_API ? 'enabled' : 'auto/default'}`);
     console.log(`   - Max Tokens: ${MAX_TOKENS}`);
     console.log(`   - Temperature: ${TEMPERATURE}${MODEL_NAME.startsWith('gpt-5') ? '（已为 GPT-5 自动调整）' : ''}`);
     if (MODEL_NAME.startsWith('gpt-5')) {
@@ -80,6 +85,9 @@ class HederaWebSocketAgent {
 
     this.llm = new ChatOpenAI({
       model: MODEL_NAME,
+      apiKey: process.env.OPENAI_API_KEY,
+      configuration: OPENAI_BASE_URL ? { baseURL: OPENAI_BASE_URL } : undefined,
+      useResponsesApi: OPENAI_USE_RESPONSES_API,
       temperature: TEMPERATURE,
       maxTokens: MAX_TOKENS,
       streaming: false, // Disable streaming for better token management
@@ -231,7 +239,8 @@ SWAP_QUOTE 结构:
 
 // Initialize and run the agent
 async function main(): Promise<void> {
-  const agent = new HederaWebSocketAgent(8080);
+  const port = parseInt(process.env.PORT || '8080', 10);
+  const agent = new HederaWebSocketAgent(port);
 
   try {
     await agent.initialize();

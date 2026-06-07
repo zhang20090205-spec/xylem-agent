@@ -127,7 +127,7 @@ export function useChat() {
   } = useWebSocket();
 
   // Get wallet info
-  const { address, isConnected: isWalletConnected, hashconnect } = useWallet();
+  const { address, isConnected: isWalletConnected, hashconnect, isDemoWallet } = useWallet();
 
   const currentSession = sessions.find(s => s.id === currentSessionId);
 
@@ -230,7 +230,7 @@ export function useChat() {
   };
 
   const handleTransactionToSign = async (message: WSTransactionToSign, sessionId: string) => {
-    if (!isWalletConnected || !address || !hashconnect) {
+    if (!isWalletConnected || !address || (!hashconnect && !isDemoWallet)) {
       console.error('❌ Wallet not connected for transaction signing');
       setIsLoading(false); // Clear loading since we can't proceed
       return;
@@ -297,6 +297,45 @@ export function useChat() {
   };
 
   const signTransactionWithWallet = async (messageId: string, transactionBytesArray: number[]) => {
+    if (isDemoWallet && address) {
+      const mockTransactionId = `${address}@${Date.now()}.000000001`;
+
+      await new Promise(resolve => setTimeout(resolve, 900));
+
+      sendTransactionResult({
+        success: true,
+        transactionId: mockTransactionId,
+        status: 'SUCCESS',
+        timestamp: Date.now()
+      });
+
+      setSessions(prev => prev.map(session => ({
+        ...session,
+        messages: session.messages.map(msg =>
+          msg.id === messageId && msg.transactionData
+            ? {
+                ...msg,
+                content: `${msg.content}\n\nDemo wallet auto-signed this transaction for the hackathon preview.`,
+                transactionData: {
+                  ...msg.transactionData,
+                  status: 'success',
+                  transactionId: mockTransactionId
+                }
+              }
+            : msg
+        )
+      })));
+
+      setPendingTransactions(prev => {
+        const newMap = new Map(prev);
+        newMap.delete(messageId);
+        return newMap;
+      });
+
+      setIsLoading(false);
+      return;
+    }
+
     if (!hashconnect || !address) {
       throw new Error('钱包未连接');
     }

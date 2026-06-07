@@ -18,10 +18,11 @@ export default function WalletButton({ variant = 'full', className = '' }: Walle
     disconnect,
     formatAddress,
     error,
+    isDemoWallet,
   } = useWallet();
 
   const [showConfigHelp, setShowConfigHelp] = useState(false);
-  const hasInvalidProjectId = projectId === 'your-project-id-here' || !projectId;
+  const hasInvalidProjectId = !isDemoWallet && (projectId === 'your-project-id-here' || !projectId);
   const hasProblem = error || hasInvalidProjectId;
 
   const icon = isConnecting ? (
@@ -38,18 +39,20 @@ export default function WalletButton({ variant = 'full', className = '' }: Walle
     ? '连接中'
     : hasProblem
       ? '需要配置'
+      : isDemoWallet
+        ? `DEMO ${formatAddress(address!)}`
       : isConnected
         ? formatAddress(address!)
         : '连接钱包';
 
-  const subLabel = isConnected ? chain?.name || '未知网络' : hasProblem ? '缺少 Project ID' : 'HashConnect';
+  const subLabel = isDemoWallet ? 'Auto-connected demo wallet' : isConnected ? chain?.name || '未知网络' : hasProblem ? '缺少 Project ID' : 'HashConnect';
 
   if (variant === 'compact') {
     return (
       <div className="relative">
         <button
-          onClick={isConnected ? disconnect : connect}
-          disabled={isConnecting || hasInvalidProjectId}
+          onClick={isDemoWallet ? undefined : isConnected ? disconnect : connect}
+          disabled={isDemoWallet || isConnecting || hasInvalidProjectId}
           className={`ether-button flex h-10 w-10 items-center justify-center ${
             hasProblem ? 'text-red-100' : isConnected ? 'text-emerald-100' : ''
           } ${className}`}
@@ -76,8 +79,8 @@ export default function WalletButton({ variant = 'full', className = '' }: Walle
   return (
     <div className="relative">
       <button
-        onClick={isConnected ? disconnect : connect}
-        disabled={isConnecting || hasInvalidProjectId}
+        onClick={isDemoWallet ? undefined : isConnected ? disconnect : connect}
+        disabled={isDemoWallet || isConnecting || hasInvalidProjectId}
         className={`ether-button flex items-center gap-2.5 px-4 py-2.5 ${
           hasProblem ? 'text-red-100' : isConnected ? 'text-emerald-100' : ''
         } ${className}`}
