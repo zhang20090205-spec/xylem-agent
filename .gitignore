@@ -1,4 +1,4 @@
-# Dependencies
+﻿# Dependencies
 node_modules/
 
 # Build output
@@ -10,7 +10,7 @@ coverage/
 .vite/
 .next/
 
-# Environment files
+# Environment and secrets
 .env
 .env.*
 !.env.example
@@ -23,10 +23,13 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Local tools and tunnels
+# Local tools and orchestration
+.omx/
+omx/
 .tools/
 .demo-tunnel/
-.cloudflared/
+.playwright-cli/
+.verify/
 
 # Editor and OS files
 .cursor/
